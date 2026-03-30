@@ -7,8 +7,8 @@ import nodemailer from 'nodemailer'
 function getMailer() {
   return nodemailer.createTransport({
     host: process.env.MAIL_HOST,
-    port: Number(process.env.MAIL_PORT) || 465,
-    secure: true,
+    port: Number(process.env.MAIL_PORT) || 587,
+    secure: false,
     auth: {
       user: process.env.MAIL_USER,
       pass: process.env.MAIL_PASSWORD,
@@ -35,11 +35,8 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     notes: analysis.notes,
   })
 
-  // Segna come inviata subito, poi manda l'email in background
-  markAsSent(Number(params.id))
-
   const mailer = getMailer()
-  mailer.sendMail({
+  await mailer.sendMail({
     from: `"YouGlamour" <${process.env.MAIL_USER}>`,
     to: analysis.customer_email,
     subject: `La tua analisi armocromatica — ${analysis.customer_name}`,
@@ -69,7 +66,8 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
         contentType: 'application/pdf',
       },
     ],
-  }).catch(err => console.error('Email send error:', err))
+  })
 
+  markAsSent(Number(params.id))
   return NextResponse.json({ ok: true })
 }

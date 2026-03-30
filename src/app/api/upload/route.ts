@@ -12,8 +12,8 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 function getMailer() {
   return nodemailer.createTransport({
     host: process.env.MAIL_HOST,
-    port: Number(process.env.MAIL_PORT) || 465,
-    secure: true,
+    port: Number(process.env.MAIL_PORT) || 587,
+    secure: false,
     auth: {
       user: process.env.MAIL_USER,
       pass: process.env.MAIL_PASSWORD,
@@ -61,10 +61,10 @@ export async function POST(req: NextRequest) {
       photos: photoPaths,
     })
 
-    // 4 & 5. Email in background — non bloccano la risposta
     const mailer = getMailer()
-    Promise.allSettled([
-      mailer.sendMail({
+
+    // 4. Email di notifica a Veronica
+    await mailer.sendMail({
       from: `"YouGlamour" <${process.env.MAIL_USER}>`,
       to: process.env.NOTIFY_EMAIL,
       subject: `🎨 Nuova analisi da fare — ${customerName} (${season})`,
@@ -84,8 +84,10 @@ export async function POST(req: NextRequest) {
           </p>
         </div>
       `,
-    }),
-      mailer.sendMail({
+    })
+
+    // 5. Email di conferma all'utente
+    await mailer.sendMail({
       from: `"YouGlamour" <${process.env.MAIL_USER}>`,
       to: customerEmail,
       subject: `✨ Abbiamo ricevuto le tue foto — ${customerName}!`,
@@ -113,8 +115,7 @@ export async function POST(req: NextRequest) {
           </p>
         </div>
       `,
-    }),
-    ]).catch(err => console.error('Email error:', err))
+    })
 
     return NextResponse.json({ success: true })
   } catch (err: any) {
