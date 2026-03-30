@@ -35,8 +35,11 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     notes: analysis.notes,
   })
 
+  // Segna come inviata subito, poi manda l'email in background
+  markAsSent(Number(params.id))
+
   const mailer = getMailer()
-  await mailer.sendMail({
+  mailer.sendMail({
     from: `"YouGlamour" <${process.env.MAIL_USER}>`,
     to: analysis.customer_email,
     subject: `La tua analisi armocromatica — ${analysis.customer_name}`,
@@ -66,8 +69,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
         contentType: 'application/pdf',
       },
     ],
-  })
+  }).catch(err => console.error('Email send error:', err))
 
-  markAsSent(Number(params.id))
   return NextResponse.json({ ok: true })
 }

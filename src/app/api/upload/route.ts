@@ -61,10 +61,10 @@ export async function POST(req: NextRequest) {
       photos: photoPaths,
     })
 
+    // 4 & 5. Email in background — non bloccano la risposta
     const mailer = getMailer()
-
-    // 4. Email di notifica a Veronica
-    await mailer.sendMail({
+    Promise.allSettled([
+      mailer.sendMail({
       from: `"YouGlamour" <${process.env.MAIL_USER}>`,
       to: process.env.NOTIFY_EMAIL,
       subject: `🎨 Nuova analisi da fare — ${customerName} (${season})`,
@@ -84,10 +84,8 @@ export async function POST(req: NextRequest) {
           </p>
         </div>
       `,
-    })
-
-    // 5. Email di conferma all'utente
-    await mailer.sendMail({
+    }),
+      mailer.sendMail({
       from: `"YouGlamour" <${process.env.MAIL_USER}>`,
       to: customerEmail,
       subject: `✨ Abbiamo ricevuto le tue foto — ${customerName}!`,
@@ -115,7 +113,8 @@ export async function POST(req: NextRequest) {
           </p>
         </div>
       `,
-    })
+    }),
+    ]).catch(err => console.error('Email error:', err))
 
     return NextResponse.json({ success: true })
   } catch (err: any) {
