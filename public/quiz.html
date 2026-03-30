@@ -608,6 +608,31 @@ function showResult() {
       <div class="result-description">${d.description.map(p=>`<p>${p}</p>`).join('')}</div>
     </div>
 
+    <!-- ── UPSELL ── -->
+    <div class="upsell-section" id="upsell-box">
+      <div class="upsell-badge">✦ Analisi professionale</div>
+      <h2 class="upsell-title">Vuoi sapere esattamente<br><em>chi sei davvero</em>?</h2>
+      <p class="upsell-sub">Il test ti ha dato la stagione — ma ogni stagione ha <strong>4 sottogruppi</strong> con palette diverse. Con l'analisi personalizzata scopri il tuo sottogruppo preciso e ricevi un PDF su misura.</p>
+
+      <div class="upsell-features">
+        <div class="upsell-feat"><span class="upsell-feat-icon">🎨</span><div><strong>Sottogruppo preciso</strong><br>Es. Inverno Puro, Inverno Freddo, Inverno Scuro...</div></div>
+        <div class="upsell-feat"><span class="upsell-feat-icon">📄</span><div><strong>PDF personalizzato</strong><br>Palette 30+ colori, make-up, abbinamenti outfit</div></div>
+        <div class="upsell-feat"><span class="upsell-feat-icon">📸</span><div><strong>Analisi sulle tue foto</strong><br>Carichi viso, occhi, polso — analizziamo noi</div></div>
+        <div class="upsell-feat"><span class="upsell-feat-icon">⚡</span><div><strong>Risposta in 48 ore</strong><br>Ricevi tutto direttamente via email</div></div>
+      </div>
+
+      <div class="upsell-cta-wrap">
+        <div class="upsell-price">
+          <span class="upsell-price-num">7€</span>
+          <span class="upsell-price-note">pagamento sicuro • una tantum</span>
+        </div>
+        <button class="btn-upsell" onclick="startCheckout()" id="btn-upsell">
+          Voglio l'analisi personalizzata →
+        </button>
+      </div>
+      <p class="upsell-guarantee">🔒 Pagamento sicuro con Stripe • Soddisfatta o rimborsata</p>
+    </div>
+
     <div class="palette-section">
       <div class="palette-label">✦ La tua palette colori</div>
       <div class="palette-swatches">${d.palette.map(c=>`<div class="swatch" style="background:${c};"></div>`).join('')}</div>
@@ -635,31 +660,6 @@ function showResult() {
     <div class="restart-wrap">
       <p style="font-size:14px;color:var(--muted);margin-bottom:20px;">Vuoi rifare il test o condividerlo con un'amica?</p>
       <button class="btn-restart" onclick="restartQuiz()">↺ Rifai il Test</button>
-    </div>
-
-    <!-- ── UPSELL ── -->
-    <div class="upsell-section" id="upsell-box">
-      <div class="upsell-badge">✦ Analisi professionale</div>
-      <h2 class="upsell-title">Vuoi sapere esattamente<br><em>chi sei davvero</em>?</h2>
-      <p class="upsell-sub">Il test ti ha dato la stagione — ma ogni stagione ha <strong>4 sottogruppi</strong> con palette diverse. Con l'analisi personalizzata scopri il tuo sottogruppo preciso e ricevi un PDF su misura.</p>
-
-      <div class="upsell-features">
-        <div class="upsell-feat"><span class="upsell-feat-icon">🎨</span><div><strong>Sottogruppo preciso</strong><br>Es. Inverno Puro, Inverno Freddo, Inverno Scuro...</div></div>
-        <div class="upsell-feat"><span class="upsell-feat-icon">📄</span><div><strong>PDF personalizzato</strong><br>Palette 30+ colori, make-up, abbinamenti outfit</div></div>
-        <div class="upsell-feat"><span class="upsell-feat-icon">📸</span><div><strong>Analisi sulle tue foto</strong><br>Carichi viso, occhi, polso — analizziamo noi</div></div>
-        <div class="upsell-feat"><span class="upsell-feat-icon">⚡</span><div><strong>Risposta in 48 ore</strong><br>Ricevi tutto direttamente via email</div></div>
-      </div>
-
-      <div class="upsell-cta-wrap">
-        <div class="upsell-price">
-          <span class="upsell-price-num">25€</span>
-          <span class="upsell-price-note">pagamento sicuro • una tantum</span>
-        </div>
-        <button class="btn-upsell" onclick="startCheckout()" id="btn-upsell">
-          Voglio l'analisi personalizzata →
-        </button>
-      </div>
-      <p class="upsell-guarantee">🔒 Pagamento sicuro con Stripe • Soddisfatta o rimborsata</p>
     </div>`;
 }
 
