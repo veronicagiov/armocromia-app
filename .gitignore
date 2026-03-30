@@ -13,6 +13,9 @@ out/
 # Database e foto caricate dagli utenti
 data/
 
+# Claude Code config (contiene permessi locali)
+.claude/settings.local.json
+
 # macOS
 .DS_Store
 
