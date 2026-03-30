@@ -9,7 +9,7 @@
 <style>
   :root {
     --cream: #ffffff;
-    --warm-white: #fff9f4;
+    --warm-white: #ffffff;
     --charcoal: #1a1614;
     --muted: #7a6e68;
     --gold: #c9a96e;
@@ -22,7 +22,7 @@
 
   /* ── HERO ── */
   .hero { position: relative; min-height: 100vh; display: flex; align-items: center; justify-content: center; flex-direction: column; text-align: center; padding: 60px 24px; overflow: hidden; }
-  .hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 80% 70% at 50% 0%, #f0e6d8 0%, transparent 65%), radial-gradient(ellipse 60% 50% at 100% 100%, #e8d8ee 0%, transparent 55%), radial-gradient(ellipse 50% 40% at 0% 80%, #d8e8e0 0%, transparent 55%); pointer-events: none; }
+  .hero::before { display: none; }
   .hero-badge { font-size: 11px; font-weight: 500; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); background: rgba(201,169,110,0.1); border: 1px solid rgba(201,169,110,0.3); padding: 8px 20px; border-radius: 100px; margin-bottom: 32px; display: inline-block; position: relative; }
   .hero h1 { font-family: 'Cormorant Garamond', serif; font-size: clamp(40px,7vw,84px); font-weight: 300; line-height: 1.05; letter-spacing: -1px; max-width: 700px; margin-bottom: 24px; position: relative; }
   .hero h1 em { font-style: italic; color: var(--gold); }
@@ -57,7 +57,7 @@
 
   .option-card { border: 1.5px solid var(--border); border-radius: 16px; overflow: hidden; cursor: pointer; transition: all .25s; background: var(--warm-white); position: relative; }
   .option-card:hover { border-color: var(--gold); transform: translateY(-3px); box-shadow: var(--shadow-hover); }
-  .option-card.selected { border-color: var(--gold); background: #fffaf4; box-shadow: 0 0 0 3px rgba(201,169,110,0.2); }
+  .option-card.selected { border-color: var(--gold); background: #ffffff; box-shadow: 0 0 0 3px rgba(201,169,110,0.2); }
   .check-badge { display: none; position: absolute; top: 10px; right: 10px; width: 26px; height: 26px; background: var(--gold); color: white; border-radius: 50%; font-size: 13px; align-items: center; justify-content: center; font-weight: 700; z-index: 2; }
   .option-card.selected .check-badge { display: flex; }
   .opt-img { width: 100%; aspect-ratio: 4/3; background-size: cover; background-position: center; }
@@ -66,8 +66,8 @@
   .opt-caption { display: block; font-size: 11px; font-weight: 600; color: var(--muted); margin-bottom: 5px; letter-spacing: .5px; }
 
   .option-text { border: 1.5px solid var(--border); border-radius: 12px; padding: 18px 20px; cursor: pointer; transition: all .2s; background: var(--warm-white); display: flex; align-items: center; gap: 14px; }
-  .option-text:hover { border-color: var(--gold); background: #fffaf4; transform: translateX(4px); }
-  .option-text.selected { border-color: var(--gold); background: #fffaf4; box-shadow: 0 0 0 3px rgba(201,169,110,0.15); }
+  .option-text:hover { border-color: var(--gold); background: #ffffff; transform: translateX(4px); }
+  .option-text.selected { border-color: var(--gold); background: #ffffff; box-shadow: 0 0 0 3px rgba(201,169,110,0.15); }
   .option-dot { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--border); flex-shrink: 0; transition: all .2s; display: flex; align-items: center; justify-content: center; }
   .option-text.selected .option-dot { background: var(--gold); border-color: var(--gold); }
   .option-text.selected .option-dot::after { content: ''; width: 8px; height: 8px; background: white; border-radius: 50%; display: block; }
