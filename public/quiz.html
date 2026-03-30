@@ -474,7 +474,7 @@ function sel(qIdx, optIdx) {
   answers[qIdx] = optIdx;
   document.getElementById('btn-next').disabled = false;
   document.querySelectorAll('.option-card,.option-text').forEach((el,i) => el.classList.toggle('selected', i===optIdx));
-  setTimeout(function() { nextQuestion(); }, 1000);
+  setTimeout(function() { nextQuestion(); }, 500);
 }
 
 function nextQuestion() {
