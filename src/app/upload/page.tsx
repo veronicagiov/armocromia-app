@@ -58,7 +58,7 @@ function UploadContent() {
   }
 
   return (
-    <main style={{ minHeight: '100vh', background: '#faf7f2', fontFamily: "'DM Sans', sans-serif", padding: '40px 24px 80px' }}>
+    <main style={{ minHeight: '100vh', background: '#ffffff', fontFamily: "'DM Sans', sans-serif", padding: '40px 24px 80px' }}>
       <div style={{ maxWidth: 560, margin: '0 auto' }}>
 
         {/* Header */}
@@ -75,7 +75,7 @@ function UploadContent() {
         </div>
 
         {/* Istruzioni foto */}
-        <div style={{ background: '#fff9f4', border: '1px solid #e8e0d8', borderRadius: 16, padding: 24, marginBottom: 32 }}>
+        <div style={{ background: '#ffffff', border: '1px solid #e8e0d8', borderRadius: 16, padding: 24, marginBottom: 32 }}>
           <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: 1.5, textTransform: 'uppercase' as const, color: '#c9a96e', marginBottom: 16 }}>Come fare le foto</p>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
             {[
@@ -84,7 +84,7 @@ function UploadContent() {
               ['👁️', 'Occhi in primo piano', 'Vedi bene il colore'],
               ['🤚', 'Polso interno', 'Si vedono le venature'],
             ].map(([icon, title, desc]) => (
-              <div key={title} style={{ background: '#faf7f2', borderRadius: 12, padding: '12px 14px' }}>
+              <div key={title} style={{ background: '#ffffff', borderRadius: 12, padding: '12px 14px' }}>
                 <span style={{ fontSize: 20, display: 'block', marginBottom: 6 }}>{icon}</span>
                 <span style={{ fontSize: 13, fontWeight: 600, display: 'block', marginBottom: 2 }}>{title}</span>
                 <span style={{ fontSize: 12, color: '#7a6e68' }}>{desc}</span>
@@ -101,7 +101,7 @@ function UploadContent() {
           style={{
             border: '2px dashed #e8e0d8', borderRadius: 16, padding: '32px 24px',
             textAlign: 'center' as const, cursor: 'pointer', marginBottom: 24,
-            background: '#fff9f4', transition: 'border-color .2s',
+            background: '#ffffff', transition: 'border-color .2s',
           }}
           onMouseEnter={e => (e.currentTarget.style.borderColor = '#c9a96e')}
           onMouseLeave={e => (e.currentTarget.style.borderColor = '#e8e0d8')}
@@ -139,7 +139,7 @@ function UploadContent() {
           <input
             type="email" value={email} onChange={e => setEmail(e.target.value)}
             placeholder="Es. sofia@email.com"
-            style={{ width: '100%', padding: '14px 18px', border: '1.5px solid #e8e0d8', borderRadius: 10, fontSize: 15, background: '#faf7f2', color: '#1a1614', outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' as const }}
+            style={{ width: '100%', padding: '14px 18px', border: '1.5px solid #e8e0d8', borderRadius: 10, fontSize: 15, background: '#ffffff', color: '#1a1614', outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' as const }}
           />
         </div>
 
@@ -150,7 +150,7 @@ function UploadContent() {
             value={notes} onChange={e => setNotes(e.target.value)}
             placeholder="Es. ho i capelli tinti, uso spesso fondotinta beige, ecc."
             rows={3}
-            style={{ width: '100%', padding: '14px 18px', border: '1.5px solid #e8e0d8', borderRadius: 10, fontSize: 14, background: '#faf7f2', color: '#1a1614', outline: 'none', fontFamily: 'inherit', resize: 'vertical' as const, boxSizing: 'border-box' as const }}
+            style={{ width: '100%', padding: '14px 18px', border: '1.5px solid #e8e0d8', borderRadius: 10, fontSize: 14, background: '#ffffff', color: '#1a1614', outline: 'none', fontFamily: 'inherit', resize: 'vertical' as const, boxSizing: 'border-box' as const }}
           />
         </div>
 
@@ -160,7 +160,7 @@ function UploadContent() {
           onClick={handleSubmit}
           disabled={loading}
           style={{
-            width: '100%', background: loading ? '#888' : '#1a1614', color: '#faf7f2',
+            width: '100%', background: loading ? '#888' : '#1a1614', color: '#ffffff',
             border: 'none', padding: '17px', borderRadius: 12, fontSize: 15,
             fontWeight: 500, cursor: loading ? 'not-allowed' : 'pointer',
             fontFamily: 'inherit', transition: 'background .2s',
@@ -179,7 +179,7 @@ function UploadContent() {
 
 export default function UploadPage() {
   return (
-    <Suspense fallback={<div style={{ minHeight: '100vh', background: '#faf7f2', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'sans-serif', color: '#7a6e68' }}>Caricamento...</div>}>
+    <Suspense fallback={<div style={{ minHeight: '100vh', background: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'sans-serif', color: '#7a6e68' }}>Caricamento...</div>}>
       <UploadContent />
     </Suspense>
   )

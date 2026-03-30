@@ -1,6 +1,6 @@
 export default function GraziePage() {
   return (
-    <main style={{ minHeight: '100vh', background: '#faf7f2', fontFamily: "'DM Sans', sans-serif", display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 24px' }}>
+    <main style={{ minHeight: '100vh', background: '#ffffff', fontFamily: "'DM Sans', sans-serif", display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 24px' }}>
       <div style={{ maxWidth: 500, width: '100%', textAlign: 'center' as const }}>
 
         <span style={{ fontSize: 56, display: 'block', marginBottom: 24 }}>✨</span>
@@ -12,7 +12,7 @@ export default function GraziePage() {
           Le tue foto sono al sicuro. Analizzeremo il tuo sottogruppo armocromatico e ti invieremo il PDF personalizzato entro <strong>48 ore</strong>.
         </p>
 
-        <div style={{ background: '#fff9f4', border: '1px solid #e8e0d8', borderRadius: 16, padding: 24, marginBottom: 40, textAlign: 'left' as const }}>
+        <div style={{ background: '#ffffff', border: '1px solid #e8e0d8', borderRadius: 16, padding: 24, marginBottom: 40, textAlign: 'left' as const }}>
           <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: 1.5, textTransform: 'uppercase' as const, color: '#c9a96e', marginBottom: 16 }}>Cosa troverai nel PDF</p>
           {[
             '🎨 Il tuo sottogruppo preciso (es. Inverno Puro, Inverno Freddo...)',
