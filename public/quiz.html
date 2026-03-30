@@ -612,6 +612,9 @@ function showResult() {
       <div class="result-subtitle">Armocromia ${d.en}</div>
       <div class="result-divider" style="background:${d.badge_color};"></div>
       <div class="result-description">${d.description.map(p=>`<p>${p}</p>`).join('')}</div>
+      <button onclick="document.getElementById('upsell-box').scrollIntoView({behavior:'smooth'})" style="margin-top:28px;background:none;border:1.5px solid ${d.badge_color};color:${d.badge_color};padding:12px 28px;border-radius:100px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;letter-spacing:0.5px;transition:all .2s;" onmouseover="this.style.background='${d.badge_color}';this.style.color='#fff'" onmouseout="this.style.background='none';this.style.color='${d.badge_color}'">
+        ✦ Scopri il tuo sottogruppo →
+      </button>
     </div>
 
     <div class="palette-section">

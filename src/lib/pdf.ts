@@ -15,6 +15,8 @@ interface SeasonInfo {
   makeup: { label: string; value: string }[]
   styleAdvice: string[]
   subgroups: Record<string, string>
+  bookLink: string
+  bookTitle: string
 }
 
 // Colori dal sottogruppo confinante
@@ -196,6 +198,8 @@ const SEASON_DATA: Record<string, SeasonInfo> = {
       'Spring Bright':
         "La Spring Bright tende verso l'Inverno. I tuoi colori migliori sono vividi e contrastati, con una chiarezza quasi cristallina. Il corallo acceso, il turchese brillante ti stanno divinamente.",
     },
+    bookLink: 'https://www.amazon.it/Armocromia-Palette-Spring-Larmadio-primavera/dp/B0BW345QJC/',
+    bookTitle: 'Armocromia Palette Spring — L\'armadio della primavera',
   },
 
   Estate: {
@@ -260,6 +264,8 @@ const SEASON_DATA: Record<string, SeasonInfo> = {
       'Summer Cool':
         "La Summer Cool tende verso l'Inverno. Puoi gestire colori più profondi mantenendo il sottotono freddo: prugna, blu periwinkle, bordeaux rosato. Hai più contrasto rispetto alle altre Estati.",
     },
+    bookLink: 'https://www.amazon.it/Armocromia-Palette-Summer-Larmadio-perfetto/dp/B0BKS91Y61/',
+    bookTitle: "Armocromia Palette Summer — L'armadio perfetto",
   },
 
   Autunno: {
@@ -324,6 +330,8 @@ const SEASON_DATA: Record<string, SeasonInfo> = {
       'Autumn Deep':
         "L'Autumn Deep è l'Autunno più profondo e scuro. I tuoi colori migliori sono intensi: borgogna scuro, marrone cioccolato, verde bottiglia, prugna calda. Puoi gestire più contrasto grazie alla profondità della tua colorazione.",
     },
+    bookLink: 'https://www.amazon.it/Armocromia-Palette-Autumn-Larmadio-perfetto/dp/B0BRZ7H2KX/',
+    bookTitle: "Armocromia Palette Autumn — L'armadio perfetto",
   },
 
   Inverno: {
@@ -388,6 +396,8 @@ const SEASON_DATA: Record<string, SeasonInfo> = {
       'Winter Deep':
         "Il Winter Deep è l'Inverno più profondo e scuro. I tuoi colori migliori sono intensi e ricchi: nero, bordeaux profondo, blu notte, verde smeraldo scuro. La tua colorazione ha una profondità rara.",
     },
+    bookLink: 'https://www.amazon.it/Armocromia-Palette-Winter-Larmadio-perfetto/dp/B0B4K1BXVF/',
+    bookTitle: "Armocromia Palette Winter — L'armadio perfetto",
   },
 }
 
@@ -610,8 +620,15 @@ export function generatePDF(input: PDFInput): Promise<Buffer> {
       MARGIN, by + 74, { width: CONTENT_W, align: 'center', lineBreak: false }
     )
 
-    doc.fontSize(10).font('Helvetica').fillColor('#AAAAAA').text('Hai domande? Scrivici a', MARGIN, 460, { width: CONTENT_W, align: 'center', lineBreak: false })
-    doc.fontSize(11).font('Helvetica').fillColor(data.accent).text('veronica@youglamour.it', MARGIN, 478, { width: CONTENT_W, align: 'center', lineBreak: false })
+    // Box libro consigliato
+    doc.fontSize(8).font('Helvetica').fillColor('#AAAAAA').text('APPROFONDISCI', MARGIN, 460, { width: CONTENT_W, align: 'center', characterSpacing: 1.5, lineBreak: false })
+    doc.fontSize(10).font('Helvetica').fillColor('#555555').text('📚 Il libro della tua stagione:', MARGIN, 476, { width: CONTENT_W, align: 'center', lineBreak: false })
+    doc.fontSize(10).font('Helvetica').fillColor(data.accent)
+      .text(data.bookTitle, MARGIN, 492, { width: CONTENT_W, align: 'center', lineBreak: false, link: data.bookLink, underline: true })
+    doc.fontSize(9).font('Helvetica').fillColor('#AAAAAA').text('→ Scopri su Amazon', MARGIN, 508, { width: CONTENT_W, align: 'center', lineBreak: false, link: data.bookLink })
+
+    doc.fontSize(10).font('Helvetica').fillColor('#AAAAAA').text('Hai domande? Scrivici a', MARGIN, 536, { width: CONTENT_W, align: 'center', lineBreak: false })
+    doc.fontSize(11).font('Helvetica').fillColor(data.accent).text('veronica@youglamour.it', MARGIN, 554, { width: CONTENT_W, align: 'center', lineBreak: false, link: 'mailto:veronica@youglamour.it' })
 
     doc.end()
   })
