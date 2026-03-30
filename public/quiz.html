@@ -226,7 +226,6 @@
   <div id="question-container"></div>
   <div class="quiz-nav">
     <button class="btn-back" id="btn-back" onclick="prevQuestion()" style="display:none">← Indietro</button>
-    <button class="btn-next" id="btn-next" onclick="nextQuestion()" disabled>Continua →</button>
   </div>
 </section>
 
@@ -427,7 +426,6 @@ function renderQuestion(idx) {
   document.getElementById('q-counter').textContent = `${idx+1} / ${questions.length}`;
   document.getElementById('progress-fill').style.width = `${(idx/questions.length)*100}%`;
   document.getElementById('btn-back').style.display = idx > 0 ? 'block' : 'none';
-  document.getElementById('btn-next').disabled = answers[idx] === undefined;
 
   let html = '';
   if (q.type === 'gradient') {
@@ -472,7 +470,6 @@ function renderQuestion(idx) {
 
 function sel(qIdx, optIdx) {
   answers[qIdx] = optIdx;
-  document.getElementById('btn-next').disabled = false;
   document.querySelectorAll('.option-card,.option-text').forEach((el,i) => el.classList.toggle('selected', i===optIdx));
   setTimeout(function() { nextQuestion(); }, 500);
 }
