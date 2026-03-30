@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Test Armocromia – Scopri la Tua Stagione</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #faf7f2;
+    --warm-white: #fff9f4;
+    --charcoal: #1a1614;
+    --muted: #7a6e68;
+    --gold: #c9a96e;
+    --border: #e8e0d8;
+    --shadow: 0 4px 32px rgba(26,22,20,0.08);
+    --shadow-hover: 0 8px 48px rgba(26,22,20,0.15);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--charcoal); min-height: 100vh; overflow-x: hidden; }
+
+  /* ── HERO ── */
+  .hero { position: relative; min-height: 100vh; display: flex; align-items: center; justify-content: center; flex-direction: column; text-align: center; padding: 60px 24px; overflow: hidden; }
+  .hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 80% 70% at 50% 0%, #f0e6d8 0%, transparent 65%), radial-gradient(ellipse 60% 50% at 100% 100%, #e8d8ee 0%, transparent 55%), radial-gradient(ellipse 50% 40% at 0% 80%, #d8e8e0 0%, transparent 55%); pointer-events: none; }
+  .hero-badge { font-size: 11px; font-weight: 500; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); background: rgba(201,169,110,0.1); border: 1px solid rgba(201,169,110,0.3); padding: 8px 20px; border-radius: 100px; margin-bottom: 32px; display: inline-block; position: relative; }
+  .hero h1 { font-family: 'Cormorant Garamond', serif; font-size: clamp(40px,7vw,84px); font-weight: 300; line-height: 1.05; letter-spacing: -1px; max-width: 700px; margin-bottom: 24px; position: relative; }
+  .hero h1 em { font-style: italic; color: var(--gold); }
+  .hero p { font-size: 16px; font-weight: 300; color: var(--muted); max-width: 440px; line-height: 1.7; margin-bottom: 48px; position: relative; }
+  .btn-start { background: var(--charcoal); color: var(--cream); border: none; padding: 18px 52px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; letter-spacing: 1.5px; text-transform: uppercase; border-radius: 100px; cursor: pointer; transition: all .3s; box-shadow: 0 4px 20px rgba(26,22,20,0.2); position: relative; }
+  .btn-start:hover { background: var(--gold); transform: translateY(-2px); }
+  .seasons-strip { display: flex; gap: 12px; margin-top: 64px; flex-wrap: wrap; justify-content: center; position: relative; }
+  .season-chip { padding: 8px 20px; border-radius: 100px; font-size: 13px; font-weight: 500; border: 1px solid var(--border); }
+  .season-chip.spring { background: rgba(232,168,124,0.12); color: #b86d3e; border-color: rgba(232,168,124,0.4); }
+  .season-chip.summer { background: rgba(184,169,201,0.12); color: #7a5e9a; border-color: rgba(184,169,201,0.4); }
+  .season-chip.autumn { background: rgba(196,128,74,0.12); color: #9a5822; border-color: rgba(196,128,74,0.4); }
+  .season-chip.winter { background: rgba(107,140,186,0.12); color: #3d6096; border-color: rgba(107,140,186,0.4); }
+
+  /* ── QUIZ ── */
+  #quiz-section { display: none; min-height: 100vh; padding: 0 24px 80px; max-width: 780px; margin: 0 auto; }
+  .progress-bar-wrap { margin-bottom: 40px; position: sticky; top: 0; background: var(--cream); padding: 20px 0 16px; z-index: 10; border-bottom: 1px solid var(--border); }
+  .progress-info { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .progress-info .label { font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); }
+  .progress-info .counter { font-family: 'Cormorant Garamond', serif; font-size: 20px; color: var(--gold); }
+  .progress-track { height: 2px; background: var(--border); border-radius: 2px; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--gold), #e8a87c); border-radius: 2px; transition: width .5s cubic-bezier(.4,0,.2,1); width: 0%; }
+  .question-card { animation: fadeUp .4s ease forwards; }
+  @keyframes fadeUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
+  .q-number { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); font-weight: 500; margin-bottom: 12px; }
+  .q-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(26px,4vw,42px); font-weight: 300; line-height: 1.2; margin-bottom: 10px; }
+  .q-subtitle { font-size: 14px; color: var(--muted); margin-bottom: 36px; line-height: 1.6; }
+
+  .options-grid { display: grid; gap: 16px; }
+  .options-grid.cols-2 { grid-template-columns: 1fr 1fr; }
+  .options-grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+  .options-grid.cols-1 { grid-template-columns: 1fr; }
+
+  .option-card { border: 1.5px solid var(--border); border-radius: 16px; overflow: hidden; cursor: pointer; transition: all .25s; background: var(--warm-white); position: relative; }
+  .option-card:hover { border-color: var(--gold); transform: translateY(-3px); box-shadow: var(--shadow-hover); }
+  .option-card.selected { border-color: var(--gold); background: #fffaf4; box-shadow: 0 0 0 3px rgba(201,169,110,0.2); }
+  .check-badge { display: none; position: absolute; top: 10px; right: 10px; width: 26px; height: 26px; background: var(--gold); color: white; border-radius: 50%; font-size: 13px; align-items: center; justify-content: center; font-weight: 700; z-index: 2; }
+  .option-card.selected .check-badge { display: flex; }
+  .opt-img { width: 100%; aspect-ratio: 4/3; background-size: cover; background-position: center; }
+  .color-top { width: 100%; height: 90px; }
+  .option-label { padding: 14px 16px; font-size: 13px; font-weight: 400; line-height: 1.4; color: var(--charcoal); }
+  .opt-caption { display: block; font-size: 11px; font-weight: 600; color: var(--muted); margin-bottom: 5px; letter-spacing: .5px; }
+
+  .option-text { border: 1.5px solid var(--border); border-radius: 12px; padding: 18px 20px; cursor: pointer; transition: all .2s; background: var(--warm-white); display: flex; align-items: center; gap: 14px; }
+  .option-text:hover { border-color: var(--gold); background: #fffaf4; transform: translateX(4px); }
+  .option-text.selected { border-color: var(--gold); background: #fffaf4; box-shadow: 0 0 0 3px rgba(201,169,110,0.15); }
+  .option-dot { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--border); flex-shrink: 0; transition: all .2s; display: flex; align-items: center; justify-content: center; }
+  .option-text.selected .option-dot { background: var(--gold); border-color: var(--gold); }
+  .option-text.selected .option-dot::after { content: ''; width: 8px; height: 8px; background: white; border-radius: 50%; display: block; }
+  .option-text-label { font-size: 15px; color: var(--charcoal); line-height: 1.4; }
+
+  .quiz-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 48px; gap: 16px; }
+  .btn-back { background: transparent; border: 1.5px solid var(--border); color: var(--muted); padding: 14px 32px; border-radius: 100px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; transition: all .2s; }
+  .btn-back:hover { border-color: var(--charcoal); color: var(--charcoal); }
+  .btn-next { background: var(--charcoal); color: var(--cream); border: none; padding: 14px 40px; border-radius: 100px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; transition: all .3s; margin-left: auto; }
+  .btn-next:hover:not(:disabled) { background: var(--gold); transform: translateY(-1px); }
+  .btn-next:disabled { opacity: .35; cursor: not-allowed; }
+
+  /* ── LEAD ── */
+  #lead-section { display: none; min-height: 100vh; align-items: center; justify-content: center; padding: 60px 24px; }
+  .lead-card { background: var(--warm-white); border: 1px solid var(--border); border-radius: 24px; padding: 56px 48px; max-width: 480px; width: 100%; text-align: center; box-shadow: var(--shadow); animation: fadeUp .5s ease; margin: 0 auto; }
+  .lead-card h2 { font-family: 'Cormorant Garamond', serif; font-size: 34px; font-weight: 300; line-height: 1.2; margin-bottom: 12px; }
+  .lead-card > p { font-size: 15px; color: var(--muted); line-height: 1.6; margin-bottom: 36px; }
+  .form-group { text-align: left; margin-bottom: 20px; }
+  .form-group label { display: block; font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; font-weight: 500; }
+  .form-group input { width: 100%; padding: 14px 18px; border: 1.5px solid var(--border); border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 15px; background: var(--cream); color: var(--charcoal); outline: none; transition: border-color .2s; }
+  .form-group input:focus { border-color: var(--gold); }
+  .input-error { border-color: #cc4444 !important; }
+  .btn-reveal { width: 100%; background: var(--charcoal); color: var(--cream); border: none; padding: 17px; border-radius: 12px; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 500; cursor: pointer; transition: all .3s; margin-top: 8px; }
+  .btn-reveal:hover { background: var(--gold); transform: translateY(-1px); }
+  .privacy-note { font-size: 12px; color: var(--muted); margin-top: 16px; line-height: 1.5; }
+
+  /* ── RESULT ── */
+  #result-section { display: none; padding: 60px 24px 100px; max-width: 860px; margin: 0 auto; animation: fadeUp .6s ease forwards; }
+  .result-header { text-align: center; margin-bottom: 56px; }
+  .result-season-badge { display: inline-block; padding: 10px 28px; border-radius: 100px; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; font-weight: 500; margin-bottom: 24px; }
+  .result-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(56px,10vw,110px); font-weight: 300; line-height: 1; margin-bottom: 8px; letter-spacing: -2px; }
+  .result-subtitle { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-style: italic; color: var(--muted); margin-bottom: 40px; }
+  .result-divider { width: 60px; height: 1px; margin: 0 auto 40px; }
+  .result-description { font-size: 16px; line-height: 1.85; color: var(--charcoal); max-width: 640px; margin: 0 auto; text-align: left; }
+  .result-description p { margin-bottom: 18px; }
+
+  /* Palette */
+  .palette-section { margin: 48px 0; text-align: center; }
+  .palette-label { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); margin-bottom: 20px; }
+  .palette-swatches { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+  .swatch { width: 52px; height: 52px; border-radius: 50%; box-shadow: 0 2px 12px rgba(0,0,0,.12); transition: transform .2s; }
+  .swatch:hover { transform: scale(1.2); }
+
+  /* Book */
+  .books-section { margin: 64px 0 0; }
+  .books-intro { text-align: center; margin-bottom: 36px; }
+  .books-intro .section-title-sm { font-family: 'Cormorant Garamond', serif; font-size: 32px; font-weight: 300; margin-bottom: 8px; }
+  .books-intro p { font-size: 15px; color: var(--muted); line-height: 1.6; max-width: 520px; margin: 10px auto 0; }
+
+  .book-card {
+    display: flex; gap: 32px; align-items: flex-start;
+    background: var(--warm-white); border: 1px solid var(--border);
+    border-radius: 20px; padding: 32px; transition: all .25s;
+    text-decoration: none; color: inherit;
+  }
+  .book-card:hover { border-color: var(--gold); box-shadow: var(--shadow-hover); transform: translateY(-3px); }
+
+  /* Copertina libro: immagine reale con <img> visibile */
+  .book-cover-img {
+    width: 110px;
+    flex-shrink: 0;
+    border-radius: 8px;
+    box-shadow: 6px 6px 20px rgba(0,0,0,.2);
+    display: block;
+    object-fit: cover;
+  }
+
+  .book-info { flex: 1; }
+  .book-tag { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); font-weight: 500; margin-bottom: 8px; }
+  .book-title { font-family: 'Cormorant Garamond', serif; font-size: 24px; font-weight: 400; line-height: 1.2; margin-bottom: 4px; }
+  .book-author { font-size: 13px; color: var(--muted); margin-bottom: 12px; }
+  .book-desc { font-size: 14px; color: var(--muted); line-height: 1.7; margin-bottom: 20px; }
+  .book-cta {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--charcoal); color: var(--cream);
+    padding: 12px 28px; border-radius: 100px;
+    font-size: 13px; font-weight: 500;
+    transition: background .2s, transform .2s;
+  }
+  .book-cta:hover { background: var(--gold); transform: translateY(-1px); }
+  .book-note { font-size: 12px; color: var(--muted); margin-top: 10px; }
+
+  .restart-wrap { text-align: center; margin-top: 64px; padding-top: 40px; border-top: 1px solid var(--border); }
+  .btn-restart { background: transparent; border: 1.5px solid var(--charcoal); color: var(--charcoal); padding: 14px 40px; border-radius: 100px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; transition: all .2s; }
+  .btn-restart:hover { background: var(--charcoal); color: var(--cream); }
+
+  /* ── UPSELL ── */
+  .upsell-section {
+    margin: 64px 0 0;
+    background: var(--charcoal);
+    border-radius: 24px;
+    padding: 48px 40px;
+    color: var(--cream);
+    position: relative;
+    overflow: hidden;
+  }
+  .upsell-section::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 80% 60% at 100% 0%, rgba(201,169,110,0.15) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 50% at 0% 100%, rgba(201,169,110,0.08) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .upsell-badge { display: inline-block; padding: 7px 18px; border-radius: 100px; background: rgba(201,169,110,0.15); border: 1px solid rgba(201,169,110,0.35); font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); margin-bottom: 20px; }
+  .upsell-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(28px,5vw,48px); font-weight: 300; line-height: 1.15; margin-bottom: 16px; }
+  .upsell-title em { font-style: italic; color: var(--gold); }
+  .upsell-sub { font-size: 15px; line-height: 1.7; color: rgba(250,247,242,0.75); margin-bottom: 36px; max-width: 540px; }
+  .upsell-sub strong { color: var(--cream); }
+  .upsell-features { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 40px; }
+  .upsell-feat { display: flex; gap: 14px; align-items: flex-start; background: rgba(255,255,255,0.05); border-radius: 12px; padding: 16px; }
+  .upsell-feat-icon { font-size: 22px; flex-shrink: 0; }
+  .upsell-feat strong { display: block; font-size: 14px; font-weight: 500; margin-bottom: 3px; color: var(--cream); }
+  .upsell-feat div { font-size: 13px; color: rgba(250,247,242,0.65); line-height: 1.5; }
+  .upsell-cta-wrap { display: flex; align-items: center; gap: 28px; flex-wrap: wrap; margin-bottom: 16px; }
+  .upsell-price { display: flex; flex-direction: column; }
+  .upsell-price-num { font-family: 'Cormorant Garamond', serif; font-size: 48px; font-weight: 300; color: var(--gold); line-height: 1; }
+  .upsell-price-note { font-size: 12px; color: rgba(250,247,242,0.5); margin-top: 4px; }
+  .btn-upsell { background: var(--gold); color: var(--charcoal); border: none; padding: 16px 36px; border-radius: 100px; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 500; cursor: pointer; transition: all .3s; flex: 1; min-width: 240px; }
+  .btn-upsell:hover { background: #d4b878; transform: translateY(-2px); box-shadow: 0 8px 32px rgba(201,169,110,0.35); }
+  .btn-upsell:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+  .upsell-guarantee { font-size: 12px; color: rgba(250,247,242,0.45); }
+
+  @media (max-width: 600px) {
+    .upsell-features { grid-template-columns: 1fr; }
+    .upsell-section { padding: 32px 24px; }
+    .upsell-cta-wrap { flex-direction: column; align-items: flex-start; gap: 16px; }
+    .btn-upsell { width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<section class="hero" id="hero-section">
+  <span class="hero-badge">✦ Scopri la tua bellezza naturale</span>
+  <h1>Qual è la tua <em>stagione</em><br>armocromatica?</h1>
+  <p>Un test di 6 domande per scoprire la palette di colori che ti valorizza davvero — e cambiare per sempre il tuo modo di vestirti.</p>
+  <button class="btn-start" onclick="startQuiz()">Inizia il Test Gratuito</button>
+  <div class="seasons-strip">
+    <span class="season-chip spring">🌸 Primavera</span>
+    <span class="season-chip summer">🌿 Estate</span>
+    <span class="season-chip autumn">🍂 Autunno</span>
+    <span class="season-chip winter">❄️ Inverno</span>
+  </div>
+</section>
+
+<!-- QUIZ -->
+<section id="quiz-section">
+  <div class="progress-bar-wrap">
+    <div class="progress-info">
+      <span class="label">Domanda</span>
+      <span class="counter" id="q-counter">1 / 6</span>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+  </div>
+  <div id="question-container"></div>
+  <div class="quiz-nav">
+    <button class="btn-back" id="btn-back" onclick="prevQuestion()" style="display:none">← Indietro</button>
+    <button class="btn-next" id="btn-next" onclick="nextQuestion()" disabled>Continua →</button>
+  </div>
+</section>
+
+<!-- LEAD -->
+<section id="lead-section">
+  <div class="lead-card">
+    <h2>Il tuo risultato è pronto!</h2>
+    <p>Inserisci il tuo nome e la tua email per scoprire la tua stagione armocromatica.</p>
+    <div class="form-group">
+      <label>Il tuo nome</label>
+      <input type="text" id="user-name" placeholder="Es. Sofia">
+    </div>
+    <div class="form-group">
+      <label>La tua email</label>
+      <input type="email" id="user-email" placeholder="Es. sofia@email.com">
+    </div>
+    <div style="display:flex; align-items:flex-start; gap:10px; margin-bottom:20px; text-align:left;">
+      <input type="checkbox" id="privacy-check" style="margin-top:3px; accent-color:var(--gold); width:16px; height:16px; flex-shrink:0; cursor:pointer;">
+      <label for="privacy-check" style="font-size:12px; color:var(--muted); line-height:1.6; cursor:pointer;">
+        Acconsento a ricevere email con contenuti e offerte sull'armocromia da YouGlamour. Puoi disiscriverti in qualsiasi momento. <a href="https://www.youglamour.it/privacy" target="_blank" style="color:var(--gold); text-decoration:underline;">Privacy policy</a>.
+      </label>
+    </div>
+    <button class="btn-reveal" onclick="showResult()">Scopri la Tua Stagione ✦</button>
+    <p class="privacy-note">🔒 I tuoi dati sono al sicuro.</p>
+  </div>
+</section>
+
+<!-- RESULT -->
+<section id="result-section"></section>
+
+<script>
+// ─── DOMANDE ────────────────────────────────────────────────────────────────
+const questions = [
+  {
+    id:1, number:"01",
+    title:"Che tipo di carnagione hai?",
+    subtitle:"Osserva la tua pelle in luce naturale, senza trucco.",
+    layout:"cols-2", type:"gradient",
+    options:[
+      { label:"Pelle chiarissima, quasi lattea — arrossisce facilmente",          scores:{ winter:2, summer:3, spring:1, autumn:0 }, gradient:"linear-gradient(160deg,#f9ebe6 0%,#f2d8d0 40%,#fce8e2 70%,#f5d4cc 100%)", caption:"Chiarissima / Lattea" },
+      { label:"Pelle chiara con sottotono rosato o beige freddo",                  scores:{ winter:2, summer:3, spring:1, autumn:0 }, gradient:"linear-gradient(160deg,#f2ddd5 0%,#e8cec4 40%,#f0d8d0 70%,#e0c8be 100%)", caption:"Chiara / Rosata" },
+      { label:"Pelle media con sottotono dorato o color miele",                    scores:{ winter:0, summer:0, spring:3, autumn:2 }, gradient:"linear-gradient(160deg,#e8c49a 0%,#d4a870 40%,#e0b882 70%,#c8a060 100%)", caption:"Media / Dorata" },
+      { label:"Pelle scura o olivastra con sottotono caldo e ambrato",             scores:{ winter:1, summer:0, spring:0, autumn:3 }, gradient:"linear-gradient(160deg,#c8956a 0%,#b07848 40%,#c08860 70%,#a06840 100%)", caption:"Scura / Ambrata" }
+    ]
+  },
+  {
+    id:2, number:"02",
+    title:"Di che colore sono i tuoi occhi?",
+    subtitle:"Guarda i tuoi occhi in luce naturale — osserva ogni sfumatura.",
+    layout:"cols-3", type:"color",
+    options:[
+      { label:"Azzurro ghiaccio, grigio freddo o blu acciaio", scores:{ winter:3, summer:2, spring:0, autumn:0 }, color:"#7aaecc" },
+      { label:"Azzurro cielo o verde acqua morbido",           scores:{ winter:0, summer:3, spring:2, autumn:0 }, color:"#8dc8d8" },
+      { label:"Verde brillante o verde erba luminoso",          scores:{ winter:1, summer:1, spring:3, autumn:1 }, color:"#62a858" },
+      { label:"Nocciola, ambra o verde-marrone",                scores:{ winter:0, summer:0, spring:2, autumn:3 }, color:"#a87030" },
+      { label:"Castano scuro profondo",                        scores:{ winter:2, summer:0, spring:1, autumn:2 }, color:"#603820" },
+      { label:"Nero o castano-nero intenso",                   scores:{ winter:3, summer:0, spring:0, autumn:1 }, color:"#201008" }
+    ]
+  },
+  {
+    id:3, number:"03",
+    title:"Qual è il tuo colore naturale di capelli?",
+    subtitle:"Pensa al colore originale prima di eventuali colorazioni.",
+    layout:"cols-2", type:"gradient",
+    options:[
+      { label:"Biondo cenere, platino o biondo freddo",         scores:{ winter:2, summer:3, spring:1, autumn:0 }, gradient:"linear-gradient(160deg,#eae0c8 0%,#d8d0b0 30%,#ece4cc 60%,#d0c8a8 100%)", caption:"Biondo cenere / Platino" },
+      { label:"Biondo dorato, miele o con riflessi caldi",      scores:{ winter:0, summer:0, spring:3, autumn:1 }, gradient:"linear-gradient(160deg,#d4a840 0%,#c09030 30%,#d8b048 60%,#b88028 100%)", caption:"Biondo dorato / Miele" },
+      { label:"Rossi, color ruggine o ramati intensi",          scores:{ winter:0, summer:0, spring:2, autumn:3 }, gradient:"linear-gradient(160deg,#c85030 0%,#b04020 30%,#d06038 60%,#a83818 100%)", caption:"Rossi / Ramati" },
+      { label:"Castano medio con riflessi caldi",               scores:{ winter:0, summer:1, spring:2, autumn:3 }, gradient:"linear-gradient(160deg,#8a5030 0%,#7a4020 30%,#926040 60%,#6a3810 100%)", caption:"Castano / Caldo" },
+      { label:"Castano scuro o nero corvino",                   scores:{ winter:3, summer:1, spring:0, autumn:1 }, gradient:"linear-gradient(160deg,#2a1808 0%,#1a1008 30%,#301808 60%,#181008 100%)", caption:"Castano scuro / Nero" },
+      { label:"Bianchi, grigi o sale e pepe",                  scores:{ winter:2, summer:2, spring:0, autumn:1 }, gradient:"linear-gradient(160deg,#d8d8d8 0%,#b8b8b8 30%,#e0e0e0 60%,#c0c0c0 100%)", caption:"Bianchi / Grigi" }
+    ]
+  },
+  {
+    id:4, number:"04",
+    title:"Quale rossetto ti valorizza di più?",
+    subtitle:"Pensa a quando ti sei sentita più luminosa con un rossetto.",
+    layout:"cols-2", type:"gradient",
+    options:[
+      { label:"Rosso puro, fucsia o ciliegia — intenso, freddo, netto",     scores:{ winter:3, summer:1, spring:0, autumn:0 }, gradient:"linear-gradient(160deg,#c81028 0%,#a00820 40%,#d81830 70%,#b00020 100%)", caption:"Rosso / Fucsia" },
+      { label:"Rosa antico, malva o rosa cipria — morbido, polveroso",      scores:{ winter:1, summer:3, spring:1, autumn:0 }, gradient:"linear-gradient(160deg,#d8a8b8 0%,#c090a0 40%,#e0b0c0 70%,#c898a8 100%)", caption:"Rosa antico / Malva" },
+      { label:"Corallo, pesca o arancio caldo — luminoso, solare",          scores:{ winter:0, summer:0, spring:3, autumn:1 }, gradient:"linear-gradient(160deg,#e87840 0%,#d86028 40%,#f08850 70%,#d07030 100%)", caption:"Corallo / Pesca" },
+      { label:"Terra bruciata, mattone o cannella — profondo, terroso",     scores:{ winter:0, summer:0, spring:0, autumn:3 }, gradient:"linear-gradient(160deg,#a04020 0%,#883010 40%,#b05030 70%,#903820 100%)", caption:"Mattone / Cannella" }
+    ]
+  },
+  {
+    id:5, number:"05",
+    title:"Come reagisce la tua pelle al sole?",
+    subtitle:"Pensa a come ti abbronzi naturalmente in estate.",
+    layout:"cols-1", type:"text",
+    options:[
+      { label:"🔴 Mi arrosto subito — la pelle si arrossa, l'abbronzatura è difficile e disomogenea", scores:{ winter:2, summer:3, spring:1, autumn:0 } },
+      { label:"🌤️ Mi abbronzo lentamente — abbronzatura chiarissima, quasi rosata, molto delicata",   scores:{ winter:1, summer:3, spring:2, autumn:0 } },
+      { label:"☀️ Mi abbronzo facilmente — la pelle diventa dorata e luminosa in modo uniforme",      scores:{ winter:0, summer:0, spring:3, autumn:2 } },
+      { label:"🌑 Mi abbronzo rapidamente e molto — la pelle diventa scura e intensa",                 scores:{ winter:2, summer:0, spring:0, autumn:3 } }
+    ]
+  },
+  {
+    id:6, number:"06",
+    title:"Quale palette ti attrae istintivamente?",
+    subtitle:"Non pensare troppo — scegli quella che senti più tua.",
+    layout:"cols-2", type:"palette",
+    options:[
+      { label:"Bianco brillante, nero, rosso puro, blu elettrico — contrasti netti e forti",          scores:{ winter:4, summer:0, spring:0, autumn:0 }, colors:["#f0f0f8","#101018","#cc1020","#1040c0","#c020a0"] },
+      { label:"Rosa cipria, lavanda, azzurro pastello, grigio perla — toni polverosi e morbidi",      scores:{ winter:0, summer:4, spring:1, autumn:0 }, colors:["#e8c8cc","#c0b0d8","#a8c0d8","#d0d0d8","#e0c0d0"] },
+      { label:"Pesca, corallo, giallo burro, verde erba — caldi e luminosi",                          scores:{ winter:0, summer:0, spring:4, autumn:1 }, colors:["#f0b080","#e88060","#f0d060","#80b858","#e8a048"] },
+      { label:"Ruggine, bronzo, verde muschio, caramello, mattone — profondi e terrosi",              scores:{ winter:0, summer:0, spring:0, autumn:4 }, colors:["#a04820","#c89040","#507840","#9a6028","#803830"] }
+    ]
+  }
+];
+
+// ─── STAGIONI ────────────────────────────────────────────────────────────────
+const seasonData = {
+  spring: {
+    name:"Primavera", en:"Spring",
+    badge_bg:"rgba(232,168,124,0.15)", badge_color:"#b86d3e",
+    bookColor1:"#e8a870", bookColor2:"#f0c090", bookAccent:"#b86d3e",
+    description:[
+      "Sei una Primavera! La tua bellezza è calda, fresca e luminosa — come un mattino di aprile in fiore. I tuoi colori ideali sono caldi e vivaci: pesca, corallo, giallo burro, verde erba e albicocca. Questi toni esaltano la tua carnagione dorata e fanno brillare i tuoi occhi in modo naturale.",
+      "La chiave del tuo stile è la leggerezza e la chiarezza. Evita colori troppo scuri o freddi che rischiano di appesantirti — i tuoi colori naturali ti regalano una freschezza spontanea che i toni caldi e luminosi sanno esaltare al meglio.",
+      "Nel make-up, scegli fondotinta con base gialla o pesca, blush corallo o albicocca e rossetti nei toni del corallo e del pesco. La tua stagione è quella che trasforma il semplice in elegante grazie alla sua luminosità naturale."
+    ],
+    palette:["#f0b080","#e88060","#80b858","#f0d060","#e8a048","#f8d0a0"],
+    book:{
+      title:"Armocromia Palette Spring",
+      subtitle:"L'armadio perfetto per la Primavera",
+      desc:"La guida definitiva per la stagione Primavera: palette completa, abbinamenti di colori, consigli per trucco, capelli e abbigliamento. Tutto ciò che ti serve per valorizzare la tua luminosità naturale ogni giorno.",
+      link:"https://www.amazon.it/Armocromia-Palette-Spring-Larmadio-primavera/dp/B0BW345QJC/"
+    }
+  },
+  summer: {
+    name:"Estate", en:"Summer",
+    badge_bg:"rgba(184,169,201,0.15)", badge_color:"#7a5e9a",
+    bookColor1:"#b8a9c9", bookColor2:"#d0c0e0", bookAccent:"#7a5e9a",
+    description:[
+      "Sei un'Estate! La tua bellezza è delicata, raffinata e poetica — come un cielo di luglio velato da una leggera foschia. I tuoi colori ideali sono freddi, tenui e polverosi: rosa cipria, lavanda, azzurro pastello, grigio perla e lilla sfumato.",
+      "La tua palette evita i contrasti troppo forti: i colori morbidi e sfumati esaltano il tuo sottotono freddo e rosato, regalandoti un'eleganza naturale e sofisticata. I colori troppo intensi o troppo caldi rischiano di spegnerti.",
+      "Nel make-up, scegli fondotinta con base rosa fredda, blush nei toni del rosa antico e rossetti malva o rosa cipria. La tua stagione è quella dell'eleganza discreta — quella che non urla ma incanta profondamente."
+    ],
+    palette:["#c0b0d8","#e8c8cc","#a8c0d8","#d0d0d8","#e0c8d0","#b8c8e0"],
+    book:{
+      title:"Armocromia Palette Summer",
+      subtitle:"L'armadio perfetto per l'Estate",
+      desc:"La guida definitiva per la stagione Estate: palette completa con tutti i colori freddi e morbidi che ti valorizzano, consigli su abbigliamento, trucco e accessori. Il manuale indispensabile per esprimere la tua eleganza naturale.",
+      link:"https://www.amazon.it/Armocromia-Palette-Summer-Larmadio-perfetto/dp/B0BKS91Y61/"
+    }
+  },
+  autumn: {
+    name:"Autunno", en:"Autumn",
+    badge_bg:"rgba(196,128,74,0.15)", badge_color:"#9a5822",
+    bookColor1:"#c4804a", bookColor2:"#d8a060", bookAccent:"#7a3810",
+    description:[
+      "Sei un'Autunno! La tua bellezza è ricca, profonda e magnetica — come un bosco al tramonto di ottobre. I tuoi colori ideali sono caldi e profondi: ruggine, bronzo, verde muschio, caramello, mattone e senape. Questi toni esaltano il tuo sottotono dorato-ambrato.",
+      "La tua palette è la più ricca tra le quattro stagioni: puoi osare con colori intensi e avvolgenti che su chiunque altro sembrerebbero eccessivi. I colori freddi o troppo luminosi rischiano invece di renderti spenta e artificiale.",
+      "Nel make-up, scegli fondotinta caldi con base gialla o ambra, bronzer e blush terra di Siena, rossetti nei toni del mattone e del rame. La tua è la stagione del fascino profondo e dell'eleganza sensuale senza sforzo."
+    ],
+    palette:["#a04820","#c89040","#507840","#9a6028","#804030","#d0a050"],
+    book:{
+      title:"Armocromia Palette Autumn",
+      subtitle:"L'armadio perfetto per l'Autunno",
+      desc:"La guida definitiva per la stagione Autunno: palette completa con tutti i colori caldi e profondi della tua stagione, consigli pratici su come abbinarli per creare outfit valorizzanti e armoniosi ogni giorno.",
+      link:"https://www.amazon.it/Armocromia-Palette-Autumn-Larmadio-perfetto/dp/B0BRZ7H2KX/"
+    }
+  },
+  winter: {
+    name:"Inverno", en:"Winter",
+    badge_bg:"rgba(107,140,186,0.15)", badge_color:"#3d6096",
+    bookColor1:"#4a78b0", bookColor2:"#6a98d0", bookAccent:"#1a3060",
+    description:[
+      "Sei un'Inverno! La tua bellezza è forte, elegante e magnetica — come un paesaggio innevato sotto un cielo stellato. I tuoi colori ideali sono freddi, puri e con contrasti netti: bianco brillante, nero profondo, rosso puro, blu elettrico e fucsia intenso.",
+      "Sei la stagione dei contrasti: il tuo aspetto guadagna forza con accostamenti decisi che su altre stagioni sembrerebbero aggressivi. I colori caldi, polverosi o tenui rischiano invece di spegnerti completamente.",
+      "Nel make-up, punta su fondotinta con base rosa fredda, contour preciso e rossetti intensi — rosso, vino o fucsia. Occhi smoky o delineati con precisione. La tua è la stagione del glamour sofisticato e della presenza scenica naturale."
+    ],
+    palette:["#2040a0","#cc1020","#f0f0f8","#101018","#8030a0","#0058b0"],
+    book:{
+      title:"Armocromia Palette Winter",
+      subtitle:"L'armadio perfetto per l'Inverno",
+      desc:"La guida definitiva per la stagione Inverno: palette completa con tutti i colori freddi e contrastati che esaltano la tua bellezza, consigli su trucco, capelli, abbigliamento e accessori per ogni occasione.",
+      link:"https://www.amazon.it/Armocromia-Palette-Winter-Larmadio-perfetto/dp/B0B4K1BXVF/"
+    }
+  }
+};
+
+// ─── STATE ───────────────────────────────────────────────────────────────────
+let current = 0, answers = [];
+
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw08HwiWZ6-BN1BCGPvt_RH5pIEbeG9CKxGh4cksEe3-nFnD3h3w_M467Rk9YPwu8vcZQ/exec";
+
+function startQuiz() {
+  document.getElementById('hero-section').style.display = 'none';
+  document.getElementById('quiz-section').style.display = 'block';
+  renderQuestion(0);
+  window.scrollTo(0,0);
+}
+
+function renderQuestion(idx) {
+  const q = questions[idx];
+  document.getElementById('q-counter').textContent = `${idx+1} / ${questions.length}`;
+  document.getElementById('progress-fill').style.width = `${(idx/questions.length)*100}%`;
+  document.getElementById('btn-back').style.display = idx > 0 ? 'block' : 'none';
+  document.getElementById('btn-next').disabled = answers[idx] === undefined;
+
+  let html = '';
+  if (q.type === 'gradient') {
+    html = q.options.map((o,i) => `
+      <div class="option-card ${answers[idx]===i?'selected':''}" onclick="sel(${idx},${i})">
+        <div class="check-badge">✓</div>
+        <div class="opt-img" style="background:${o.gradient};"></div>
+        <div class="option-label"><span class="opt-caption">${o.caption}</span>${o.label}</div>
+      </div>`).join('');
+  } else if (q.type === 'color') {
+    html = q.options.map((o,i) => `
+      <div class="option-card ${answers[idx]===i?'selected':''}" onclick="sel(${idx},${i})">
+        <div class="check-badge">✓</div>
+        <div class="color-top" style="background:${o.color};"></div>
+        <div class="option-label">${o.label}</div>
+      </div>`).join('');
+  } else if (q.type === 'palette') {
+    html = q.options.map((o,i) => `
+      <div class="option-card ${answers[idx]===i?'selected':''}" onclick="sel(${idx},${i})">
+        <div class="check-badge">✓</div>
+        <div style="padding:22px 16px 12px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
+          ${o.colors.map(c=>`<div style="width:36px;height:36px;border-radius:50%;background:${c};box-shadow:0 2px 8px rgba(0,0,0,.15);flex-shrink:0;"></div>`).join('')}
+        </div>
+        <div class="option-label">${o.label}</div>
+      </div>`).join('');
+  } else {
+    html = q.options.map((o,i) => `
+      <div class="option-text ${answers[idx]===i?'selected':''}" onclick="sel(${idx},${i})">
+        <div class="option-dot"></div>
+        <span class="option-text-label">${o.label}</span>
+      </div>`).join('');
+  }
+
+  document.getElementById('question-container').innerHTML = `
+    <div class="question-card">
+      <div class="q-number">Domanda ${q.number}</div>
+      <h2 class="q-title">${q.title}</h2>
+      <p class="q-subtitle">${q.subtitle}</p>
+      <div class="options-grid ${q.layout}">${html}</div>
+    </div>`;
+}
+
+function sel(qIdx, optIdx) {
+  answers[qIdx] = optIdx;
+  document.getElementById('btn-next').disabled = false;
+  document.querySelectorAll('.option-card,.option-text').forEach((el,i) => el.classList.toggle('selected', i===optIdx));
+}
+
+function nextQuestion() {
+  if (current < questions.length-1) { current++; renderQuestion(current); window.scrollTo(0,0); }
+  else showLead();
+}
+function prevQuestion() {
+  if (current > 0) { current--; renderQuestion(current); window.scrollTo(0,0); }
+}
+function showLead() {
+  document.getElementById('quiz-section').style.display = 'none';
+  document.getElementById('lead-section').style.display = 'flex';
+  window.scrollTo(0,0);
+}
+
+function calculateSeason() {
+  const t = { spring:0, summer:0, autumn:0, winter:0 };
+  answers.forEach((ai,qi) => {
+    if (ai===undefined) return;
+    Object.entries(questions[qi].options[ai].scores).forEach(([s,v]) => t[s]+=v);
+  });
+  return Object.entries(t).sort((a,b)=>b[1]-a[1])[0][0];
+}
+
+function saveToGoogleSheet(name, email, season) {
+  try {
+    // Metodo più affidabile: form nascosto inviato a iframe silenzioso
+    const iframe = document.createElement('iframe');
+    iframe.name = 'silent_submit';
+    iframe.style.display = 'none';
+    document.body.appendChild(iframe);
+
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = GOOGLE_SCRIPT_URL;
+    form.target = 'silent_submit';
+    form.style.display = 'none';
+
+    const fields = {
+      nome: name,
+      email: email,
+      stagione: season,
+      data: new Date().toLocaleDateString('it-IT')
+    };
+    Object.entries(fields).forEach(([k, v]) => {
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = k;
+      input.value = v;
+      form.appendChild(input);
+    });
+
+    document.body.appendChild(form);
+    form.submit();
+
+    // Pulizia dopo 5 secondi
+    setTimeout(() => {
+      document.body.removeChild(form);
+      document.body.removeChild(iframe);
+    }, 5000);
+  } catch(e) { /* silenzioso */ }
+}
+
+function makeBookSVG(d) {
+  const c1 = d.bookColor1;
+  const c2 = d.bookColor2;
+  const acc = d.bookAccent;
+  const label = d.name.toUpperCase();
+  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(`
+<svg xmlns="http://www.w3.org/2000/svg" width="110" height="165" viewBox="0 0 110 165">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="${c1}"/>
+      <stop offset="100%" stop-color="${c2}"/>
+    </linearGradient>
+  </defs>
+  <!-- Copertina -->
+  <rect width="110" height="165" rx="4" fill="url(#bg)"/>
+  <!-- Dorso -->
+  <rect width="8" height="165" rx="4" fill="${acc}" opacity="0.4"/>
+  <!-- Banda decorativa -->
+  <rect x="0" y="28" width="110" height="3" fill="${acc}" opacity="0.35"/>
+  <rect x="0" y="134" width="110" height="3" fill="${acc}" opacity="0.35"/>
+  <!-- Cerchio decorativo -->
+  <circle cx="55" cy="72" r="28" fill="${acc}" opacity="0.15"/>
+  <circle cx="55" cy="72" r="20" fill="none" stroke="${acc}" stroke-width="1.5" opacity="0.5"/>
+  <!-- Stagione -->
+  <text x="55" y="68" font-family="Georgia,serif" font-size="9" fill="${acc}" text-anchor="middle" opacity="0.9">ARMOCROMIA</text>
+  <text x="55" y="80" font-family="Georgia,serif" font-size="8" fill="${acc}" text-anchor="middle" opacity="0.9">PALETTE</text>
+  <text x="55" y="93" font-family="Georgia,serif" font-size="11" font-weight="bold" fill="${acc}" text-anchor="middle">${label}</text>
+  <!-- Sottotitolo -->
+  <text x="55" y="150" font-family="Georgia,serif" font-size="6.5" fill="${acc}" text-anchor="middle" opacity="0.8">L'armadio perfetto</text>
+</svg>`)}`;
+}
+
+function showResult() {
+  const emailEl = document.getElementById('user-email');
+  const name = document.getElementById('user-name').value.trim() || 'cara';
+  const email = emailEl.value.trim();
+  emailEl.classList.remove('input-error');
+  if (!email || !email.includes('@') || !email.includes('.')) {
+    emailEl.classList.add('input-error'); emailEl.focus(); return;
+  }
+  const privacyCheck = document.getElementById('privacy-check');
+  if (!privacyCheck.checked) {
+    privacyCheck.style.outline = '2px solid #cc4444';
+    privacyCheck.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
+  privacyCheck.style.outline = '';
+
+  const season = calculateSeason();
+  lastSeason = seasonData[season].name;
+  lastName = name;
+  lastEmail = email;
+  saveToGoogleSheet(name, email, seasonData[season].name);
+
+  const d = seasonData[season];
+  document.getElementById('lead-section').style.display = 'none';
+  const el = document.getElementById('result-section');
+  el.style.display = 'block';
+  window.scrollTo(0,0);
+
+  const b = d.book;
+
+  el.innerHTML = `
+    <div class="result-header">
+      <div class="result-season-badge" style="background:${d.badge_bg};color:${d.badge_color};">La tua stagione</div>
+      <div class="result-title" style="color:${d.badge_color}">${d.name}</div>
+      <div class="result-subtitle">Armocromia ${d.en}</div>
+      <div class="result-divider" style="background:${d.badge_color};"></div>
+      <div class="result-description">${d.description.map(p=>`<p>${p}</p>`).join('')}</div>
+    </div>
+
+    <div class="palette-section">
+      <div class="palette-label">✦ La tua palette colori</div>
+      <div class="palette-swatches">${d.palette.map(c=>`<div class="swatch" style="background:${c};"></div>`).join('')}</div>
+    </div>
+
+    <div class="books-section">
+      <div class="books-intro">
+        <div class="section-title-sm">Il libro perfetto per te, ${name}</div>
+        <p>Hai scoperto di essere una <strong>${d.name}</strong>. Approfondisci con il manuale dedicato alla tua stagione — la guida più completa per sfruttare al massimo la tua palette personale.</p>
+      </div>
+
+      <a class="book-card" href="${b.link}" target="_blank" rel="noopener">
+        <img class="book-cover-img" src="${makeBookSVG(d)}" alt="Copertina ${b.title}">
+        <div class="book-info">
+          <div class="book-tag">✦ Il libro della tua stagione</div>
+          <div class="book-title">${b.title}</div>
+          <div class="book-author">${b.subtitle}</div>
+          <div class="book-desc">${b.desc}</div>
+          <span class="book-cta">Acquista su Amazon →</span>
+          <div class="book-note">📦 Disponibile in versione cartacea e Kindle</div>
+        </div>
+      </a>
+    </div>
+
+    <div class="restart-wrap">
+      <p style="font-size:14px;color:var(--muted);margin-bottom:20px;">Vuoi rifare il test o condividerlo con un'amica?</p>
+      <button class="btn-restart" onclick="restartQuiz()">↺ Rifai il Test</button>
+    </div>
+
+    <!-- ── UPSELL ── -->
+    <div class="upsell-section" id="upsell-box">
+      <div class="upsell-badge">✦ Analisi professionale</div>
+      <h2 class="upsell-title">Vuoi sapere esattamente<br><em>chi sei davvero</em>?</h2>
+      <p class="upsell-sub">Il test ti ha dato la stagione — ma ogni stagione ha <strong>4 sottogruppi</strong> con palette diverse. Con l'analisi personalizzata scopri il tuo sottogruppo preciso e ricevi un PDF su misura.</p>
+
+      <div class="upsell-features">
+        <div class="upsell-feat"><span class="upsell-feat-icon">🎨</span><div><strong>Sottogruppo preciso</strong><br>Es. Inverno Puro, Inverno Freddo, Inverno Scuro...</div></div>
+        <div class="upsell-feat"><span class="upsell-feat-icon">📄</span><div><strong>PDF personalizzato</strong><br>Palette 30+ colori, make-up, abbinamenti outfit</div></div>
+        <div class="upsell-feat"><span class="upsell-feat-icon">📸</span><div><strong>Analisi sulle tue foto</strong><br>Carichi viso, occhi, polso — analizziamo noi</div></div>
+        <div class="upsell-feat"><span class="upsell-feat-icon">⚡</span><div><strong>Risposta in 48 ore</strong><br>Ricevi tutto direttamente via email</div></div>
+      </div>
+
+      <div class="upsell-cta-wrap">
+        <div class="upsell-price">
+          <span class="upsell-price-num">25€</span>
+          <span class="upsell-price-note">pagamento sicuro • una tantum</span>
+        </div>
+        <button class="btn-upsell" onclick="startCheckout()" id="btn-upsell">
+          Voglio l'analisi personalizzata →
+        </button>
+      </div>
+      <p class="upsell-guarantee">🔒 Pagamento sicuro con Stripe • Soddisfatta o rimborsata</p>
+    </div>`;
+}
+
+function restartQuiz() {
+  current=0; answers=[];
+  document.getElementById('result-section').style.display='none';
+  document.getElementById('user-name').value='';
+  document.getElementById('user-email').value='';
+  document.getElementById('hero-section').style.display='flex';
+  window.scrollTo(0,0);
+}
+
+// Variabili globali per l'upsell
+let lastSeason = '';
+let lastName = '';
+let lastEmail = '';
+
+async function startCheckout() {
+  const btn = document.getElementById('btn-upsell');
+  btn.disabled = true;
+  btn.textContent = 'Reindirizzamento a Stripe...';
+
+  try {
+    const res = await fetch('/api/create-checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        season: lastSeason,
+        name: lastName,
+        email: lastEmail,
+      })
+    });
+    const data = await res.json();
+    if (data.url) {
+      window.open(data.url, '_top');
+    } else {
+      alert('Errore nel pagamento. Riprova.');
+      btn.disabled = false;
+      btn.textContent = 'Voglio l\'analisi personalizzata →';
+    }
+  } catch(e) {
+    alert('Errore di connessione. Riprova.');
+    btn.disabled = false;
+    btn.textContent = 'Voglio l\'analisi personalizzata →';
+  }
+}
+</script>
+</body>
+</html>

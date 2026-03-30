@@ -1,0 +1,21 @@
+# Dipendenze
+node_modules/
+
+# Next.js
+.next/
+out/
+
+# Variabili d'ambiente (contengono password e chiavi!)
+.env
+.env.local
+.env.*.local
+
+# Database e foto caricate dagli utenti
+data/
+
+# macOS
+.DS_Store
+
+# Log
+*.log
+npm-debug.log*
