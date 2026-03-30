@@ -269,6 +269,29 @@ export default function AdminDashboard() {
             )}
 
             {leads.length > 0 && (
+              <>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 16 }}>
+                <button
+                  onClick={() => {
+                    const rows = [['email', 'name'], ...leads.map(l => [l.email, l.name])]
+                    const csv = rows.map(r => r.map(v => `"${v.replace(/"/g, '""')}"`).join(',')).join('\n')
+                    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+                    const url = URL.createObjectURL(blob)
+                    const a = document.createElement('a')
+                    a.href = url
+                    a.download = `lead-substack-${new Date().toISOString().slice(0,10)}.csv`
+                    a.click()
+                    URL.revokeObjectURL(url)
+                  }}
+                  style={{
+                    padding: '10px 20px', borderRadius: 8, border: '1.5px solid #1a1614',
+                    background: '#1a1614', color: '#fff', fontSize: 13, fontWeight: 600,
+                    cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8,
+                  }}
+                >
+                  ↓ Esporta CSV per Substack ({leads.length})
+                </button>
+              </div>
               <div style={{ background: '#fff', border: '1px solid #E8E0D8', borderRadius: 12, overflow: 'hidden' }}>
                 {/* Intestazione tabella */}
                 <div style={{ display: 'grid', gridTemplateColumns: '2fr 2fr 1.5fr 1.5fr', gap: 16, padding: '12px 24px', background: '#F5F3F0', borderBottom: '1px solid #E8E0D8' }}>
@@ -303,6 +326,7 @@ export default function AdminDashboard() {
                   )
                 })}
               </div>
+              </>
             )}
           </>
         )}
