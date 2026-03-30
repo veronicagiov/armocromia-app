@@ -39,6 +39,16 @@ db.exec(`
   )
 `)
 
+db.exec(`
+  CREATE TABLE IF NOT EXISTS leads (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    email TEXT NOT NULL,
+    season TEXT NOT NULL,
+    created_at TEXT DEFAULT (datetime('now', 'localtime'))
+  )
+`)
+
 export interface Analysis {
   id: number
   stripe_session_id: string
@@ -96,6 +106,25 @@ export function updateSubgroup(id: number, subgroup: string): void {
 
 export function markAsSent(id: number): void {
   db.prepare("UPDATE analyses SET status = 'sent' WHERE id = ?").run(id)
+}
+
+export interface Lead {
+  id: number
+  name: string
+  email: string
+  season: string
+  created_at: string
+}
+
+export function insertLead(data: { name: string; email: string; season: string }): void {
+  db.prepare(`
+    INSERT OR IGNORE INTO leads (name, email, season)
+    VALUES (?, ?, ?)
+  `).run(data.name, data.email, data.season)
+}
+
+export function getAllLeads(): Lead[] {
+  return db.prepare('SELECT * FROM leads ORDER BY created_at DESC').all() as Lead[]
 }
 
 export default db

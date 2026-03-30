@@ -590,6 +590,11 @@ function showResult() {
   lastName = name;
   lastEmail = email;
   saveToGoogleSheet(name, email, seasonData[season].name);
+  fetch('/api/leads', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, email, season: seasonData[season].name }),
+  }).catch(() => {});
 
   const d = seasonData[season];
   document.getElementById('lead-section').style.display = 'none';
