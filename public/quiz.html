@@ -608,6 +608,30 @@ function showResult() {
       <div class="result-description">${d.description.map(p=>`<p>${p}</p>`).join('')}</div>
     </div>
 
+    <div class="palette-section">
+      <div class="palette-label">✦ La tua palette colori</div>
+      <div class="palette-swatches">${d.palette.map(c=>`<div class="swatch" style="background:${c};"></div>`).join('')}</div>
+    </div>
+
+    <div class="books-section">
+      <div class="books-intro">
+        <div class="section-title-sm">Il libro perfetto per te, ${name}</div>
+        <p>Hai scoperto di essere una <strong>${d.name}</strong>. Approfondisci con il manuale dedicato alla tua stagione — la guida più completa per sfruttare al massimo la tua palette personale.</p>
+      </div>
+
+      <a class="book-card" href="${b.link}" target="_blank" rel="noopener">
+        <img class="book-cover-img" src="${makeBookSVG(d)}" alt="Copertina ${b.title}">
+        <div class="book-info">
+          <div class="book-tag">✦ Il libro della tua stagione</div>
+          <div class="book-title">${b.title}</div>
+          <div class="book-author">${b.subtitle}</div>
+          <div class="book-desc">${b.desc}</div>
+          <span class="book-cta">Acquista su Amazon →</span>
+          <div class="book-note">📦 Disponibile in versione cartacea e Kindle</div>
+        </div>
+      </a>
+    </div>
+
     <!-- ── UPSELL ── -->
     <div class="upsell-section" id="upsell-box">
       <div class="upsell-badge">✦ Analisi professionale</div>
@@ -631,30 +655,6 @@ function showResult() {
         </button>
       </div>
       <p class="upsell-guarantee">🔒 Pagamento sicuro con Stripe • Soddisfatta o rimborsata</p>
-    </div>
-
-    <div class="palette-section">
-      <div class="palette-label">✦ La tua palette colori</div>
-      <div class="palette-swatches">${d.palette.map(c=>`<div class="swatch" style="background:${c};"></div>`).join('')}</div>
-    </div>
-
-    <div class="books-section">
-      <div class="books-intro">
-        <div class="section-title-sm">Il libro perfetto per te, ${name}</div>
-        <p>Hai scoperto di essere una <strong>${d.name}</strong>. Approfondisci con il manuale dedicato alla tua stagione — la guida più completa per sfruttare al massimo la tua palette personale.</p>
-      </div>
-
-      <a class="book-card" href="${b.link}" target="_blank" rel="noopener">
-        <img class="book-cover-img" src="${makeBookSVG(d)}" alt="Copertina ${b.title}">
-        <div class="book-info">
-          <div class="book-tag">✦ Il libro della tua stagione</div>
-          <div class="book-title">${b.title}</div>
-          <div class="book-author">${b.subtitle}</div>
-          <div class="book-desc">${b.desc}</div>
-          <span class="book-cta">Acquista su Amazon →</span>
-          <div class="book-note">📦 Disponibile in versione cartacea e Kindle</div>
-        </div>
-      </a>
     </div>
 
     <div class="restart-wrap">
