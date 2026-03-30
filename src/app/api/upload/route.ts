@@ -29,7 +29,8 @@ export async function POST(req: NextRequest) {
     }
 
     // 2. Salva foto su filesystem
-    const uploadDir = path.join(process.cwd(), 'data', 'uploads', sessionId)
+    const baseDir = process.env.NODE_ENV === 'production' ? '/storage' : path.join(process.cwd(), 'data')
+    const uploadDir = path.join(baseDir, 'uploads', sessionId)
     fs.mkdirSync(uploadDir, { recursive: true })
 
     const photoPaths: string[] = []

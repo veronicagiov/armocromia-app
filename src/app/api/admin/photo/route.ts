@@ -13,7 +13,8 @@ export async function GET(req: NextRequest) {
 
   // Sanitize: impedisce path traversal
   const safePath = file.replace(/\.\./g, '').replace(/^\/+/, '')
-  const fullPath = path.join(process.cwd(), 'data', 'uploads', safePath)
+  const baseDir = process.env.NODE_ENV === 'production' ? '/storage' : path.join(process.cwd(), 'data')
+  const fullPath = path.join(baseDir, 'uploads', safePath)
 
   if (!fs.existsSync(fullPath)) {
     return new NextResponse('Not found', { status: 404 })
