@@ -1,21 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { Resend } from 'resend'
 import { checkAdminAuth } from '@/lib/auth'
 import { getAnalysisById, markAsSent } from '@/lib/db'
 import { generatePDF } from '@/lib/pdf'
-import nodemailer from 'nodemailer'
 
-function getMailer() {
-  return nodemailer.createTransport({
-    host: process.env.MAIL_HOST,
-    port: Number(process.env.MAIL_PORT) || 587,
-    secure: false,
-    auth: {
-      user: process.env.MAIL_USER,
-      pass: process.env.MAIL_PASSWORD,
-    },
-    tls: { rejectUnauthorized: false },
-  })
-}
+const resend = new Resend(process.env.RESEND_API_KEY)
 
 export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
   if (!checkAdminAuth()) {
@@ -35,9 +24,8 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     notes: analysis.notes,
   })
 
-  const mailer = getMailer()
-  await mailer.sendMail({
-    from: `"YouGlamour" <${process.env.MAIL_USER}>`,
+  await resend.emails.send({
+    from: 'YouGlamour <veronica@youglamour.it>',
     to: analysis.customer_email,
     subject: `La tua analisi armocromatica — ${analysis.customer_name}`,
     html: `
@@ -62,8 +50,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     attachments: [
       {
         filename: `analisi-armocromia-${analysis.customer_name.toLowerCase().replace(/\s+/g, '-')}.pdf`,
-        content: pdfBuffer,
-        contentType: 'application/pdf',
+        content: pdfBuffer.toString('base64'),
       },
     ],
   })

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import nodemailer from 'nodemailer'
+import { Resend } from 'resend'
 import Stripe from 'stripe'
 import { insertAnalysis } from '@/lib/db'
 import fs from 'fs'
@@ -9,18 +9,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2024-06-20',
 })
 
-function getMailer() {
-  return nodemailer.createTransport({
-    host: process.env.MAIL_HOST,
-    port: Number(process.env.MAIL_PORT) || 587,
-    secure: false,
-    auth: {
-      user: process.env.MAIL_USER,
-      pass: process.env.MAIL_PASSWORD,
-    },
-    tls: { rejectUnauthorized: false },
-  })
-}
+const resend = new Resend(process.env.RESEND_API_KEY)
 
 export async function POST(req: NextRequest) {
   try {
@@ -61,12 +50,10 @@ export async function POST(req: NextRequest) {
       photos: photoPaths,
     })
 
-    const mailer = getMailer()
-
     // 4. Email di notifica a Veronica
-    await mailer.sendMail({
-      from: `"YouGlamour" <${process.env.MAIL_USER}>`,
-      to: process.env.NOTIFY_EMAIL,
+    await resend.emails.send({
+      from: 'YouGlamour <veronica@youglamour.it>',
+      to: process.env.NOTIFY_EMAIL!,
       subject: `🎨 Nuova analisi da fare — ${customerName} (${season})`,
       html: `
         <div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; padding: 32px; color: #1a1614;">
@@ -87,8 +74,8 @@ export async function POST(req: NextRequest) {
     })
 
     // 5. Email di conferma all'utente
-    await mailer.sendMail({
-      from: `"YouGlamour" <${process.env.MAIL_USER}>`,
+    await resend.emails.send({
+      from: 'YouGlamour <veronica@youglamour.it>',
       to: customerEmail,
       subject: `✨ Abbiamo ricevuto le tue foto — ${customerName}!`,
       html: `
