@@ -2,9 +2,7 @@ import Database from 'better-sqlite3'
 import path from 'path'
 import fs from 'fs'
 
-const DATA_DIR = process.env.NODE_ENV === 'production'
-  ? '/storage'
-  : path.join(process.cwd(), 'data')
+const DATA_DIR = process.env.STORAGE_PATH || path.join(process.cwd(), 'data')
 const DB_PATH = path.join(DATA_DIR, 'armocromia.db')
 
 if (!fs.existsSync(DATA_DIR)) {
