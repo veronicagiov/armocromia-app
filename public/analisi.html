@@ -49,7 +49,7 @@
     }
     .hero h1 {
       font-family: 'Cormorant Garamond', serif;
-      font-size: clamp(38px, 7vw, 72px);
+      font-size: clamp(32px, 4vw, 56px);
       font-weight: 300;
       line-height: 1.05;
       letter-spacing: -1px;
@@ -440,7 +440,80 @@
     }
     .page-footer a { color: var(--gold); text-decoration: none; }
 
+    /* ── MOCKUP PDF ── */
+    .hero-inner {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 64px;
+      max-width: 1100px;
+      margin: 0 auto;
+      text-align: left;
+    }
+    .hero-text { flex: 1; min-width: 0; }
+    .hero-text .hero-badge { display: inline-block; }
+    .hero-text h1 { text-align: left; }
+    .hero-text .hero-sub { margin-left: 0; text-align: left; }
+    .hero-text .seasons-title { text-align: left; }
+    .hero-text .quiz-link { text-align: left; }
+    .hero-text .seasons-grid { margin-left: 0; margin-right: 0; }
+    .mockup-wrap {
+      flex-shrink: 0;
+      width: 220px;
+      position: relative;
+    }
+    .mockup-shadow {
+      position: absolute; inset: 0;
+      background: rgba(26,22,20,0.15);
+      border-radius: 6px;
+      filter: blur(18px);
+      transform: translate(8px, 12px);
+    }
+    .mockup-doc {
+      position: relative;
+      width: 220px; height: 310px;
+      border-radius: 6px;
+      overflow: hidden;
+      background: var(--mk-light, #F0F0FF);
+      transition: background .5s ease;
+    }
+    .mockup-bar { position: absolute; left: 0; right: 0; height: 7px; background: var(--mk-accent, #1A3A6E); transition: background .5s; }
+    .mockup-bar.top { top: 0; } .mockup-bar.bottom { bottom: 0; }
+    .mockup-circle {
+      position: absolute; width: 200px; height: 200px; border-radius: 50%;
+      background: var(--mk-accent, #1A3A6E); opacity: .07;
+      top: 50%; left: 50%; transform: translate(-50%, -50%);
+      transition: background .5s;
+    }
+    .mockup-content {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 16px; text-align: center;
+    }
+    .mockup-yg { font-size: 6px; letter-spacing: 2.5px; text-transform: uppercase; color: #BBBBBB; margin-bottom: 12px; }
+    .mockup-season { font-family: 'Cormorant Garamond', serif; font-size: 34px; font-weight: 300; color: var(--mk-accent, #1A3A6E); line-height: 1; margin-bottom: 3px; letter-spacing: -0.5px; transition: color .5s; }
+    .mockup-en { font-family: 'Cormorant Garamond', serif; font-size: 9px; font-style: italic; color: var(--mk-accent, #1A3A6E); opacity: .6; margin-bottom: 10px; transition: color .5s; }
+    .mockup-divider { width: 28px; height: 1px; background: var(--mk-accent, #1A3A6E); opacity: .3; margin-bottom: 10px; transition: background .5s; }
+    .mockup-sub { font-size: 6px; letter-spacing: 1.5px; text-transform: uppercase; color: #AAAAAA; margin-bottom: 14px; }
+    .mockup-palette { display: flex; gap: 4px; margin-bottom: 14px; justify-content: center; }
+    .mockup-swatch { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; }
+    .mockup-box {
+      background: rgba(255,255,255,0.8);
+      border: 1px solid var(--mk-accent, #1A3A6E);
+      border-radius: 6px; padding: 5px 12px;
+      font-size: 6.5px; color: #AAAAAA; letter-spacing: .8px; transition: border-color .5s;
+    }
+    .mockup-box strong { display: block; font-family: 'Cormorant Garamond', serif; font-size: 10px; color: var(--mk-accent, #1A3A6E); font-weight: 400; margin-top: 2px; transition: color .5s; }
+    .mockup-footer { position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); font-size: 5px; letter-spacing: 1.5px; text-transform: uppercase; color: #CCCCCC; white-space: nowrap; }
+
     /* ── RESPONSIVE ── */
+    @media (max-width: 860px) {
+      .hero-inner { flex-direction: column; text-align: center; gap: 32px; }
+      .hero-text h1, .hero-text .hero-sub, .hero-text .seasons-title, .hero-text .quiz-link { text-align: center; }
+      .hero-text .seasons-grid { margin: 0 auto 16px; }
+      .mockup-wrap { display: none; }
+    }
     @media (max-width: 600px) {
       .seasons-grid { grid-template-columns: repeat(2, 1fr); }
       .features-grid { grid-template-columns: 1fr; }
@@ -453,42 +526,70 @@
 
   <!-- ── HERO ── -->
   <section class="hero">
-    <span class="hero-badge">✦ Analisi personalizzata</span>
-    <h1>Conosci la tua stagione armocromatica<br>ma non il <em>sottogruppo</em>?</h1>
-    <p class="hero-sub">
-      Ogni stagione ha 4 sottogruppi con palette completamente diverse.
-      Scopri il tuo sottogruppo preciso e ricevi un PDF su misura con i tuoi colori, il tuo make-up e i tuoi outfit.
-    </p>
+    <div class="hero-inner">
+      <!-- Testo + stagioni -->
+      <div class="hero-text">
+        <span class="hero-badge">✦ Analisi personalizzata</span>
+        <h1>Conosci la tua stagione armocromatica<br>ma non il <em>sottogruppo</em>?</h1>
+        <p class="hero-sub">
+          Ogni stagione ha 4 sottogruppi con palette completamente diverse.
+          Scopri il tuo e ricevi un PDF su misura con i tuoi colori, make-up e outfit.
+        </p>
 
-    <p class="seasons-title">Seleziona la tua stagione per iniziare</p>
+        <p class="seasons-title">Seleziona la tua stagione per iniziare</p>
 
-    <div class="seasons-grid">
-      <button class="season-btn spring" onclick="openModal('Primavera')">
-        <div class="season-dot" style="background:var(--spring)"></div>
-        <span class="season-name">Primavera</span>
-        <span class="season-sub">Spring · 4 sottogruppi</span>
-      </button>
-      <button class="season-btn summer" onclick="openModal('Estate')">
-        <div class="season-dot" style="background:var(--summer)"></div>
-        <span class="season-name">Estate</span>
-        <span class="season-sub">Summer · 4 sottogruppi</span>
-      </button>
-      <button class="season-btn autumn" onclick="openModal('Autunno')">
-        <div class="season-dot" style="background:var(--autumn)"></div>
-        <span class="season-name">Autunno</span>
-        <span class="season-sub">Autumn · 4 sottogruppi</span>
-      </button>
-      <button class="season-btn winter" onclick="openModal('Inverno')">
-        <div class="season-dot" style="background:var(--winter)"></div>
-        <span class="season-name">Inverno</span>
-        <span class="season-sub">Winter · 4 sottogruppi</span>
-      </button>
+        <div class="seasons-grid">
+          <button class="season-btn spring" onclick="openModal('Primavera')" onmouseenter="updateMockup('Primavera')" onmouseleave="resetMockup()">
+            <div class="season-dot" style="background:var(--spring)"></div>
+            <span class="season-name">Primavera</span>
+            <span class="season-sub">Spring · 4 sottogruppi</span>
+          </button>
+          <button class="season-btn summer" onclick="openModal('Estate')" onmouseenter="updateMockup('Estate')" onmouseleave="resetMockup()">
+            <div class="season-dot" style="background:var(--summer)"></div>
+            <span class="season-name">Estate</span>
+            <span class="season-sub">Summer · 4 sottogruppi</span>
+          </button>
+          <button class="season-btn autumn" onclick="openModal('Autunno')" onmouseenter="updateMockup('Autunno')" onmouseleave="resetMockup()">
+            <div class="season-dot" style="background:var(--autumn)"></div>
+            <span class="season-name">Autunno</span>
+            <span class="season-sub">Autumn · 4 sottogruppi</span>
+          </button>
+          <button class="season-btn winter" onclick="openModal('Inverno')" onmouseenter="updateMockup('Inverno')" onmouseleave="resetMockup()">
+            <div class="season-dot" style="background:var(--winter)"></div>
+            <span class="season-name">Inverno</span>
+            <span class="season-sub">Winter · 4 sottogruppi</span>
+          </button>
+        </div>
+
+        <span class="quiz-link">
+          Non sai ancora la tua stagione?
+          <a href="https://www.youglamour.it/test-armocromia/" target="_top">Fai prima il test gratuito →</a>
+        </span>
+      </div>
+
+      <!-- Mockup PDF -->
+      <div class="mockup-wrap">
+        <div class="mockup-shadow"></div>
+        <div class="mockup-doc" id="mockup-doc">
+          <div class="mockup-bar top"></div>
+          <div class="mockup-bar bottom"></div>
+          <div class="mockup-circle"></div>
+          <div class="mockup-content">
+            <div class="mockup-yg">youglamour.it</div>
+            <div class="mockup-season" id="mk-season">Inverno</div>
+            <div class="mockup-en" id="mk-en">Winter · Armocromia</div>
+            <div class="mockup-divider"></div>
+            <div class="mockup-sub">Analisi Personalizzata</div>
+            <div class="mockup-palette" id="mk-palette"></div>
+            <div class="mockup-box">
+              Il tuo sottogruppo
+              <strong id="mk-subgroup">Winter Cool</strong>
+            </div>
+          </div>
+          <div class="mockup-footer">youglamour.it · Analisi Armocromia</div>
+        </div>
+      </div>
     </div>
-
-    <span class="quiz-link">
-      Non sai ancora la tua stagione?
-      <a href="https://www.youglamour.it/test-armocromia/" target="_top">Fai prima il test gratuito →</a>
-    </span>
   </section>
 
   <div class="divider"></div>
@@ -610,6 +711,38 @@
 
   <script>
     const BASE_URL = 'https://armocromia-app-production.up.railway.app'
+
+    const MOCKUP_DATA = {
+      Inverno:   { accent: '#1A3A6E', light: '#F0F0FF', en: 'Winter · Armocromia',   subgroup: 'Winter Cool',  colors: ['#1A1A1A','#CC0000','#003399','#006633','#660099','#CC0066','#336699','#003366','#AABBCC'] },
+      Primavera: { accent: '#D4845A', light: '#FFF5EE', en: 'Spring · Armocromia',   subgroup: 'Spring Warm',  colors: ['#FF6B47','#FFAE94','#FA8072','#C19A6B','#FFF0C8','#90EE90','#40E0D0','#FFD700','#F88070'] },
+      Estate:    { accent: '#9B7FA6', light: '#F8F0FF', en: 'Summer · Armocromia',   subgroup: 'Summer Soft',  colors: ['#C8B0CC','#B0A0CC','#D4A0B8','#A8C0D8','#F0C8D8','#9890B0','#D8C8E8','#88A0B8','#C890A8'] },
+      Autunno:   { accent: '#A0522D', light: '#FFF0E8', en: 'Autumn · Armocromia',   subgroup: 'Autumn Warm',  colors: ['#8B2500','#C47A3A','#6B8E23','#8B6914','#CD853F','#A0522D','#556B2F','#D2691E','#704214'] },
+    }
+
+    function updateMockup(season) {
+      const d = MOCKUP_DATA[season]
+      if (!d) return
+      const doc = document.getElementById('mockup-doc')
+      doc.style.setProperty('--mk-accent', d.accent)
+      doc.style.setProperty('--mk-light', d.light)
+      doc.style.background = d.light
+      document.getElementById('mk-season').textContent = season
+      document.getElementById('mk-en').textContent = d.en
+      document.getElementById('mk-subgroup').textContent = d.subgroup
+      const pal = document.getElementById('mk-palette')
+      pal.innerHTML = ''
+      d.colors.forEach(c => {
+        const sw = document.createElement('div')
+        sw.className = 'mockup-swatch'
+        sw.style.background = c
+        pal.appendChild(sw)
+      })
+    }
+
+    function resetMockup() { /* mantieni l'ultima stagione hoverata */ }
+
+    // Inizializza con Inverno
+    updateMockup('Inverno')
 
     const SEASON_COLORS = {
       Primavera: { color: '#E8895A', bg: 'rgba(232,137,90,0.12)' },

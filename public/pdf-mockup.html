@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    width: 800px; height: 800px;
+    background: #f0ece8;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .wrapper { position: relative; width: 340px; height: 480px; }
+  .shadow {
+    position: absolute; inset: 0;
+    background: rgba(26,22,20,0.18);
+    border-radius: 6px;
+    filter: blur(24px);
+    transform: translate(12px, 16px);
+    z-index: 0;
+  }
+  .pdf {
+    position: absolute; inset: 0;
+    border-radius: 6px;
+    overflow: hidden;
+    z-index: 1;
+    background: var(--light);
+  }
+  .bar { position: absolute; left: 0; right: 0; height: 10px; background: var(--accent); }
+  .bar.top { top: 0; } .bar.bottom { bottom: 0; }
+  .circle {
+    position: absolute;
+    width: 300px; height: 300px;
+    border-radius: 50%;
+    background: var(--accent);
+    opacity: .07;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+  }
+  .content {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 24px; text-align: center;
+  }
+  .yg-label { font-size: 8px; letter-spacing: 3px; text-transform: uppercase; color: #BBBBBB; margin-bottom: 18px; }
+  .season { font-family: 'Cormorant Garamond', serif; font-size: 52px; font-weight: 300; color: var(--accent); line-height: 1; margin-bottom: 4px; letter-spacing: -1px; }
+  .season-en { font-family: 'Cormorant Garamond', serif; font-size: 13px; font-style: italic; color: var(--accent); opacity: .6; margin-bottom: 16px; letter-spacing: 1px; }
+  .divider { width: 40px; height: 1px; background: var(--accent); opacity: .3; margin-bottom: 16px; }
+  .subtitle { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: #AAAAAA; margin-bottom: 20px; }
+  .palette { display: flex; gap: 6px; margin-bottom: 20px; justify-content: center; flex-wrap: nowrap; }
+  .swatch { width: 22px; height: 22px; border-radius: 50%; flex-shrink: 0; }
+  .name-box {
+    background: rgba(255,255,255,0.75);
+    border: 1px solid var(--accent);
+    border-opacity: .2;
+    border-radius: 8px;
+    padding: 8px 20px;
+    font-size: 10px; color: #AAAAAA; letter-spacing: 1px;
+  }
+  .name-box strong { display: block; font-family: 'Cormorant Garamond', serif; font-size: 15px; color: var(--accent); font-weight: 400; margin-top: 2px; letter-spacing: 0; }
+  .yg-footer { position: absolute; bottom: 18px; left: 50%; transform: translateX(-50%); font-size: 7px; letter-spacing: 2px; text-transform: uppercase; color: #CCCCCC; white-space: nowrap; }
+
+  /* Stagioni */
+  .inverno  { --accent: #1A3A6E; --light: #F0F0FF; }
+  .primavera{ --accent: #D4845A; --light: #FFF5EE; }
+  .estate   { --accent: #9B7FA6; --light: #F8F0FF; }
+  .autunno  { --accent: #A0522D; --light: #FFF0E8; }
+</style>
+</head>
+<body>
+<div class="wrapper">
+  <div class="shadow"></div>
+  <div class="pdf inverno" id="pdf-doc">
+    <div class="bar top"></div>
+    <div class="bar bottom"></div>
+    <div class="circle"></div>
+    <div class="content">
+      <div class="yg-label">youglamour.it</div>
+      <div class="season" id="season-name">Inverno</div>
+      <div class="season-en" id="season-en">Winter · Armocromia</div>
+      <div class="divider"></div>
+      <div class="subtitle">Analisi Personalizzata</div>
+      <div class="palette" id="palette"></div>
+      <div class="name-box">
+        Il tuo sottogruppo
+        <strong id="subgroup-name">Winter Cool</strong>
+      </div>
+    </div>
+    <div class="yg-footer">youglamour.it · Analisi Armocromia Personalizzata</div>
+  </div>
+</div>
+
+<script>
+const SEASONS = {
+  inverno:   { name: 'Inverno',   en: 'Winter · Armocromia',   subgroup: 'Winter Cool',      colors: ['#1A1A1A','#CC0000','#003399','#006633','#660099','#CC0066','#336699','#003366','#AABBCC'] },
+  primavera: { name: 'Primavera', en: 'Spring · Armocromia',   subgroup: 'Spring Warm',       colors: ['#FF6B47','#FFAE94','#FA8072','#E2725B','#C19A6B','#FFF0C8','#90EE90','#40E0D0','#FFD700'] },
+  estate:    { name: 'Estate',    en: 'Summer · Armocromia',   subgroup: 'Summer Soft',       colors: ['#C8B0CC','#B0A0CC','#D4A0B8','#A8C0D8','#F0C8D8','#9890B0','#D8C8E8','#88A0B8','#C890A8'] },
+  autunno:   { name: 'Autunno',   en: 'Autumn · Armocromia',   subgroup: 'Autumn Warm',       colors: ['#8B2500','#C47A3A','#6B8E23','#8B6914','#CD853F','#A0522D','#556B2F','#D2691E','#704214'] },
+}
+
+const params = new URLSearchParams(window.location.search)
+const key = (params.get('season') || 'inverno').toLowerCase()
+const s = SEASONS[key] || SEASONS.inverno
+
+document.getElementById('pdf-doc').className = 'pdf ' + key
+document.getElementById('season-name').textContent = s.name
+document.getElementById('season-en').textContent = s.en
+document.getElementById('subgroup-name').textContent = s.subgroup
+
+const palette = document.getElementById('palette')
+s.colors.forEach(c => {
+  const d = document.createElement('div')
+  d.className = 'swatch'
+  d.style.background = c
+  if (c === '#FFF0C8' || c === '#F0C8D8' || c === '#D8C8E8') d.style.border = '1px solid #ddd'
+  palette.appendChild(d)
+})
+</script>
+</body>
+</html>
