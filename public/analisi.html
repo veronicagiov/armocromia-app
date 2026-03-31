@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Analisi Armocromia Personalizzata — YouGlamour</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --gold: #c9a96e;
+      --charcoal: #1a1614;
+      --muted: #7a6e68;
+      --border: #e8e0d8;
+      --spring: #E8895A;
+      --summer: #9B7FA6;
+      --autumn: #A0522D;
+      --winter: #1A3A6E;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: #ffffff;
+      color: var(--charcoal);
+      overflow-x: hidden;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      padding: 64px 24px 56px;
+      text-align: center;
+      max-width: 780px;
+      margin: 0 auto;
+    }
+    .hero-badge {
+      display: inline-block;
+      font-size: 10px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      font-weight: 500;
+      color: var(--gold);
+      background: rgba(201,169,110,0.1);
+      border: 1px solid rgba(201,169,110,0.3);
+      padding: 7px 20px;
+      border-radius: 100px;
+      margin-bottom: 28px;
+    }
+    .hero h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(38px, 7vw, 72px);
+      font-weight: 300;
+      line-height: 1.05;
+      letter-spacing: -1px;
+      margin-bottom: 20px;
+    }
+    .hero h1 em { font-style: italic; color: var(--gold); }
+    .hero-sub {
+      font-size: 17px;
+      color: var(--muted);
+      line-height: 1.7;
+      max-width: 560px;
+      margin: 0 auto 48px;
+      font-weight: 300;
+    }
+
+    /* ── STAGIONI ── */
+    .seasons-title {
+      font-size: 11px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: #bbb;
+      margin-bottom: 20px;
+      font-weight: 500;
+    }
+    .seasons-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      max-width: 720px;
+      margin: 0 auto 16px;
+    }
+    .season-btn {
+      border: 2px solid var(--border);
+      border-radius: 16px;
+      padding: 24px 16px 20px;
+      cursor: pointer;
+      background: #fff;
+      transition: all .25s;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .season-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      transition: opacity .25s;
+    }
+    .season-btn:hover { transform: translateY(-3px); box-shadow: 0 12px 40px rgba(0,0,0,0.08); }
+    .season-btn.spring { --c: var(--spring); }
+    .season-btn.summer { --c: var(--summer); }
+    .season-btn.autumn { --c: var(--autumn); }
+    .season-btn.winter { --c: var(--winter); }
+    .season-btn:hover { border-color: var(--c); }
+    .season-btn:hover::before { opacity: 0.04; background: var(--c); }
+    .season-dot {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      margin: 0 auto 12px;
+      background: var(--c);
+      opacity: .85;
+    }
+    .season-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 22px;
+      font-weight: 400;
+      color: var(--charcoal);
+      margin-bottom: 6px;
+      display: block;
+    }
+    .season-sub {
+      font-size: 11px;
+      color: #bbb;
+      letter-spacing: 0.5px;
+    }
+    .season-btn:hover .season-name { color: var(--c); }
+
+    .quiz-link {
+      font-size: 13px;
+      color: #bbb;
+      margin-top: 12px;
+      display: block;
+      text-align: center;
+    }
+    .quiz-link a {
+      color: var(--gold);
+      text-decoration: underline;
+      text-decoration-color: rgba(201,169,110,0.4);
+    }
+
+    /* ── DIVIDER ── */
+    .divider {
+      width: 60px; height: 1px;
+      background: var(--border);
+      margin: 64px auto;
+    }
+
+    /* ── FEATURES ── */
+    .section {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+    .section-label {
+      font-size: 10px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 500;
+      text-align: center;
+      margin-bottom: 12px;
+    }
+    .section-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(32px, 5vw, 52px);
+      font-weight: 300;
+      line-height: 1.1;
+      text-align: center;
+      margin-bottom: 48px;
+    }
+    .section-title em { font-style: italic; color: var(--gold); }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      margin-bottom: 0;
+    }
+    .feature-card {
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px 28px 24px;
+    }
+    .feature-icon { font-size: 28px; margin-bottom: 14px; display: block; }
+    .feature-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--charcoal);
+      margin-bottom: 6px;
+    }
+    .feature-desc {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    /* ── COME FUNZIONA ── */
+    .steps {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      max-width: 560px;
+      margin: 0 auto;
+    }
+    .step {
+      display: flex;
+      gap: 24px;
+      align-items: flex-start;
+      position: relative;
+      padding-bottom: 32px;
+    }
+    .step:last-child { padding-bottom: 0; }
+    .step:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      left: 19px; top: 44px;
+      width: 2px;
+      bottom: 0;
+      background: var(--border);
+    }
+    .step-num {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      background: var(--charcoal);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 1;
+    }
+    .step-body { padding-top: 8px; }
+    .step-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .step-desc {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* ── PRICING ── */
+    .pricing-card {
+      max-width: 500px;
+      margin: 0 auto;
+      border: 2px solid var(--charcoal);
+      border-radius: 24px;
+      padding: 44px 40px 40px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .pricing-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+      background: var(--gold);
+    }
+    .price-amount {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 72px;
+      font-weight: 300;
+      line-height: 1;
+      color: var(--charcoal);
+      margin-bottom: 4px;
+    }
+    .price-note {
+      font-size: 13px;
+      color: #bbb;
+      margin-bottom: 28px;
+      letter-spacing: 0.5px;
+    }
+    .price-includes {
+      text-align: left;
+      margin-bottom: 32px;
+    }
+    .price-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      color: var(--muted);
+      padding: 7px 0;
+      border-bottom: 1px solid #f5f3f0;
+    }
+    .price-item:last-child { border-bottom: none; }
+    .price-item-check {
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      background: var(--charcoal);
+      color: #fff;
+      font-size: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .btn-buy {
+      width: 100%;
+      background: var(--charcoal);
+      color: #fff;
+      border: none;
+      padding: 17px;
+      border-radius: 100px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all .3s;
+      margin-bottom: 12px;
+    }
+    .btn-buy:hover { background: var(--gold); transform: translateY(-2px); }
+    .btn-buy:disabled { background: #888; cursor: not-allowed; transform: none; }
+    .secure-note {
+      font-size: 12px;
+      color: #bbb;
+    }
+
+    /* ── MODAL ── */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(26,22,20,0.55);
+      backdrop-filter: blur(4px);
+      z-index: 9999;
+      display: flex; align-items: center; justify-content: center;
+      padding: 24px;
+    }
+    .modal-overlay.hidden { display: none; }
+    .modal-card {
+      background: #fff;
+      border-radius: 24px;
+      max-width: 460px;
+      width: 100%;
+      padding: 40px 36px 36px;
+      position: relative;
+      animation: slideUp .35s ease;
+    }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .modal-close {
+      position: absolute; top: 16px; right: 16px;
+      width: 30px; height: 30px;
+      background: none; border: none; cursor: pointer;
+      font-size: 18px; color: #bbb; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      transition: background .2s;
+    }
+    .modal-close:hover { background: #f5f3f0; color: var(--charcoal); }
+    .modal-season-badge {
+      display: inline-block;
+      padding: 5px 16px;
+      border-radius: 100px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+    .modal-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 28px;
+      font-weight: 300;
+      line-height: 1.2;
+      margin-bottom: 8px;
+    }
+    .modal-sub {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 28px;
+      line-height: 1.5;
+    }
+    .field-label {
+      display: block;
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+    .field-input {
+      width: 100%;
+      padding: 13px 16px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      color: var(--charcoal);
+      background: #fff;
+      outline: none;
+      transition: border-color .2s;
+      margin-bottom: 16px;
+    }
+    .field-input:focus { border-color: var(--gold); }
+    .modal-error {
+      font-size: 13px;
+      color: #cc4444;
+      background: #fff0f0;
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin-bottom: 16px;
+      display: none;
+    }
+    .btn-modal-pay {
+      width: 100%;
+      border: none;
+      padding: 16px;
+      border-radius: 100px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all .3s;
+      color: #fff;
+      margin-bottom: 10px;
+    }
+    .btn-modal-pay:hover { filter: brightness(1.1); transform: translateY(-1px); }
+    .btn-modal-pay:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+    .modal-secure { font-size: 11px; color: #ccc; text-align: center; }
+
+    /* ── FOOTER ── */
+    .page-footer {
+      text-align: center;
+      padding: 48px 24px 64px;
+      font-size: 13px;
+      color: #ccc;
+    }
+    .page-footer a { color: var(--gold); text-decoration: none; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 600px) {
+      .seasons-grid { grid-template-columns: repeat(2, 1fr); }
+      .features-grid { grid-template-columns: 1fr; }
+      .pricing-card { padding: 36px 24px 32px; }
+      .modal-card { padding: 36px 24px 28px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── HERO ── -->
+  <section class="hero">
+    <span class="hero-badge">✦ Analisi personalizzata</span>
+    <h1>Sei una <em>stagione</em>.<br>Ma sai quale <em>sottotipo</em> sei?</h1>
+    <p class="hero-sub">
+      Ogni stagione ha 4 sottogruppi con palette completamente diverse.
+      Scopri il tuo sottogruppo preciso e ricevi un PDF su misura con i tuoi colori, il tuo make-up e i tuoi outfit.
+    </p>
+
+    <p class="seasons-title">Seleziona la tua stagione per iniziare</p>
+
+    <div class="seasons-grid">
+      <button class="season-btn spring" onclick="openModal('Primavera')">
+        <div class="season-dot" style="background:var(--spring)"></div>
+        <span class="season-name">Primavera</span>
+        <span class="season-sub">Spring · 4 sottogruppi</span>
+      </button>
+      <button class="season-btn summer" onclick="openModal('Estate')">
+        <div class="season-dot" style="background:var(--summer)"></div>
+        <span class="season-name">Estate</span>
+        <span class="season-sub">Summer · 4 sottogruppi</span>
+      </button>
+      <button class="season-btn autumn" onclick="openModal('Autunno')">
+        <div class="season-dot" style="background:var(--autumn)"></div>
+        <span class="season-name">Autunno</span>
+        <span class="season-sub">Autumn · 4 sottogruppi</span>
+      </button>
+      <button class="season-btn winter" onclick="openModal('Inverno')">
+        <div class="season-dot" style="background:var(--winter)"></div>
+        <span class="season-name">Inverno</span>
+        <span class="season-sub">Winter · 4 sottogruppi</span>
+      </button>
+    </div>
+
+    <span class="quiz-link">
+      Non sai ancora la tua stagione?
+      <a href="https://www.youglamour.it/test-armocromia/" target="_top">Fai prima il test gratuito →</a>
+    </span>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ── COSA RICEVI ── -->
+  <div class="section">
+    <p class="section-label">✦ Cosa ricevi</p>
+    <h2 class="section-title">Tutto quello che ti serve<br>per vestirti <em>al meglio</em></h2>
+
+    <div class="features-grid">
+      <div class="feature-card">
+        <span class="feature-icon">🎨</span>
+        <div class="feature-title">Il tuo sottogruppo preciso</div>
+        <div class="feature-desc">Non solo "Inverno" ma il tuo sottotipo esatto — Inverno Assoluto, Winter Cool, Winter Bright o Winter Deep — con le sue peculiarità specifiche.</div>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">📄</span>
+        <div class="feature-title">PDF personalizzato</div>
+        <div class="feature-desc">Un documento di 5 pagine con la tua palette di 30+ colori, i colori da evitare e quelli dei sottogruppi confinanti.</div>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">💄</span>
+        <div class="feature-title">Consigli make-up</div>
+        <div class="feature-desc">Fondotinta, ombretto, blush, rossetto, eyeliner e bronzer: tutto scelto specificamente per il tuo sottotono.</div>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">👗</span>
+        <div class="feature-title">Guida allo stile</div>
+        <div class="feature-desc">Abbinamenti colore, stampe, texture e accessori che funzionano con la tua palette. Outfit che ti valorizzano davvero.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ── COME FUNZIONA ── -->
+  <div class="section">
+    <p class="section-label">✦ Come funziona</p>
+    <h2 class="section-title">Tre passi,<br><em>semplice così</em></h2>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">Scegli la tua stagione e paga</div>
+          <div class="step-desc">Seleziona la tua stagione qui sopra, inserisci nome e email, e completa il pagamento di 7€ in totale sicurezza con Stripe.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">Carica le tue foto</div>
+          <div class="step-desc">Dopo il pagamento carichi 4 foto semplici: viso frontale, viso di lato, occhi in primo piano, polso interno. Servono per analizzare il tuo sottotono reale.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">Ricevi il PDF entro 48 ore</div>
+          <div class="step-desc">Analizziamo le tue foto, determiniamo il tuo sottogruppo preciso e ti inviamo il PDF personalizzato direttamente via email.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ── PRICING ── -->
+  <div class="section" style="padding-bottom: 80px;">
+    <p class="section-label">✦ Prezzo</p>
+    <h2 class="section-title" style="margin-bottom: 36px;">Inizia adesso</h2>
+
+    <div class="pricing-card">
+      <div class="price-amount">7€</div>
+      <div class="price-note">pagamento unico · nessun abbonamento</div>
+
+      <div class="price-includes">
+        <div class="price-item"><span class="price-item-check">✓</span> Analisi sottogruppo personalizzata</div>
+        <div class="price-item"><span class="price-item-check">✓</span> PDF 5 pagine su misura</div>
+        <div class="price-item"><span class="price-item-check">✓</span> Palette 30+ colori valorizzanti</div>
+        <div class="price-item"><span class="price-item-check">✓</span> Consigli make-up specifici</div>
+        <div class="price-item"><span class="price-item-check">✓</span> Guida allo stile e outfit</div>
+        <div class="price-item"><span class="price-item-check">✓</span> Risposta entro 48 ore via email</div>
+      </div>
+
+      <button class="btn-buy" onclick="scrollToSeasons()">
+        Scegli la tua stagione →
+      </button>
+      <div class="secure-note">🔒 Pagamento sicuro con Stripe</div>
+    </div>
+  </div>
+
+  <!-- ── FOOTER ── -->
+  <div class="page-footer">
+    <a href="https://www.youglamour.it">youglamour.it</a> ·
+    <a href="mailto:veronica@youglamour.it">veronica@youglamour.it</a>
+  </div>
+
+  <!-- ── MODAL ── -->
+  <div class="modal-overlay hidden" id="modal-overlay">
+    <div class="modal-card" id="modal-card">
+      <button class="modal-close" onclick="closeModal()">✕</button>
+      <div class="modal-season-badge" id="modal-badge"></div>
+      <div class="modal-title" id="modal-title"></div>
+      <div class="modal-sub">Inserisci i tuoi dati per procedere al pagamento.</div>
+
+      <label class="field-label">Il tuo nome</label>
+      <input class="field-input" type="text" id="modal-name" placeholder="Es. Sofia">
+
+      <label class="field-label">La tua email (riceverai il PDF qui)</label>
+      <input class="field-input" type="email" id="modal-email" placeholder="Es. sofia@email.com">
+
+      <div class="modal-error" id="modal-error"></div>
+
+      <button class="btn-modal-pay" id="modal-btn" onclick="startCheckout()"></button>
+      <div class="modal-secure">🔒 Pagamento sicuro con Stripe · 7€ una tantum</div>
+    </div>
+  </div>
+
+  <script>
+    const BASE_URL = 'https://armocromia-app-production.up.railway.app'
+
+    const SEASON_COLORS = {
+      Primavera: { color: '#E8895A', bg: 'rgba(232,137,90,0.12)' },
+      Estate:    { color: '#9B7FA6', bg: 'rgba(155,127,166,0.12)' },
+      Autunno:   { color: '#A0522D', bg: 'rgba(160,82,45,0.12)' },
+      Inverno:   { color: '#1A3A6E', bg: 'rgba(26,58,110,0.12)' },
+    }
+
+    let selectedSeason = ''
+
+    function openModal(season) {
+      selectedSeason = season
+      const s = SEASON_COLORS[season]
+
+      document.getElementById('modal-badge').textContent = season
+      document.getElementById('modal-badge').style.background = s.bg
+      document.getElementById('modal-badge').style.color = s.color
+
+      document.getElementById('modal-title').textContent = 'Sei una ' + season + '?'
+      document.getElementById('modal-btn').textContent = 'Procedi al pagamento — 7€ →'
+      document.getElementById('modal-btn').style.background = s.color
+
+      document.getElementById('modal-error').style.display = 'none'
+      document.getElementById('modal-name').value = ''
+      document.getElementById('modal-email').value = ''
+      document.getElementById('modal-overlay').classList.remove('hidden')
+      document.getElementById('modal-name').focus()
+    }
+
+    function closeModal() {
+      document.getElementById('modal-overlay').classList.add('hidden')
+    }
+
+    document.getElementById('modal-overlay').addEventListener('click', function(e) {
+      if (e.target === this) closeModal()
+    })
+
+    function scrollToSeasons() {
+      document.querySelector('.seasons-grid').scrollIntoView({ behavior: 'smooth' })
+    }
+
+    async function startCheckout() {
+      const name  = document.getElementById('modal-name').value.trim()
+      const email = document.getElementById('modal-email').value.trim()
+      const errorEl = document.getElementById('modal-error')
+      const btn = document.getElementById('modal-btn')
+
+      if (!name) { showError('Inserisci il tuo nome.'); return }
+      if (!email || !email.includes('@')) { showError('Inserisci un\'email valida.'); return }
+
+      btn.disabled = true
+      btn.textContent = 'Reindirizzamento a Stripe...'
+      errorEl.style.display = 'none'
+
+      try {
+        const res = await fetch(BASE_URL + '/api/create-checkout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ season: selectedSeason, name, email }),
+        })
+        const data = await res.json()
+        if (!res.ok || !data.url) throw new Error(data.error || 'Errore durante il pagamento')
+        window.open(data.url, '_top')
+      } catch (err) {
+        showError(err.message || 'Si è verificato un errore. Riprova.')
+        btn.disabled = false
+        btn.textContent = 'Procedi al pagamento — 7€ →'
+      }
+    }
+
+    function showError(msg) {
+      const el = document.getElementById('modal-error')
+      el.textContent = msg
+      el.style.display = 'block'
+    }
+
+    // Invio con Enter
+    document.getElementById('modal-email').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') startCheckout()
+    })
+    document.getElementById('modal-name').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') document.getElementById('modal-email').focus()
+    })
+  </script>
+</body>
+</html>
