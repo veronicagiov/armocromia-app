@@ -270,28 +270,60 @@ export default function AdminDashboard() {
 
             {leads.length > 0 && (
               <>
-              <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 16 }}>
-                <button
-                  onClick={() => {
-                    const rows = [['email', 'name'], ...leads.map(l => [l.email, l.name])]
-                    const csv = rows.map(r => r.map(v => `"${v.replace(/"/g, '""')}"`).join(',')).join('\n')
-                    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
-                    const url = URL.createObjectURL(blob)
-                    const a = document.createElement('a')
-                    a.href = url
-                    a.download = `lead-substack-${new Date().toISOString().slice(0,10)}.csv`
-                    a.click()
-                    URL.revokeObjectURL(url)
-                  }}
-                  style={{
-                    padding: '10px 20px', borderRadius: 8, border: '1.5px solid #1a1614',
-                    background: '#1a1614', color: '#fff', fontSize: 13, fontWeight: 600,
-                    cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8,
-                  }}
-                >
-                  ↓ Esporta CSV per Substack ({leads.length})
-                </button>
-              </div>
+              {(() => {
+                const STORAGE_KEY = 'yg_last_export'
+                const lastExportTs = typeof window !== 'undefined' ? localStorage.getItem(STORAGE_KEY) : null
+                const lastExportDate = lastExportTs ? new Date(parseInt(lastExportTs)) : null
+                const newLeads = lastExportDate
+                  ? leads.filter(l => new Date(l.created_at) > lastExportDate)
+                  : leads
+
+                function downloadCsv(list: Lead[], filename: string) {
+                  const rows = [['email', 'name'], ...list.map(l => [l.email, l.name])]
+                  const csv = rows.map(r => r.map(v => `"${v.replace(/"/g, '""')}"`).join(',')).join('\n')
+                  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+                  const url = URL.createObjectURL(blob)
+                  const a = document.createElement('a')
+                  a.href = url; a.download = filename; a.click()
+                  URL.revokeObjectURL(url)
+                  localStorage.setItem(STORAGE_KEY, Date.now().toString())
+                }
+
+                return (
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, flexWrap: 'wrap', gap: 10 }}>
+                    <div style={{ fontSize: 12, color: '#999' }}>
+                      {lastExportDate
+                        ? <>Ultimo export: <strong style={{ color: '#555' }}>{lastExportDate.toLocaleDateString('it-IT', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</strong> · <strong style={{ color: newLeads.length > 0 ? '#c9a96e' : '#999' }}>{newLeads.length} nuovi</strong></>
+                        : <span>Nessun export precedente</span>
+                      }
+                    </div>
+                    <div style={{ display: 'flex', gap: 10 }}>
+                      <button
+                        onClick={() => downloadCsv(newLeads, `lead-nuovi-${new Date().toISOString().slice(0,10)}.csv`)}
+                        disabled={newLeads.length === 0}
+                        style={{
+                          padding: '10px 20px', borderRadius: 8, border: '1.5px solid #c9a96e',
+                          background: newLeads.length === 0 ? '#f5f3f0' : '#c9a96e',
+                          color: newLeads.length === 0 ? '#bbb' : '#fff',
+                          fontSize: 13, fontWeight: 600, cursor: newLeads.length === 0 ? 'default' : 'pointer',
+                        }}
+                      >
+                        ↓ Nuovi dall'ultimo export ({newLeads.length})
+                      </button>
+                      <button
+                        onClick={() => downloadCsv(leads, `lead-tutti-${new Date().toISOString().slice(0,10)}.csv`)}
+                        style={{
+                          padding: '10px 20px', borderRadius: 8, border: '1.5px solid #1a1614',
+                          background: '#1a1614', color: '#fff', fontSize: 13, fontWeight: 600, cursor: 'pointer',
+                        }}
+                      >
+                        ↓ Tutti ({leads.length})
+                      </button>
+                    </div>
+                  </div>
+                )
+              })()}
+
               <div style={{ background: '#fff', border: '1px solid #E8E0D8', borderRadius: 12, overflow: 'hidden' }}>
                 {/* Intestazione tabella */}
                 <div style={{ display: 'grid', gridTemplateColumns: '2fr 2fr 1.5fr 1.5fr', gap: 16, padding: '12px 24px', background: '#F5F3F0', borderBottom: '1px solid #E8E0D8' }}>
