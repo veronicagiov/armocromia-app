@@ -8,7 +8,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const dataDir = process.env.STORAGE_PATH || path.join(process.cwd(), 'data')
+  const dataDir = process.env.STORAGE_PATH || (fs.existsSync('/storage') ? '/storage' : path.join(process.cwd(), 'data'))
   const dbPath = path.join(dataDir, 'armocromia.db')
 
   let dirContents: string[] = []
