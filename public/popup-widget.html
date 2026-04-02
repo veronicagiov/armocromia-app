@@ -1,0 +1,243 @@
+<!-- YouGlamour · Popup Test Armocromia -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
+<style>
+  #yg-popup-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(26,22,20,0.55);
+    backdrop-filter: blur(4px);
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    animation: yg-fade-in .4s ease;
+  }
+  #yg-popup-overlay.yg-hidden {
+    display: none;
+  }
+  @keyframes yg-fade-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  @keyframes yg-slide-up {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  #yg-popup-card {
+    background: #ffffff;
+    border-radius: 24px;
+    max-width: 520px;
+    width: 100%;
+    padding: 48px 44px 40px;
+    position: relative;
+    box-shadow: 0 32px 80px rgba(26,22,20,0.22);
+    animation: yg-slide-up .45s ease;
+    overflow: hidden;
+    text-align: center;
+    font-family: 'DM Sans', sans-serif;
+  }
+  /* Cerchi decorativi stagioni */
+  #yg-popup-card::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 180px; height: 180px;
+    border-radius: 50%;
+    background: conic-gradient(
+      #E8895A 0deg 90deg,
+      #9B7FA6 90deg 180deg,
+      #A0522D 180deg 270deg,
+      #1A3A6E 270deg 360deg
+    );
+    opacity: .12;
+  }
+  #yg-popup-card::after {
+    content: '';
+    position: absolute;
+    bottom: -50px; left: -50px;
+    width: 140px; height: 140px;
+    border-radius: 50%;
+    background: conic-gradient(
+      #1A3A6E 0deg 90deg,
+      #A0522D 90deg 180deg,
+      #9B7FA6 180deg 270deg,
+      #E8895A 270deg 360deg
+    );
+    opacity: .10;
+  }
+  #yg-popup-close {
+    position: absolute;
+    top: 16px; right: 16px;
+    width: 32px; height: 32px;
+    border: none; background: none;
+    cursor: pointer;
+    color: #bbb;
+    font-size: 20px;
+    line-height: 1;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%;
+    transition: background .2s, color .2s;
+    font-family: sans-serif;
+  }
+  #yg-popup-close:hover { background: #f5f3f0; color: #1a1614; }
+  .yg-badge {
+    display: inline-block;
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    font-weight: 500;
+    color: #c9a96e;
+    background: rgba(201,169,110,0.1);
+    border: 1px solid rgba(201,169,110,0.3);
+    padding: 6px 18px;
+    border-radius: 100px;
+    margin-bottom: 20px;
+    position: relative;
+  }
+  .yg-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 42px;
+    font-weight: 300;
+    line-height: 1.1;
+    color: #1a1614;
+    letter-spacing: -0.5px;
+    margin-bottom: 8px;
+    position: relative;
+  }
+  .yg-title em {
+    font-style: italic;
+    color: #c9a96e;
+  }
+  .yg-subtitle {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    font-style: italic;
+    color: #7a6e68;
+    margin-bottom: 24px;
+    position: relative;
+  }
+  .yg-seasons {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+    position: relative;
+  }
+  .yg-season-dot {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: #7a6e68;
+    font-weight: 400;
+  }
+  .yg-season-dot span {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+    flex-shrink: 0;
+  }
+  .yg-note {
+    font-size: 12px;
+    color: #bbb;
+    margin-bottom: 28px;
+    letter-spacing: 0.5px;
+    position: relative;
+  }
+  .yg-cta {
+    display: inline-block;
+    background: #1a1614;
+    color: #ffffff;
+    text-decoration: none;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 16px 40px;
+    border-radius: 100px;
+    transition: background .3s, transform .2s;
+    position: relative;
+    cursor: pointer;
+    border: none;
+  }
+  .yg-cta:hover {
+    background: #c9a96e;
+    transform: translateY(-2px);
+    color: #ffffff;
+    text-decoration: none;
+  }
+  .yg-skip {
+    display: block;
+    margin-top: 16px;
+    font-size: 12px;
+    color: #ccc;
+    cursor: pointer;
+    background: none;
+    border: none;
+    font-family: 'DM Sans', sans-serif;
+    text-decoration: underline;
+    position: relative;
+  }
+  .yg-skip:hover { color: #999; }
+</style>
+
+<div id="yg-popup-overlay" class="yg-hidden">
+  <div id="yg-popup-card">
+    <button id="yg-popup-close" aria-label="Chiudi">✕</button>
+
+    <div class="yg-badge">✦ Test gratuito</div>
+
+    <div class="yg-title">
+      E tu che stagione<br><em>sei davvero?</em>
+    </div>
+    <div class="yg-subtitle">Inverno · Primavera · Estate · Autunno</div>
+
+    <div class="yg-seasons">
+      <div class="yg-season-dot"><span style="background:#1A3A6E"></span>Inverno</div>
+      <div class="yg-season-dot"><span style="background:#E8895A"></span>Primavera</div>
+      <div class="yg-season-dot"><span style="background:#9B7FA6"></span>Estate</div>
+      <div class="yg-season-dot"><span style="background:#A0522D"></span>Autunno</div>
+    </div>
+
+    <div class="yg-note">Scoprilo in soli 45 secondi</div>
+
+    <a class="yg-cta" href="https://www.youglamour.it/test-armocromia/">
+      Inizia il Test Gratuito →
+    </a>
+    <button class="yg-skip" onclick="document.getElementById('yg-popup-overlay').classList.add('yg-hidden')">
+      No grazie
+    </button>
+  </div>
+</div>
+
+<script>
+(function() {
+  var STORAGE_KEY = 'yg_popup_dismissed';
+  var DELAY_MS    = 4000; // appare dopo 4 secondi
+
+  // Non mostrare se già chiuso nelle ultime 48 ore
+  var dismissed = localStorage.getItem(STORAGE_KEY);
+  if (dismissed && (Date.now() - parseInt(dismissed)) < 48 * 60 * 60 * 1000) return;
+
+  setTimeout(function() {
+    var overlay = document.getElementById('yg-popup-overlay');
+    if (overlay) overlay.classList.remove('yg-hidden');
+  }, DELAY_MS);
+
+  function closePopup() {
+    var overlay = document.getElementById('yg-popup-overlay');
+    if (overlay) overlay.classList.add('yg-hidden');
+    localStorage.setItem(STORAGE_KEY, Date.now().toString());
+  }
+
+  document.getElementById('yg-popup-close').addEventListener('click', closePopup);
+  document.getElementById('yg-popup-overlay').addEventListener('click', function(e) {
+    if (e.target === this) closePopup();
+  });
+})();
+</script>
