@@ -3,6 +3,8 @@ import { checkAdminAuth } from '@/lib/auth'
 import fs from 'fs'
 import path from 'path'
 
+export const dynamic = 'force-dynamic'
+
 export async function GET(req: NextRequest) {
   if (!checkAdminAuth()) {
     return new NextResponse('Unauthorized', { status: 401 })

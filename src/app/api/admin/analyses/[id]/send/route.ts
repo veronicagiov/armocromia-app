@@ -4,7 +4,9 @@ import { checkAdminAuth } from '@/lib/auth'
 import { getAnalysisById, markAsSent } from '@/lib/db'
 import { generatePDF } from '@/lib/pdf'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+export const dynamic = 'force-dynamic'
+
+const getResend = () => new Resend(process.env.RESEND_API_KEY)
 
 export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
   if (!checkAdminAuth()) {
@@ -24,7 +26,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     notes: analysis.notes,
   })
 
-  await resend.emails.send({
+  await getResend().emails.send({
     from: 'YouGlamour <veronica@youglamour.it>',
     to: analysis.customer_email,
     subject: `La tua analisi armocromatica — ${analysis.customer_name}`,

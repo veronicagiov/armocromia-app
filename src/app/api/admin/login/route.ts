@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { getExpectedToken } from '@/lib/auth'
 
+export const dynamic = 'force-dynamic'
+
 export async function POST(req: NextRequest) {
   const { password } = await req.json()
   const expected = Buffer.from(process.env.ADMIN_PASSWORD || 'changeme').toString('utf8')

@@ -31,7 +31,7 @@
     .hero {
       padding: 40px 24px 32px;
       text-align: center;
-      max-width: 780px;
+      max-width: 960px;
       margin: 0 auto;
     }
     .hero-badge {
@@ -104,8 +104,18 @@
     .season-btn.summer { --c: var(--summer); }
     .season-btn.autumn { --c: var(--autumn); }
     .season-btn.winter { --c: var(--winter); }
-    .season-btn:hover { border-color: var(--c); }
-    .season-btn:hover::before { opacity: 0.04; background: var(--c); }
+    .season-btn:hover, .season-btn.selected { border-color: var(--c); }
+    .season-btn:hover::before, .season-btn.selected::before { opacity: 0.04; background: var(--c); }
+    .season-btn.selected { transform: translateY(-3px); box-shadow: 0 12px 40px rgba(0,0,0,0.08); }
+    .season-btn.selected .season-name { color: var(--c); }
+    .season-btn.selected::after {
+      content: '✓';
+      position: absolute;
+      top: 8px; right: 10px;
+      font-size: 14px;
+      color: var(--c);
+      font-weight: 700;
+    }
     .season-dot {
       width: 36px; height: 36px;
       border-radius: 50%;
@@ -126,7 +136,7 @@
       color: #bbb;
       letter-spacing: 0.5px;
     }
-    .season-btn:hover .season-name { color: var(--c); }
+    .season-btn:hover .season-name, .season-btn.selected .season-name { color: var(--c); }
 
     .quiz-link {
       font-size: 13px;
@@ -320,8 +330,8 @@
       transition: all .3s;
       margin-bottom: 12px;
     }
-    .btn-buy:hover { background: var(--gold); transform: translateY(-2px); }
-    .btn-buy:disabled { background: #888; cursor: not-allowed; transform: none; }
+    .btn-buy:hover:not(:disabled) { background: var(--gold); transform: translateY(-2px); }
+    .btn-buy:disabled { background: #ccc; cursor: not-allowed; transform: none; color: #fff; }
     .secure-note {
       font-size: 12px;
       color: #bbb;
@@ -516,6 +526,7 @@
     }
     @media (max-width: 600px) {
       .seasons-grid { grid-template-columns: repeat(2, 1fr); }
+      .season-sub { display: none; }
       .features-grid { grid-template-columns: 1fr; }
       .pricing-card { padding: 36px 24px 32px; }
       .modal-card { padding: 36px 24px 28px; }
@@ -539,22 +550,22 @@
         <p class="seasons-title">Seleziona la tua stagione per iniziare</p>
 
         <div class="seasons-grid">
-          <button class="season-btn spring" onclick="openModal('Primavera')" onmouseenter="updateMockup('Primavera')" onmouseleave="resetMockup()">
+          <button class="season-btn spring" onclick="selectSeason('Primavera', this)" onmouseenter="updateMockup('Primavera')" onmouseleave="resetMockup()">
             <div class="season-dot" style="background:var(--spring)"></div>
             <span class="season-name">Primavera</span>
             <span class="season-sub">Spring · 4 sottogruppi</span>
           </button>
-          <button class="season-btn summer" onclick="openModal('Estate')" onmouseenter="updateMockup('Estate')" onmouseleave="resetMockup()">
+          <button class="season-btn summer" onclick="selectSeason('Estate', this)" onmouseenter="updateMockup('Estate')" onmouseleave="resetMockup()">
             <div class="season-dot" style="background:var(--summer)"></div>
             <span class="season-name">Estate</span>
             <span class="season-sub">Summer · 4 sottogruppi</span>
           </button>
-          <button class="season-btn autumn" onclick="openModal('Autunno')" onmouseenter="updateMockup('Autunno')" onmouseleave="resetMockup()">
+          <button class="season-btn autumn" onclick="selectSeason('Autunno', this)" onmouseenter="updateMockup('Autunno')" onmouseleave="resetMockup()">
             <div class="season-dot" style="background:var(--autumn)"></div>
             <span class="season-name">Autunno</span>
             <span class="season-sub">Autumn · 4 sottogruppi</span>
           </button>
-          <button class="season-btn winter" onclick="openModal('Inverno')" onmouseenter="updateMockup('Inverno')" onmouseleave="resetMockup()">
+          <button class="season-btn winter" onclick="selectSeason('Inverno', this)" onmouseenter="updateMockup('Inverno')" onmouseleave="resetMockup()">
             <div class="season-dot" style="background:var(--winter)"></div>
             <span class="season-name">Inverno</span>
             <span class="season-sub">Winter · 4 sottogruppi</span>
@@ -634,7 +645,7 @@
       <div class="step">
         <div class="step-num">1</div>
         <div class="step-body">
-          <div class="step-title">Scegli la tua stagione e paga</div>
+          <div class="step-title">Scegli la tua stagione e acquista</div>
           <div class="step-desc">Seleziona la tua stagione qui sopra, inserisci nome e email, e completa il pagamento di 7€ in totale sicurezza con Stripe.</div>
         </div>
       </div>
@@ -675,8 +686,11 @@
         <div class="price-item"><span class="price-item-check">✓</span> Risposta entro 48 ore via email</div>
       </div>
 
-      <button class="btn-buy" onclick="scrollToSeasons()">
-        Scegli la tua stagione →
+      <div id="pricing-season-info" style="display:none; margin-bottom:20px; padding:14px 20px; border-radius:12px; text-align:left;">
+        <span style="font-size:13px; font-weight:500;" id="pricing-season-text"></span>
+      </div>
+      <button class="btn-buy" id="btn-buy" onclick="handleBuy()" disabled>
+        Seleziona prima la tua stagione ↑
       </button>
       <div class="secure-note">🔒 Pagamento sicuro con Stripe</div>
     </div>
@@ -710,7 +724,7 @@
   </div>
 
   <script>
-    const BASE_URL = 'https://armocromia-app-production.up.railway.app'
+    const BASE_URL = ''
 
     const MOCKUP_DATA = {
       Inverno:   { accent: '#1A3A6E', light: '#F0F0FF', en: 'Winter · Armocromia',   subgroup: 'Winter Cool',  colors: ['#1A1A1A','#CC0000','#003399','#006633','#660099','#CC0066','#336699','#003366','#AABBCC'] },
@@ -752,6 +766,54 @@
     }
 
     let selectedSeason = ''
+
+    function selectSeason(season, btnEl) {
+      selectedSeason = season
+      updateMockup(season)
+
+      // Evidenzia il bottone selezionato
+      document.querySelectorAll('.season-btn').forEach(b => b.classList.remove('selected'))
+      btnEl.classList.add('selected')
+
+      // Aggiorna il pulsante pricing
+      const s = SEASON_COLORS[season]
+      const buyBtn = document.getElementById('btn-buy')
+      buyBtn.textContent = 'Acquista analisi ' + season + ' — 7€ →'
+      buyBtn.disabled = false
+      buyBtn.style.background = s.color
+
+      // Mostra stagione selezionata nella card pricing
+      const info = document.getElementById('pricing-season-info')
+      info.style.display = 'block'
+      info.style.background = s.bg
+      info.style.border = '1px solid ' + s.color + '33'
+      document.getElementById('pricing-season-text').innerHTML =
+        '<span style="color:' + s.color + '">✦ ' + season + '</span> — Analisi sottogruppo + PDF personalizzato'
+
+      // Animazione mockup per attirare l'attenzione sull'anteprima
+      const mockup = document.getElementById('mockup-doc')
+      mockup.style.transition = 'transform .4s ease, box-shadow .4s ease'
+      mockup.style.transform = 'scale(1.06)'
+      mockup.style.boxShadow = '0 16px 48px rgba(0,0,0,0.15)'
+      setTimeout(() => {
+        mockup.style.transform = 'scale(1)'
+        mockup.style.boxShadow = 'none'
+      }, 600)
+
+      // Scroll morbido: mostra la sezione sotto senza perdere il mockup di vista
+      setTimeout(() => {
+        const quizLink = document.querySelector('.quiz-link')
+        quizLink.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }, 800)
+    }
+
+    function handleBuy() {
+      if (!selectedSeason) {
+        document.querySelector('.seasons-grid').scrollIntoView({ behavior: 'smooth' })
+        return
+      }
+      openModal(selectedSeason)
+    }
 
     function openModal(season) {
       selectedSeason = season

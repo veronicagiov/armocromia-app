@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      width: 1200px;
+      height: 630px;
+      overflow: hidden;
+    }
+
+    .card {
+      width: 1200px;
+      height: 630px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      background: #fefefe;
+      overflow: hidden;
+    }
+
+    /* Brushstroke effects using CSS */
+    .brush {
+      position: absolute;
+      border-radius: 40% 60% 50% 40% / 50% 40% 60% 50%;
+      filter: blur(2px);
+    }
+
+    .brush-1 {
+      width: 550px; height: 180px;
+      background: linear-gradient(135deg, #d4639a 0%, #e88bba 40%, #c94f85 70%, #d4639a 100%);
+      top: 40px; right: -60px;
+      transform: rotate(-12deg);
+      opacity: 0.85;
+      border-radius: 20% 80% 30% 70% / 60% 30% 70% 40%;
+    }
+    .brush-2 {
+      width: 400px; height: 120px;
+      background: linear-gradient(135deg, #e8a0c4 0%, #f0b8d4 50%, #d87aab 100%);
+      top: 120px; right: 20px;
+      transform: rotate(-8deg);
+      opacity: 0.7;
+      border-radius: 60% 40% 50% 50% / 40% 60% 40% 60%;
+    }
+    .brush-3 {
+      width: 300px; height: 90px;
+      background: linear-gradient(135deg, #f0c8da 0%, #f5d8e6 100%);
+      top: 200px; right: -30px;
+      transform: rotate(-5deg);
+      opacity: 0.6;
+      border-radius: 50% 50% 40% 60% / 60% 40% 60% 40%;
+    }
+    .brush-4 {
+      width: 250px; height: 70px;
+      background: linear-gradient(135deg, #c94f85 0%, #d4639a 100%);
+      bottom: 140px; right: 80px;
+      transform: rotate(-15deg);
+      opacity: 0.5;
+      border-radius: 30% 70% 60% 40% / 50% 50% 50% 50%;
+    }
+    /* Subtle accent brushes */
+    .brush-5 {
+      width: 180px; height: 50px;
+      background: linear-gradient(90deg, #e8c8a0, #f0d8b8);
+      bottom: 80px; left: 60px;
+      transform: rotate(-3deg);
+      opacity: 0.4;
+      border-radius: 50% 50% 40% 60% / 60% 40% 60% 40%;
+    }
+    .brush-6 {
+      width: 150px; height: 45px;
+      background: linear-gradient(90deg, #c8b0d8, #d8c4e4);
+      top: 60px; left: 40px;
+      transform: rotate(5deg);
+      opacity: 0.3;
+      border-radius: 40% 60% 50% 50% / 50% 50% 50% 50%;
+    }
+
+    /* Content */
+    .content {
+      position: relative;
+      z-index: 2;
+      padding: 0 80px;
+      max-width: 750px;
+    }
+
+    .badge {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 11px;
+      letter-spacing: 3.5px;
+      text-transform: uppercase;
+      font-weight: 500;
+      color: #c9a96e;
+      margin-bottom: 24px;
+      display: inline-block;
+    }
+
+    .title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 56px;
+      font-weight: 300;
+      line-height: 1.15;
+      color: #2a2422;
+      margin-bottom: 28px;
+    }
+    .title em {
+      font-style: italic;
+      color: #c24d80;
+    }
+
+    .subtitle {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 16px;
+      color: #8a7e78;
+      font-weight: 300;
+      line-height: 1.6;
+      max-width: 480px;
+    }
+
+    /* Bottom bar */
+    .bottom-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #c94f85, #e8a0c4, #c9a96e, #c8b0d8);
+    }
+
+    /* Author */
+    .author {
+      position: absolute;
+      bottom: 28px;
+      left: 80px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: #a09890;
+      font-weight: 400;
+    }
+    .author span {
+      color: #c24d80;
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <!-- Brushstrokes -->
+    <div class="brush brush-1"></div>
+    <div class="brush brush-2"></div>
+    <div class="brush brush-3"></div>
+    <div class="brush brush-4"></div>
+    <div class="brush brush-5"></div>
+    <div class="brush brush-6"></div>
+
+    <!-- Content -->
+    <div class="content">
+      <div class="badge">Personal Shopper in Palette</div>
+      <div class="title">
+        Perché quel colore<br>ti sta <em>da dio</em><br>e a me no?
+      </div>
+    </div>
+
+    <!-- Bottom gradient bar -->
+    <div class="bottom-bar"></div>
+
+    <!-- Author -->
+    <div class="author">di <span>Veronica</span> &mdash; YouGlamour</div>
+  </div>
+</body>
+</html>

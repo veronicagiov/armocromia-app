@@ -5,11 +5,13 @@ import { insertAnalysis } from '@/lib/db'
 import fs from 'fs'
 import path from 'path'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+export const dynamic = 'force-dynamic'
+
+const getStripe = () => new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2024-06-20',
 })
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+const getResend = () => new Resend(process.env.RESEND_API_KEY)
 
 export async function POST(req: NextRequest) {
   try {
@@ -23,7 +25,7 @@ export async function POST(req: NextRequest) {
     const files = formData.getAll('photos') as File[]
 
     // 1. Verifica pagamento Stripe
-    const session = await stripe.checkout.sessions.retrieve(sessionId)
+    const session = await getStripe().checkout.sessions.retrieve(sessionId)
     if (session.payment_status !== 'paid') {
       return NextResponse.json({ error: 'Pagamento non completato' }, { status: 403 })
     }
@@ -52,7 +54,7 @@ export async function POST(req: NextRequest) {
     })
 
     // 4. Email di notifica a Veronica
-    await resend.emails.send({
+    await getResend().emails.send({
       from: 'YouGlamour <veronica@youglamour.it>',
       to: process.env.NOTIFY_EMAIL!,
       subject: `🎨 Nuova analisi da fare — ${customerName} (${season})`,
@@ -75,7 +77,7 @@ export async function POST(req: NextRequest) {
     })
 
     // 5. Email di conferma all'utente
-    await resend.emails.send({
+    await getResend().emails.send({
       from: 'YouGlamour <veronica@youglamour.it>',
       to: customerEmail,
       subject: `✨ Abbiamo ricevuto le tue foto — ${customerName}!`,

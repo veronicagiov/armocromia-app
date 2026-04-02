@@ -108,6 +108,64 @@ export function markAsSent(id: number): void {
   db.prepare("UPDATE analyses SET status = 'sent' WHERE id = ?").run(id)
 }
 
+// ── Wardrobe ──────────────────────────────────────
+db.exec(`
+  CREATE TABLE IF NOT EXISTS wardrobe_items (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    category TEXT NOT NULL,
+    color_hex TEXT NOT NULL,
+    color_name TEXT,
+    frequency TEXT NOT NULL DEFAULT 'sometimes',
+    photo TEXT,
+    note TEXT DEFAULT '',
+    season TEXT NOT NULL,
+    in_palette INTEGER DEFAULT 0,
+    created_at TEXT DEFAULT (datetime('now', 'localtime'))
+  )
+`)
+
+export interface WardrobeItem {
+  id: number
+  category: string
+  color_hex: string
+  color_name: string | null
+  frequency: 'often' | 'sometimes' | 'never'
+  photo: string | null
+  note: string
+  season: string
+  in_palette: number
+  created_at: string
+}
+
+export function getAllWardrobeItems(): WardrobeItem[] {
+  return db.prepare('SELECT * FROM wardrobe_items ORDER BY created_at DESC').all() as WardrobeItem[]
+}
+
+export function insertWardrobeItem(data: {
+  category: string
+  color_hex: string
+  color_name: string | null
+  frequency: string
+  photo: string | null
+  note: string
+  season: string
+  in_palette: boolean
+}): number {
+  const result = db.prepare(`
+    INSERT INTO wardrobe_items (category, color_hex, color_name, frequency, photo, note, season, in_palette)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+  `).run(data.category, data.color_hex, data.color_name, data.frequency, data.photo, data.note, data.season, data.in_palette ? 1 : 0)
+  return result.lastInsertRowid as number
+}
+
+export function deleteWardrobeItem(id: number): void {
+  db.prepare('DELETE FROM wardrobe_items WHERE id = ?').run(id)
+}
+
+export function updateWardrobeFrequency(id: number, frequency: string): void {
+  db.prepare('UPDATE wardrobe_items SET frequency = ? WHERE id = ?').run(frequency, id)
+}
+
 export interface Lead {
   id: number
   name: string
