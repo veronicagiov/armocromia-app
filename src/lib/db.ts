@@ -108,6 +108,15 @@ export function markAsSent(id: number): void {
   db.prepare("UPDATE analyses SET status = 'sent' WHERE id = ?").run(id)
 }
 
+export function deleteAnalysis(id: number): void {
+  db.prepare('DELETE FROM analyses WHERE id = ?').run(id)
+}
+
+export function deleteAnalysesBulk(ids: number[]): void {
+  const placeholders = ids.map(() => '?').join(',')
+  db.prepare(`DELETE FROM analyses WHERE id IN (${placeholders})`).run(...ids)
+}
+
 // ── Wardrobe ──────────────────────────────────────
 db.exec(`
   CREATE TABLE IF NOT EXISTS wardrobe_items (
@@ -217,12 +226,30 @@ export function markSubquizPaid(id: number): void {
   db.prepare('UPDATE subquiz_submissions SET paid = 1 WHERE id = ?').run(id)
 }
 
+export function deleteSubquizSubmission(id: number): void {
+  db.prepare('DELETE FROM subquiz_submissions WHERE id = ?').run(id)
+}
+
+export function deleteSubquizSubmissionsBulk(ids: number[]): void {
+  const placeholders = ids.map(() => '?').join(',')
+  db.prepare(`DELETE FROM subquiz_submissions WHERE id IN (${placeholders})`).run(...ids)
+}
+
 export interface Lead {
   id: number
   name: string
   email: string
   season: string
   created_at: string
+}
+
+export function deleteLead(id: number): void {
+  db.prepare('DELETE FROM leads WHERE id = ?').run(id)
+}
+
+export function deleteLeadsBulk(ids: number[]): void {
+  const placeholders = ids.map(() => '?').join(',')
+  db.prepare(`DELETE FROM leads WHERE id IN (${placeholders})`).run(...ids)
 }
 
 export function insertLead(data: { name: string; email: string; season: string }): void {

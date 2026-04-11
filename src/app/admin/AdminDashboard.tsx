@@ -58,6 +58,10 @@ export default function AdminDashboard() {
   const [sending, setSending] = useState<Record<number, boolean>>({})
   const [sent, setSent] = useState<Record<number, boolean>>({})
   const [subgroups, setSubgroups] = useState<Record<number, string>>({})
+  const [selectedAnalyses, setSelectedAnalyses] = useState<Set<number>>(new Set())
+  const [selectedSubquiz, setSelectedSubquiz] = useState<Set<number>>(new Set())
+  const [selectedLeads, setSelectedLeads] = useState<Set<number>>(new Set())
+  const [deleting, setDeleting] = useState(false)
   const router = useRouter()
 
   const load = useCallback(async () => {
@@ -103,6 +107,35 @@ export default function AdminDashboard() {
   async function handleLogout() {
     await fetch('/api/admin/logout', { method: 'POST' })
     router.push('/admin/login')
+  }
+
+  function toggleSelect(set: Set<number>, setFn: (s: Set<number>) => void, id: number) {
+    const next = new Set(set)
+    if (next.has(id)) next.delete(id); else next.add(id)
+    setFn(next)
+  }
+
+  function toggleSelectAll(ids: number[], set: Set<number>, setFn: (s: Set<number>) => void) {
+    if (ids.every(id => set.has(id))) setFn(new Set())
+    else setFn(new Set(ids))
+  }
+
+  async function handleDeleteBulk(endpoint: string, ids: number[], setFn: (s: Set<number>) => void) {
+    if (ids.length === 0) return
+    if (!confirm(`Eliminare ${ids.length} elemento/i?`)) return
+    setDeleting(true)
+    await fetch(endpoint, { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ids }) })
+    setFn(new Set())
+    await load()
+    setDeleting(false)
+  }
+
+  async function handleDeleteSingle(endpoint: string, id: number) {
+    if (!confirm('Eliminare questo elemento?')) return
+    setDeleting(true)
+    await fetch(endpoint, { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ids: [id] }) })
+    await load()
+    setDeleting(false)
   }
 
   const pending = analyses.filter(a => a.status === 'pending').length
@@ -163,6 +196,19 @@ export default function AdminDashboard() {
         {/* ── TAB ANALISI ── */}
         {tab === 'analyses' && (
           <>
+            {analyses.length > 0 && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: '#666', cursor: 'pointer' }}>
+                  <input type="checkbox" checked={analyses.length > 0 && analyses.every(a => selectedAnalyses.has(a.id))} onChange={() => toggleSelectAll(analyses.map(a => a.id), selectedAnalyses, setSelectedAnalyses)} style={{ accentColor: '#c9a96e', width: 16, height: 16 }} />
+                  Seleziona tutti
+                </label>
+                {selectedAnalyses.size > 0 && (
+                  <button onClick={() => handleDeleteBulk('/api/admin/analyses', [...selectedAnalyses], setSelectedAnalyses)} disabled={deleting} style={{ padding: '6px 16px', background: '#cc4444', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
+                    Elimina selezionati ({selectedAnalyses.size})
+                  </button>
+                )}
+              </div>
+            )}
             {analyses.length === 0 && (
               <div style={{ background: '#fff', border: '1px solid #E8E0D8', borderRadius: 12, padding: 48, textAlign: 'center', color: '#999' }}>
                 Nessuna analisi ancora ricevuta.
@@ -184,6 +230,8 @@ export default function AdminDashboard() {
 
                   <div style={{ padding: '20px 24px' }}>
                     <div style={{ display: 'flex', alignItems: 'flex-start', gap: 24, flexWrap: 'wrap' }}>
+                      {/* Checkbox */}
+                      <input type="checkbox" checked={selectedAnalyses.has(a.id)} onChange={() => toggleSelect(selectedAnalyses, setSelectedAnalyses, a.id)} style={{ accentColor: '#c9a96e', width: 16, height: 16, marginTop: 4, cursor: 'pointer', flexShrink: 0 }} />
                       {/* Info cliente */}
                       <div style={{ flex: 2, minWidth: 200 }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
@@ -250,6 +298,13 @@ export default function AdminDashboard() {
                         >
                           {isSending ? 'Invio...' : alreadySent ? '✓ Inviata' : 'Invia PDF'}
                         </button>
+                        <button
+                          onClick={() => handleDeleteSingle('/api/admin/analyses', a.id)}
+                          disabled={deleting}
+                          style={{ padding: '6px 14px', background: 'none', border: '1px solid #E8E0D8', borderRadius: 8, cursor: 'pointer', fontSize: 12, color: '#cc4444' }}
+                        >
+                          Elimina
+                        </button>
                       </div>
                     </div>
 
@@ -280,6 +335,19 @@ export default function AdminDashboard() {
         {/* ── TAB SUBQUIZ ── */}
         {tab === 'subquiz' && (
           <>
+            {subquizSubs.length > 0 && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: '#666', cursor: 'pointer' }}>
+                  <input type="checkbox" checked={subquizSubs.length > 0 && subquizSubs.every(s => selectedSubquiz.has(s.id))} onChange={() => toggleSelectAll(subquizSubs.map(s => s.id), selectedSubquiz, setSelectedSubquiz)} style={{ accentColor: '#c9a96e', width: 16, height: 16 }} />
+                  Seleziona tutti
+                </label>
+                {selectedSubquiz.size > 0 && (
+                  <button onClick={() => handleDeleteBulk('/api/admin/subquiz-submissions', [...selectedSubquiz], setSelectedSubquiz)} disabled={deleting} style={{ padding: '6px 16px', background: '#cc4444', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
+                    Elimina selezionati ({selectedSubquiz.size})
+                  </button>
+                )}
+              </div>
+            )}
             {subquizSubs.length === 0 && (
               <div style={{ background: '#fff', border: '1px solid #E8E0D8', borderRadius: 12, padding: 48, textAlign: 'center', color: '#999' }}>
                 Nessuna submission del subquiz ancora ricevuta.
@@ -289,7 +357,8 @@ export default function AdminDashboard() {
             {subquizSubs.length > 0 && (
               <div style={{ background: '#fff', border: '1px solid #E8E0D8', borderRadius: 12, overflow: 'hidden' }}>
                 {/* Intestazione tabella */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 2fr 1fr 1.5fr 1fr 1fr', gap: 12, padding: '12px 24px', background: '#F5F3F0', borderBottom: '1px solid #E8E0D8' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '30px 1.5fr 2fr 1fr 1.5fr 1fr 1fr 60px', gap: 12, padding: '12px 24px', background: '#F5F3F0', borderBottom: '1px solid #E8E0D8' }}>
+                  <div></div>
                   {['Nome', 'Email', 'Stagione', 'Sottogruppo (quiz)', 'Foto', 'Data'].map(h => (
                     <div key={h} style={{ fontSize: 11, color: '#999', letterSpacing: 1.5, textTransform: 'uppercase', fontWeight: 600 }}>{h}</div>
                   ))}
@@ -305,11 +374,12 @@ export default function AdminDashboard() {
                     <div key={s.id}>
                       <div
                         style={{
-                          display: 'grid', gridTemplateColumns: '1.5fr 2fr 1fr 1.5fr 1fr 1fr', gap: 12,
+                          display: 'grid', gridTemplateColumns: '30px 1.5fr 2fr 1fr 1.5fr 1fr 1fr 60px', gap: 12,
                           padding: '14px 24px', borderBottom: i < subquizSubs.length - 1 ? '1px solid #F0EBE5' : 'none',
                           alignItems: 'center',
                         }}
                       >
+                        <input type="checkbox" checked={selectedSubquiz.has(s.id)} onChange={() => toggleSelect(selectedSubquiz, setSelectedSubquiz, s.id)} style={{ accentColor: '#c9a96e', width: 16, height: 16, cursor: 'pointer' }} />
                         <div style={{ fontSize: 14, fontWeight: 600, color: '#1a1614' }}>{s.name}</div>
                         <div style={{ fontSize: 13, color: '#666' }}>{s.email}</div>
                         <div>
@@ -333,6 +403,7 @@ export default function AdminDashboard() {
                         <div style={{ fontSize: 12, color: '#BBB' }}>
                           {new Date(s.created_at).toLocaleDateString('it-IT', { day: '2-digit', month: 'short', year: 'numeric' })}
                         </div>
+                        <button onClick={() => handleDeleteSingle('/api/admin/subquiz-submissions', s.id)} disabled={deleting} style={{ padding: '4px 10px', background: 'none', border: '1px solid #E8E0D8', borderRadius: 6, cursor: 'pointer', fontSize: 11, color: '#cc4444' }}>Elimina</button>
                       </div>
 
                       {isExpSub && photos.length > 0 && (
@@ -423,12 +494,26 @@ export default function AdminDashboard() {
                 )
               })()}
 
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: '#666', cursor: 'pointer' }}>
+                  <input type="checkbox" checked={leads.length > 0 && leads.every(l => selectedLeads.has(l.id))} onChange={() => toggleSelectAll(leads.map(l => l.id), selectedLeads, setSelectedLeads)} style={{ accentColor: '#c9a96e', width: 16, height: 16 }} />
+                  Seleziona tutti
+                </label>
+                {selectedLeads.size > 0 && (
+                  <button onClick={() => handleDeleteBulk('/api/admin/leads', [...selectedLeads], setSelectedLeads)} disabled={deleting} style={{ padding: '6px 16px', background: '#cc4444', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
+                    Elimina selezionati ({selectedLeads.size})
+                  </button>
+                )}
+              </div>
+
               <div style={{ background: '#fff', border: '1px solid #E8E0D8', borderRadius: 12, overflow: 'hidden' }}>
                 {/* Intestazione tabella */}
-                <div style={{ display: 'grid', gridTemplateColumns: '2fr 2fr 1.5fr 1.5fr', gap: 16, padding: '12px 24px', background: '#F5F3F0', borderBottom: '1px solid #E8E0D8' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '30px 2fr 2fr 1.5fr 1.5fr 60px', gap: 16, padding: '12px 24px', background: '#F5F3F0', borderBottom: '1px solid #E8E0D8' }}>
+                  <div></div>
                   {['Nome', 'Email', 'Stagione', 'Data'].map(h => (
                     <div key={h} style={{ fontSize: 11, color: '#999', letterSpacing: 1.5, textTransform: 'uppercase', fontWeight: 600 }}>{h}</div>
                   ))}
+                  <div></div>
                 </div>
 
                 {leads.map((l, i) => {
@@ -438,11 +523,12 @@ export default function AdminDashboard() {
                     <div
                       key={l.id}
                       style={{
-                        display: 'grid', gridTemplateColumns: '2fr 2fr 1.5fr 1.5fr', gap: 16,
+                        display: 'grid', gridTemplateColumns: '30px 2fr 2fr 1.5fr 1.5fr 60px', gap: 16,
                         padding: '14px 24px', borderBottom: i < leads.length - 1 ? '1px solid #F0EBE5' : 'none',
                         alignItems: 'center',
                       }}
                     >
+                      <input type="checkbox" checked={selectedLeads.has(l.id)} onChange={() => toggleSelect(selectedLeads, setSelectedLeads, l.id)} style={{ accentColor: '#c9a96e', width: 16, height: 16, cursor: 'pointer' }} />
                       <div style={{ fontSize: 14, fontWeight: 600, color: '#1a1614' }}>{l.name}</div>
                       <div style={{ fontSize: 13, color: '#666' }}>{l.email}</div>
                       <div>
@@ -453,6 +539,7 @@ export default function AdminDashboard() {
                       <div style={{ fontSize: 12, color: '#BBB' }}>
                         {new Date(l.created_at).toLocaleDateString('it-IT', { day: '2-digit', month: 'short', year: 'numeric' })}
                       </div>
+                      <button onClick={() => handleDeleteSingle('/api/admin/leads', l.id)} disabled={deleting} style={{ padding: '4px 10px', background: 'none', border: '1px solid #E8E0D8', borderRadius: 6, cursor: 'pointer', fontSize: 11, color: '#cc4444' }}>Elimina</button>
                     </div>
                   )
                 })}
