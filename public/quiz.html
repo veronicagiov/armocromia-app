@@ -196,6 +196,86 @@
     .upsell-cta-wrap { flex-direction: column; align-items: flex-start; gap: 16px; }
     .btn-upsell { width: 100%; }
   }
+
+  /* ── SUBQUIZ ── */
+  #subquiz-section { display: none; min-height: 100vh; padding: 0 24px 80px; max-width: 780px; margin: 0 auto; }
+  #subresult-section { display: none; padding: 60px 24px 100px; max-width: 860px; margin: 0 auto; animation: fadeUp .6s ease forwards; }
+
+  .subquiz-intro { text-align: center; margin-bottom: 48px; animation: fadeUp .5s ease; }
+  .subquiz-intro h2 { font-family: 'Cormorant Garamond', serif; font-size: clamp(32px,6vw,52px); font-weight: 300; line-height: 1.1; margin-bottom: 12px; }
+  .subquiz-intro h2 em { font-style: italic; color: var(--gold); }
+  .subquiz-intro p { font-size: 15px; color: var(--muted); line-height: 1.7; max-width: 500px; margin: 0 auto; }
+
+  .sub-result-reveal { text-align: center; margin-bottom: 48px; }
+  .sub-result-eyebrow { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); font-weight: 500; margin-bottom: 16px; }
+  .sub-result-name { font-family: 'Cormorant Garamond', serif; font-size: clamp(44px,8vw,80px); font-weight: 300; line-height: 1.05; letter-spacing: -1px; margin-bottom: 8px; }
+  .sub-result-season-tag { display: inline-block; padding: 8px 22px; border-radius: 100px; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; font-weight: 500; margin-bottom: 28px; }
+  .sub-result-desc { font-size: 16px; line-height: 1.85; color: var(--charcoal); max-width: 600px; margin: 0 auto 36px; text-align: center; }
+  .sub-result-preview-label { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); margin-bottom: 16px; }
+  .sub-result-swatches { display: flex; justify-content: center; gap: 14px; margin-bottom: 12px; }
+  .sub-result-swatches .swatch { width: 56px; height: 56px; }
+  .sub-result-more { font-size: 13px; color: var(--muted); font-style: italic; }
+
+  .subquiz-cta-section {
+    margin: 56px auto 0;
+    max-width: 640px;
+    background: var(--charcoal);
+    border-radius: 24px;
+    padding: 48px 40px;
+    color: var(--cream);
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+  }
+  .subquiz-cta-section::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 80% 60% at 100% 0%, rgba(201,169,110,0.15) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 50% at 0% 100%, rgba(201,169,110,0.08) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .subquiz-cta-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(24px,4vw,36px); font-weight: 300; line-height: 1.2; margin-bottom: 20px; position: relative; }
+  .subquiz-cta-title em { font-style: italic; color: var(--gold); }
+  .subquiz-cta-list { list-style: none; text-align: left; max-width: 400px; margin: 0 auto 32px; position: relative; }
+  .subquiz-cta-list li { padding: 10px 0; font-size: 15px; color: rgba(250,247,242,0.85); border-bottom: 1px solid rgba(255,255,255,0.06); display: flex; align-items: center; gap: 12px; }
+  .subquiz-cta-list li span.icon { font-size: 18px; flex-shrink: 0; }
+  .subquiz-cta-price { position: relative; display: flex; align-items: center; justify-content: center; gap: 24px; flex-wrap: wrap; margin-bottom: 24px; }
+  .subquiz-cta-price .price-big { font-family: 'Cormorant Garamond', serif; font-size: 52px; font-weight: 300; color: var(--gold); line-height: 1; }
+  .subquiz-cta-price .price-note { font-size: 13px; color: rgba(250,247,242,0.5); text-align: left; }
+
+  /* ── PHOTO UPLOAD ── */
+  .photo-upload-section { text-align: center; margin-bottom: 48px; animation: fadeUp .5s ease; }
+  .photo-upload-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(28px,5vw,44px); font-weight: 300; line-height: 1.15; margin-bottom: 12px; }
+  .photo-upload-title em { font-style: italic; color: var(--gold); }
+  .photo-upload-sub { font-size: 15px; color: var(--muted); line-height: 1.7; max-width: 500px; margin: 0 auto 36px; }
+  .photo-dropzone {
+    max-width: 480px; margin: 0 auto 16px;
+    border: 2px dashed var(--border); border-radius: 20px;
+    padding: 40px 24px; cursor: pointer;
+    transition: all .25s; background: var(--warm-white);
+  }
+  .photo-dropzone:hover, .photo-dropzone.dragover { border-color: var(--gold); background: rgba(201,169,110,0.04); }
+  .photo-dropzone-icon { font-size: 40px; margin-bottom: 12px; }
+  .photo-dropzone-text { font-size: 15px; color: var(--charcoal); margin-bottom: 4px; }
+  .photo-dropzone-hint { font-size: 13px; color: var(--muted); }
+  .photo-previews { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-top: 24px; }
+  .photo-preview-item { position: relative; width: 120px; height: 120px; border-radius: 16px; overflow: hidden; box-shadow: var(--shadow); }
+  .photo-preview-item img { width: 100%; height: 100%; object-fit: cover; }
+  .photo-preview-remove {
+    position: absolute; top: 6px; right: 6px; width: 26px; height: 26px;
+    background: rgba(0,0,0,0.6); color: white; border: none; border-radius: 50%;
+    font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  }
+  .photo-tips { max-width: 420px; margin: 24px auto 0; text-align: left; }
+  .photo-tips li { font-size: 13px; color: var(--muted); line-height: 1.6; padding: 4px 0; }
+  .btn-confirm-photos { background: var(--charcoal); color: var(--cream); border: none; padding: 17px 48px; border-radius: 100px; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 500; cursor: pointer; transition: all .3s; margin-top: 32px; display: none; }
+  .btn-confirm-photos:hover:not(:disabled) { background: var(--gold); transform: translateY(-1px); }
+  .btn-confirm-photos:disabled { opacity: .4; cursor: not-allowed; }
+  #payment-section { display: none; padding: 60px 24px 100px; max-width: 860px; margin: 0 auto; animation: fadeUp .6s ease forwards; }
+
+  @media (max-width: 600px) {
+    .subquiz-cta-section { padding: 32px 24px; }
+  }
 </style>
 </head>
 <body>
@@ -255,6 +335,27 @@
 
 <!-- RESULT -->
 <section id="result-section"></section>
+
+<!-- SUBQUIZ -->
+<section id="subquiz-section">
+  <div class="progress-bar-wrap">
+    <div class="progress-info">
+      <span class="label">Sottogruppo</span>
+      <span class="counter" id="sub-q-counter">1 / 5</span>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="sub-progress-fill"></div></div>
+  </div>
+  <div id="sub-question-container"></div>
+  <div class="quiz-nav">
+    <button class="btn-back" id="sub-btn-back" onclick="prevSubQuestion()" style="display:none">← Indietro</button>
+  </div>
+</section>
+
+<!-- SUBRESULT (upload foto) -->
+<section id="subresult-section"></section>
+
+<!-- PAYMENT (upsell dopo conferma foto) -->
+<section id="payment-section"></section>
 
 <script>
 // ─── DOMANDE ────────────────────────────────────────────────────────────────
@@ -609,8 +710,8 @@ function showResult() {
       <div class="result-subtitle">Armocromia ${d.en}</div>
       <div class="result-divider" style="background:${d.badge_color};"></div>
       <div class="result-description">${d.description.map(p=>`<p>${p}</p>`).join('')}</div>
-      <button onclick="document.getElementById('upsell-box').scrollIntoView({behavior:'smooth'})" style="margin-top:28px;background:none;border:1.5px solid ${d.badge_color};color:${d.badge_color};padding:12px 28px;border-radius:100px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;letter-spacing:0.5px;transition:all .2s;" onmouseover="this.style.background='${d.badge_color}';this.style.color='#fff'" onmouseout="this.style.background='none';this.style.color='${d.badge_color}'">
-        ✦ Scopri il tuo sottogruppo →
+      <button onclick="startSubQuiz()" style="margin-top:28px;background:${d.badge_color};border:none;color:#fff;padding:14px 32px;border-radius:100px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;letter-spacing:0.5px;transition:all .2s;box-shadow:0 4px 16px rgba(0,0,0,0.15);" onmouseover="this.style.opacity='0.85';this.style.transform='translateY(-2px)'" onmouseout="this.style.opacity='1';this.style.transform='translateY(0)'">
+        Ora scopri il tuo sottogruppo!
       </button>
     </div>
 
@@ -638,29 +739,14 @@ function showResult() {
       </a>
     </div>
 
-    <!-- ── UPSELL ── -->
+    <!-- ── CTA SOTTOGRUPPO ── -->
     <div class="upsell-section" id="upsell-box">
-      <div class="upsell-badge">✦ Analisi professionale</div>
-      <h2 class="upsell-title">Vuoi sapere esattamente<br><em>chi sei davvero</em>?</h2>
-      <p class="upsell-sub">Il test ti ha dato la stagione — ma ogni stagione ha <strong>4 sottogruppi</strong> con palette diverse. Con l'analisi personalizzata scopri il tuo sottogruppo preciso e ricevi un PDF su misura.</p>
-
-      <div class="upsell-features">
-        <div class="upsell-feat"><span class="upsell-feat-icon">🎨</span><div><strong>Sottogruppo preciso</strong><br>Es. Inverno Puro, Inverno Freddo, Inverno Scuro...</div></div>
-        <div class="upsell-feat"><span class="upsell-feat-icon">📄</span><div><strong>PDF personalizzato</strong><br>Palette 30+ colori, make-up, abbinamenti outfit</div></div>
-        <div class="upsell-feat"><span class="upsell-feat-icon">📸</span><div><strong>Analisi sulle tue foto</strong><br>Carichi viso, occhi, polso — analizziamo noi</div></div>
-        <div class="upsell-feat"><span class="upsell-feat-icon">⚡</span><div><strong>Risposta in 48 ore</strong><br>Ricevi tutto direttamente via email</div></div>
-      </div>
-
-      <div class="upsell-cta-wrap">
-        <div class="upsell-price">
-          <span class="upsell-price-num">7€</span>
-          <span class="upsell-price-note">pagamento sicuro • una tantum</span>
-        </div>
-        <button class="btn-upsell" onclick="startCheckout()" id="btn-upsell">
-          Voglio l'analisi personalizzata →
-        </button>
-      </div>
-      <p class="upsell-guarantee">🔒 Pagamento sicuro con Stripe</p>
+      <div class="upsell-badge">✦ C'è di più da scoprire</div>
+      <h2 class="upsell-title">Sai che la tua stagione ha<br><em>4 sottogruppi</em>?</h2>
+      <p class="upsell-sub">Essere ${d.name} è solo l'inizio. Ogni stagione nasconde <strong>4 anime diverse</strong> — con palette, colori e consigli completamente diversi tra loro. Scopri quale sei davvero con 5 domande veloci.</p>
+      <button class="btn-upsell" onclick="startSubQuiz()" style="max-width:400px;">
+        Ora scopri il tuo sottogruppo!
+      </button>
     </div>
 
     <div class="restart-wrap">
@@ -671,7 +757,11 @@ function showResult() {
 
 function restartQuiz() {
   current=0; answers=[];
+  subCurrent=0; subAnswers=[]; selectedSeason=null; uploadedPhotos=[];
   document.getElementById('result-section').style.display='none';
+  document.getElementById('subquiz-section').style.display='none';
+  document.getElementById('subresult-section').style.display='none';
+  document.getElementById('payment-section').style.display='none';
   document.getElementById('user-name').value='';
   document.getElementById('user-email').value='';
   document.getElementById('hero-section').style.display='flex';
@@ -684,9 +774,11 @@ let lastName = '';
 let lastEmail = '';
 
 async function startCheckout() {
-  const btn = document.getElementById('btn-upsell');
-  btn.disabled = true;
-  btn.textContent = 'Reindirizzamento a Stripe...';
+  const btn = document.getElementById('btn-sub-upsell') || document.getElementById('btn-upsell');
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = 'Reindirizzamento a Stripe...';
+  }
 
   try {
     const res = await fetch('/api/create-checkout', {
@@ -703,14 +795,453 @@ async function startCheckout() {
       window.open(data.url, '_top');
     } else {
       alert('Errore nel pagamento. Riprova.');
-      btn.disabled = false;
-      btn.textContent = 'Voglio l\'analisi personalizzata →';
+      if (btn) { btn.disabled = false; btn.textContent = 'Paga e ricevi il PDF ✦'; }
     }
   } catch(e) {
     alert('Errore di connessione. Riprova.');
-    btn.disabled = false;
-    btn.textContent = 'Voglio l\'analisi personalizzata →';
+    if (btn) { btn.disabled = false; btn.textContent = 'Paga e ricevi il PDF ✦'; }
   }
+}
+
+// ─── SUBQUIZ: SOTTOGRUPPO ───────────────────────────────────────────────────
+
+const subgroupMap = {
+  spring: { pure:'Primavera Assoluta', light:'Spring Light', warm:'Spring Warm', bright:'Spring Bright' },
+  summer: { pure:'Estate Assoluta', light:'Summer Light', soft:'Summer Soft', cool:'Summer Cool' },
+  autumn: { pure:'Autunno Assoluto', soft:'Autumn Soft', warm:'Autumn Warm', deep:'Autumn Deep' },
+  winter: { pure:'Inverno Assoluto', cool:'Winter Cool', bright:'Winter Bright', deep:'Winter Deep' }
+};
+
+const subgroupInfo = {
+  'Primavera Assoluta': {
+    desc: "Sei la Primavera nella sua forma più pura: calda, luminosa e fresca. I tuoi colori naturali sono in perfetto equilibrio — né troppo chiari né troppo intensi, semplicemente radiosi.",
+    colors: ['#f0b080','#e88060','#80b858','#f0d060','#e8a048'],
+    accent: '#b86d3e', light: 'rgba(232,168,124,0.15)'
+  },
+  'Spring Light': {
+    desc: "Sei la versione più delicata della Primavera: colori chiari, luminosi e quasi eterei. La tua palette ideale è fatta di toni pastello caldi — pesca chiaro, giallo burro, verde menta.",
+    colors: ['#f8d8b0','#f0c8a0','#b8d888','#f8e8a0','#f0d0b8'],
+    accent: '#c08050', light: 'rgba(232,168,124,0.15)'
+  },
+  'Spring Warm': {
+    desc: "Sei la Primavera più calda e solare: i tuoi colori naturali tendono a tonalità dorate e ambrate. La tua palette ideale brilla di corallo, arancio, verde oliva chiaro e giallo caldo.",
+    colors: ['#e08040','#d09030','#708838','#e8a030','#c07028'],
+    accent: '#a06020', light: 'rgba(232,168,124,0.15)'
+  },
+  'Spring Bright': {
+    desc: "Sei la Primavera più vivace e accesa: i tuoi colori naturali hanno una luminosità magnetica. La tua palette è fatta di tonalità brillanti e sature — corallo vivo, turchese, giallo limone.",
+    colors: ['#e86040','#f0a028','#40a858','#f0c020','#d85040'],
+    accent: '#c04020', light: 'rgba(232,168,124,0.15)'
+  },
+  'Estate Assoluta': {
+    desc: "Sei l'Estate nella sua essenza più pura: fredda, delicata e sofisticata. I tuoi colori naturali sono armoniosamente bilanciati in un equilibrio morbido e raffinato.",
+    colors: ['#c0b0d8','#e8c8cc','#a8c0d8','#d0d0d8','#e0c8d0'],
+    accent: '#7a5e9a', light: 'rgba(184,169,201,0.15)'
+  },
+  'Summer Light': {
+    desc: "Sei la versione più chiara e luminosa dell'Estate: i tuoi colori sono delicatissimi, quasi trasparenti. La tua palette è fatta di pastelli freddi — rosa polvere, azzurro cielo, lilla tenue.",
+    colors: ['#d8c8e0','#f0d8dc','#c0d8e8','#e0e0e8','#e8d8e0'],
+    accent: '#9078a8', light: 'rgba(184,169,201,0.15)'
+  },
+  'Summer Soft': {
+    desc: "Sei l'Estate più sfumata e vellutata: i tuoi colori hanno una qualità morbida e polverosa. La tua palette è fatta di toni desaturati e avvolgenti — salvia, malva, grigio perla, rosa cenere.",
+    colors: ['#b0a8b8','#d0b8c0','#98b0b8','#c0c0c8','#c8b8c0'],
+    accent: '#6a5878', light: 'rgba(184,169,201,0.15)'
+  },
+  'Summer Cool': {
+    desc: "Sei l'Estate più fredda e cristallina: i tuoi colori naturali hanno un sottotono decisamente blu-rosato. La tua palette ideale è fatta di toni freddi e decisi — fucsia, blu lavanda, rosa shocking.",
+    colors: ['#a888c0','#d0a0b8','#88a8d0','#b0b0d0','#c8a0c0'],
+    accent: '#604880', light: 'rgba(184,169,201,0.15)'
+  },
+  'Autunno Assoluto': {
+    desc: "Sei l'Autunno nella sua forma più completa: caldo, ricco e avvolgente. I tuoi colori naturali sono in perfetto equilibrio tra profondità e calore — il cuore puro della stagione.",
+    colors: ['#a04820','#c89040','#507840','#9a6028','#804030'],
+    accent: '#9a5822', light: 'rgba(196,128,74,0.15)'
+  },
+  'Autumn Soft': {
+    desc: "Sei l'Autunno più morbido e sfumato: i tuoi colori hanno una qualità vellutata e calda ma mai troppo intensa. La tua palette è fatta di toni ovattati — cammello, terracotta chiara, verde salvia.",
+    colors: ['#b88868','#c8a078','#688860','#b89868','#a08060'],
+    accent: '#886040', light: 'rgba(196,128,74,0.15)'
+  },
+  'Autumn Warm': {
+    desc: "Sei l'Autunno più caldo e solare: i tuoi colori naturali sono dominati da sfumature dorate e ramate. La tua palette brilla di arancione, ocra, rame, verde bosco e senape.",
+    colors: ['#c06818','#d8a030','#486828','#b87818','#a05010'],
+    accent: '#884010', light: 'rgba(196,128,74,0.15)'
+  },
+  'Autumn Deep': {
+    desc: "Sei l'Autunno più profondo e intenso: i tuoi colori naturali sono scuri, ricchi e drammatici. La tua palette è fatta di toni profondi — bordeaux, cioccolato, verde scuro, prugna.",
+    colors: ['#702818','#905828','#385020','#703020','#602018'],
+    accent: '#5a2810', light: 'rgba(196,128,74,0.15)'
+  },
+  'Inverno Assoluto': {
+    desc: "Sei l'Inverno nella sua forma più pura: freddo, contrastato e potente. I tuoi colori naturali sono in perfetto equilibrio tra chiari e scuri — il vero ghiaccio e fuoco della stagione.",
+    colors: ['#2040a0','#cc1020','#f0f0f8','#101018','#8030a0'],
+    accent: '#3d6096', light: 'rgba(107,140,186,0.15)'
+  },
+  'Winter Cool': {
+    desc: "Sei l'Inverno più freddo e cristallino: il tuo sottotono è decisamente blu. La tua palette è fatta di toni freddi puri — blu royal, fucsia, bianco ottico, grigio acciaio.",
+    colors: ['#1848b0','#b01060','#e8e8f0','#404058','#6020a0'],
+    accent: '#2850a0', light: 'rgba(107,140,186,0.15)'
+  },
+  'Winter Bright': {
+    desc: "Sei l'Inverno più vivace e luminoso: i tuoi colori naturali hanno una brillantezza che cattura lo sguardo. La tua palette è fatta di toni saturi e puri — rosso vivo, blu elettrico, smeraldo, fucsia.",
+    colors: ['#e01020','#0050d0','#00a050','#d010a0','#f0e800'],
+    accent: '#1040b0', light: 'rgba(107,140,186,0.15)'
+  },
+  'Winter Deep': {
+    desc: "Sei l'Inverno più profondo e misterioso: i tuoi colori naturali sono scuri e intensi con un sottotono freddo. La tua palette è fatta di toni profondi — nero, blu notte, bordeaux, verde foresta.",
+    colors: ['#101020','#182868','#581028','#103828','#301848'],
+    accent: '#1a3060', light: 'rgba(107,140,186,0.15)'
+  }
+};
+
+const subQuestions = [
+  {
+    id:1, number:"01",
+    title:"Che stagione sei?",
+    subtitle:"Seleziona la tua stagione armocromatica. Se hai appena fatto il test, scegli il risultato che hai ottenuto.",
+    layout:"cols-2", type:"palette",
+    options:[
+      { label:"Primavera — calda, luminosa e fresca", value:"spring", colors:["#f0b080","#e88060","#80b858","#f0d060","#e8a048"] },
+      { label:"Estate — fredda, delicata e sofisticata", value:"summer", colors:["#c0b0d8","#e8c8cc","#a8c0d8","#d0d0d8","#e0c8d0"] },
+      { label:"Autunno — calda, profonda e avvolgente", value:"autumn", colors:["#a04820","#c89040","#507840","#9a6028","#804030"] },
+      { label:"Inverno — fredda, contrastata e potente", value:"winter", colors:["#2040a0","#cc1020","#f0f0f8","#101018","#8030a0"] }
+    ]
+  },
+  {
+    id:2, number:"02",
+    title:"Quanto contrasto c'è tra i tuoi colori naturali?",
+    subtitle:"Pensa alla differenza tra pelle, occhi e capelli: quanto sono distanti tra loro?",
+    layout:"cols-1", type:"text",
+    options:[
+      { label:"🌸 Poco contrasto — pelle, occhi e capelli sono tutti di tonalità simili e delicate", scores:{ light:3, soft:2, pure:1 } },
+      { label:"⚖️ Contrasto medio e armonioso — i miei tratti si bilanciano senza estremi", scores:{ pure:3, warm:1, cool:1 } },
+      { label:"✨ Contrasto vivace — i miei occhi o capelli spiccano rispetto alla pelle", scores:{ bright:3, deep:1 } },
+      { label:"🌑 Contrasto forte e profondo — colori intensi e scuri dominano il mio aspetto", scores:{ deep:3, bright:1, cool:1 } }
+    ]
+  },
+  {
+    id:3, number:"03",
+    title:"Come descriveresti i tuoi colori naturali?",
+    subtitle:"Osservati allo specchio senza trucco, in luce naturale.",
+    layout:"cols-1", type:"text",
+    options:[
+      { label:"🎨 Vivaci e saturi — i miei colori sono luminosi e accesi, quasi elettrici", scores:{ bright:3, warm:1 } },
+      { label:"🌫️ Morbidi e sfumati — come un acquerello, tutto è delicato e armonioso", scores:{ soft:3, light:1 } },
+      { label:"🍫 Profondi e ricchi — colori intensi, pieni, quasi vellutati", scores:{ deep:3, warm:1 } },
+      { label:"🪞 Equilibrati — non troppo vivaci, non troppo spenti, semplicemente armoniosi", scores:{ pure:3 } }
+    ]
+  },
+  {
+    id:4, number:"04",
+    title:"La tua colorazione complessiva è più chiara o più scura?",
+    subtitle:"Pensa al quadro generale: pelle + occhi + capelli nel loro insieme.",
+    layout:"cols-1", type:"text",
+    options:[
+      { label:"☁️ Decisamente chiara — pelle diafana, occhi chiari, capelli biondi o castano chiaro", scores:{ light:3, soft:1 } },
+      { label:"🌤️ Medio-chiara — luminosa e fresca, ma non pallidissima", scores:{ light:1, pure:2, bright:1 } },
+      { label:"🌅 Media — un mix equilibrato, né chiarissima né scura", scores:{ pure:2, warm:2 } },
+      { label:"🌙 Medio-scura o scura — capelli scuri, occhi profondi, pelle media o olivastra", scores:{ deep:3, cool:1 } }
+    ]
+  },
+  {
+    id:5, number:"05",
+    title:"Quale accessorio senti più tuo?",
+    subtitle:"Non pensarci troppo — scegli quello che indosseresti ogni giorno.",
+    layout:"cols-2", type:"gradient",
+    options:[
+      { label:"Perle e quarzo rosa — tutto morbido, chiaro e luminoso", caption:"Perla / Quarzo rosa", scores:{ light:2, soft:2 }, gradient:"linear-gradient(160deg,#f8e8e0 0%,#f0d0c8 30%,#e8d0c0 60%,#f0d8d0 100%)" },
+      { label:"Oro giallo caldo e ambra — solare, deciso e avvolgente", caption:"Oro caldo / Ambra", scores:{ warm:3, bright:1 }, gradient:"linear-gradient(160deg,#d4a840 0%,#c09030 30%,#e0b848 60%,#b88028 100%)" },
+      { label:"Argento e platino — freddo, elegante e preciso", caption:"Argento / Platino", scores:{ cool:3, bright:1 }, gradient:"linear-gradient(160deg,#d0d0d8 0%,#b8b8c8 30%,#e0e0e8 60%,#c0c0d0 100%)" },
+      { label:"Bronzo antico e rame — ricco, profondo e avvolgente", caption:"Bronzo / Rame", scores:{ deep:2, warm:2 }, gradient:"linear-gradient(160deg,#a07030 0%,#886020 30%,#b08040 60%,#907028 100%)" }
+    ]
+  }
+];
+
+let subCurrent = 0, subAnswers = [], selectedSeason = null;
+
+function startSubQuiz() {
+  // Se l'utente ha già fatto il quiz stagione, pre-selezioniamo
+  const seasonMap = { 'Primavera':'spring', 'Estate':'summer', 'Autunno':'autumn', 'Inverno':'winter' };
+  selectedSeason = seasonMap[lastSeason] || null;
+
+  subCurrent = 0;
+  subAnswers = [];
+
+  // Se conosciamo già la stagione, saltiamo la domanda 1
+  if (selectedSeason) {
+    subAnswers[0] = ['spring','summer','autumn','winter'].indexOf(selectedSeason);
+    subCurrent = 1;
+  }
+
+  document.getElementById('result-section').style.display = 'none';
+  document.getElementById('subquiz-section').style.display = 'block';
+  renderSubQuestion(subCurrent);
+  window.scrollTo(0,0);
+}
+
+function renderSubQuestion(idx) {
+  const q = subQuestions[idx];
+  const total = selectedSeason ? 4 : 5;
+  const displayIdx = selectedSeason ? idx : idx + 1;
+  document.getElementById('sub-q-counter').textContent = `${displayIdx} / ${total}`;
+  document.getElementById('sub-progress-fill').style.width = `${((displayIdx - 1) / total) * 100}%`;
+
+  const canGoBack = selectedSeason ? idx > 1 : idx > 0;
+  document.getElementById('sub-btn-back').style.display = canGoBack ? 'block' : 'none';
+
+  let html = '';
+  if (q.type === 'palette') {
+    html = q.options.map((o,i) => `
+      <div class="option-card ${subAnswers[idx]===i?'selected':''}" onclick="selSub(${idx},${i})">
+        <div class="check-badge">✓</div>
+        <div style="padding:22px 16px 12px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
+          ${o.colors.map(c=>`<div style="width:36px;height:36px;border-radius:50%;background:${c};box-shadow:0 2px 8px rgba(0,0,0,.15);flex-shrink:0;"></div>`).join('')}
+        </div>
+        <div class="option-label">${o.label}</div>
+      </div>`).join('');
+  } else if (q.type === 'gradient') {
+    html = q.options.map((o,i) => `
+      <div class="option-card ${subAnswers[idx]===i?'selected':''}" onclick="selSub(${idx},${i})">
+        <div class="check-badge">✓</div>
+        <div class="opt-img" style="background:${o.gradient};"></div>
+        <div class="option-label"><span class="opt-caption">${o.caption}</span>${o.label}</div>
+      </div>`).join('');
+  } else {
+    html = q.options.map((o,i) => `
+      <div class="option-text ${subAnswers[idx]===i?'selected':''}" onclick="selSub(${idx},${i})">
+        <div class="option-dot"></div>
+        <span class="option-text-label">${o.label}</span>
+      </div>`).join('');
+  }
+
+  document.getElementById('sub-question-container').innerHTML = `
+    <div class="question-card">
+      <div class="q-number">Domanda ${q.number}</div>
+      <h2 class="q-title">${q.title}</h2>
+      <p class="q-subtitle">${q.subtitle}</p>
+      <div class="options-grid ${q.layout}">${html}</div>
+    </div>`;
+}
+
+function selSub(qIdx, optIdx) {
+  subAnswers[qIdx] = optIdx;
+  // Se è la domanda stagione, salva la scelta
+  if (qIdx === 0) {
+    selectedSeason = subQuestions[0].options[optIdx].value;
+  }
+  document.querySelectorAll('#sub-question-container .option-card, #sub-question-container .option-text').forEach((el,i) => el.classList.toggle('selected', i===optIdx));
+  setTimeout(function() { nextSubQuestion(); }, 500);
+}
+
+function nextSubQuestion() {
+  if (subCurrent < subQuestions.length - 1) {
+    subCurrent++;
+    renderSubQuestion(subCurrent);
+    window.scrollTo(0,0);
+  } else {
+    showSubResult();
+  }
+}
+
+function prevSubQuestion() {
+  const minIdx = selectedSeason ? 1 : 0;
+  if (subCurrent > minIdx) {
+    subCurrent--;
+    renderSubQuestion(subCurrent);
+    window.scrollTo(0,0);
+  }
+}
+
+function calculateSubgroup() {
+  if (!selectedSeason) return 'Primavera Assoluta';
+  const axes = { pure:0, light:0, deep:0, bright:0, soft:0, warm:0, cool:0 };
+
+  // Somma i punteggi dalle domande 2-5 (indici 1-4)
+  for (let i = 1; i < subQuestions.length; i++) {
+    const ai = subAnswers[i];
+    if (ai === undefined) continue;
+    const scores = subQuestions[i].options[ai].scores;
+    if (scores) {
+      Object.entries(scores).forEach(([axis, val]) => { axes[axis] += val; });
+    }
+  }
+
+  // Mappa degli assi ai sottogruppi per la stagione selezionata
+  const mapping = subgroupMap[selectedSeason];
+  if (!mapping) return 'Primavera Assoluta';
+
+  let bestSubgroup = null, bestScore = -1;
+  Object.entries(mapping).forEach(([axis, subName]) => {
+    const score = axes[axis] || 0;
+    if (score > bestScore) {
+      bestScore = score;
+      bestSubgroup = subName;
+    }
+  });
+
+  return bestSubgroup;
+}
+
+let uploadedPhotos = [];
+let lastSubgroup = '';
+
+function showSubResult() {
+  const subgroup = calculateSubgroup();
+  lastSubgroup = subgroup;
+
+  document.getElementById('subquiz-section').style.display = 'none';
+  const el = document.getElementById('subresult-section');
+  el.style.display = 'block';
+  window.scrollTo(0,0);
+
+  el.innerHTML = `
+    <div class="photo-upload-section">
+      <div class="sub-result-eyebrow">✦ Ultimo passo</div>
+      <h2 class="photo-upload-title">Carica un <em>selfie</em><br>per l'analisi dei tuoi colori</h2>
+      <p class="photo-upload-sub">Per determinare con precisione il tuo sottogruppo, abbiamo bisogno di analizzare i tuoi colori naturali. Carica 1 o 2 foto del viso in luce naturale, senza filtri.</p>
+
+      <div class="photo-dropzone" id="photo-dropzone" onclick="document.getElementById('photo-input').click()">
+        <div class="photo-dropzone-icon">📸</div>
+        <div class="photo-dropzone-text">Tocca per caricare le tue foto</div>
+        <div class="photo-dropzone-hint">oppure trascina qui • max 2 foto • JPG o PNG</div>
+      </div>
+      <input type="file" id="photo-input" accept="image/jpeg,image/png" multiple style="display:none" onchange="handlePhotoSelect(event)">
+      <div class="photo-previews" id="photo-previews"></div>
+
+      <ul class="photo-tips">
+        <li>📷 Scatta in luce naturale (vicino a una finestra)</li>
+        <li>🚫 Senza filtri, senza trucco pesante</li>
+        <li>🙂 Viso ben visibile, capelli sciolti se possibile</li>
+      </ul>
+
+      <button class="btn-confirm-photos" id="btn-confirm-photos" onclick="confirmPhotos()" disabled>
+        Conferma e prosegui ✦
+      </button>
+    </div>`;
+
+  // Setup drag & drop
+  const dropzone = document.getElementById('photo-dropzone');
+  dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('dragover'); });
+  dropzone.addEventListener('dragleave', () => { dropzone.classList.remove('dragover'); });
+  dropzone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropzone.classList.remove('dragover');
+    handleFiles(e.dataTransfer.files);
+  });
+}
+
+function handlePhotoSelect(e) {
+  handleFiles(e.target.files);
+}
+
+function handleFiles(files) {
+  const maxPhotos = 2;
+  for (let i = 0; i < files.length && uploadedPhotos.length < maxPhotos; i++) {
+    const file = files[i];
+    if (!file.type.match('image/(jpeg|png)')) continue;
+    if (file.size > 10 * 1024 * 1024) continue;
+    uploadedPhotos.push(file);
+  }
+  renderPhotoPreviews();
+}
+
+function renderPhotoPreviews() {
+  const container = document.getElementById('photo-previews');
+  container.innerHTML = uploadedPhotos.map((file, i) => {
+    const url = URL.createObjectURL(file);
+    return `
+      <div class="photo-preview-item">
+        <img src="${url}" alt="Foto ${i+1}">
+        <button class="photo-preview-remove" onclick="removePhoto(${i})">✕</button>
+      </div>`;
+  }).join('');
+
+  const dropzone = document.getElementById('photo-dropzone');
+  if (uploadedPhotos.length >= 2) {
+    dropzone.style.display = 'none';
+  } else {
+    dropzone.style.display = 'block';
+    dropzone.querySelector('.photo-dropzone-text').textContent =
+      uploadedPhotos.length === 0 ? 'Tocca per caricare le tue foto' : 'Aggiungi un\'altra foto';
+  }
+
+  // Mostra/abilita bottone conferma
+  const btn = document.getElementById('btn-confirm-photos');
+  if (uploadedPhotos.length > 0) {
+    btn.style.display = 'inline-block';
+    btn.disabled = false;
+  } else {
+    btn.style.display = 'none';
+    btn.disabled = true;
+  }
+}
+
+function removePhoto(idx) {
+  uploadedPhotos.splice(idx, 1);
+  renderPhotoPreviews();
+}
+
+async function confirmPhotos() {
+  const btn = document.getElementById('btn-confirm-photos');
+  btn.disabled = true;
+  btn.textContent = 'Caricamento in corso...';
+
+  try {
+    // Salva foto e dati subquiz sul server (pre-pagamento, per analytics)
+    const formData = new FormData();
+    formData.append('name', lastName);
+    formData.append('email', lastEmail);
+    formData.append('season', lastSeason);
+    formData.append('subgroup', lastSubgroup);
+    uploadedPhotos.forEach(f => formData.append('photos', f));
+
+    await fetch('/api/subquiz-upload', { method: 'POST', body: formData });
+  } catch(e) { /* silenzioso — non bloccare il flusso */ }
+
+  // Mostra pagina pagamento
+  showPaymentPage();
+}
+
+function showPaymentPage() {
+  document.getElementById('subresult-section').style.display = 'none';
+  const el = document.getElementById('payment-section');
+  el.style.display = 'block';
+  window.scrollTo(0,0);
+
+  el.innerHTML = `
+    <div style="text-align:center;margin-bottom:48px;animation:fadeUp .5s ease;">
+      <div class="sub-result-eyebrow">✦ Le tue foto sono state caricate</div>
+      <h2 class="photo-upload-title" style="margin-bottom:12px;">Ci siamo quasi!</h2>
+      <p class="photo-upload-sub">Abbiamo ricevuto le tue foto. Ora manca solo un passo per ricevere la tua analisi completa con il sottogruppo preciso.</p>
+    </div>
+
+    <div class="subquiz-cta-section">
+      <div class="upsell-badge" style="margin-bottom:24px;">✦ Il tuo PDF personalizzato</div>
+      <h2 class="subquiz-cta-title">Scopri il tuo <em>sottogruppo</em><br>e ricevi la guida completa</h2>
+      <p style="font-size:15px;color:rgba(250,247,242,0.75);line-height:1.7;margin-bottom:28px;max-width:480px;margin-left:auto;margin-right:auto;position:relative;">Analizzeremo le tue foto e le tue risposte per identificare il tuo sottogruppo preciso. Riceverai via email un <strong style="color:var(--cream);">PDF personalizzato</strong> con tutto quello che ti serve.</p>
+      <ul class="subquiz-cta-list">
+        <li><span class="icon">🔍</span> Il tuo sottogruppo preciso tra i 16 possibili</li>
+        <li><span class="icon">🎨</span> Palette completa con 30+ colori perfetti per te</li>
+        <li><span class="icon">💄</span> Consigli make-up: fondotinta, blush, rossetto, ombretti</li>
+        <li><span class="icon">👗</span> Guida outfit: abbinamenti e colori da indossare</li>
+        <li><span class="icon">🚫</span> I colori da evitare assolutamente</li>
+        <li><span class="icon">💎</span> Colori "prestito" dalle stagioni vicine</li>
+      </ul>
+      <div class="subquiz-cta-price">
+        <span class="price-big">7€</span>
+        <span class="price-note">una tantum • PDF via email<br>consegna in 48 ore</span>
+      </div>
+      <button class="btn-upsell" onclick="startCheckout()" id="btn-sub-upsell" style="max-width:400px;margin:0 auto;display:block;">
+        Paga e ricevi il PDF ✦
+      </button>
+      <p style="font-size:12px;color:rgba(250,247,242,0.45);margin-top:16px;">🔒 Pagamento sicuro con Stripe</p>
+    </div>
+
+    <div class="restart-wrap">
+      <p style="font-size:14px;color:var(--muted);margin-bottom:20px;">Vuoi rifare il test o condividerlo con un'amica?</p>
+      <button class="btn-restart" onclick="restartQuiz()">↺ Rifai il Test</button>
+    </div>`;
 }
 </script>
 </body>

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { Resend } from 'resend'
 import Stripe from 'stripe'
-import { insertAnalysis } from '@/lib/db'
+import { insertAnalysis, getLatestSubquizByEmail, markSubquizPaid } from '@/lib/db'
 import fs from 'fs'
 import path from 'path'
 
@@ -30,42 +30,58 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Pagamento non completato' }, { status: 403 })
     }
 
-    // 2. Salva foto su filesystem
+    // 2. Salva foto su filesystem (se caricate direttamente)
     const baseDir = process.env.STORAGE_PATH || (fs.existsSync('/storage') ? '/storage' : path.join(process.cwd(), 'data'))
-    const uploadDir = path.join(baseDir, 'uploads', sessionId)
-    fs.mkdirSync(uploadDir, { recursive: true })
+    let photoPaths: string[] = []
 
-    const photoPaths: string[] = []
-    for (const file of files) {
-      const buffer = Buffer.from(await file.arrayBuffer())
-      const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_')
-      fs.writeFileSync(path.join(uploadDir, safeName), buffer)
-      photoPaths.push(`${sessionId}/${safeName}`)
+    if (files.length > 0) {
+      const uploadDir = path.join(baseDir, 'uploads', sessionId)
+      fs.mkdirSync(uploadDir, { recursive: true })
+      for (const file of files) {
+        const buffer = Buffer.from(await file.arrayBuffer())
+        const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_')
+        fs.writeFileSync(path.join(uploadDir, safeName), buffer)
+        photoPaths.push(`${sessionId}/${safeName}`)
+      }
+    }
+
+    // 2b. Recupera foto dal subquiz (pre-pagamento) se non ci sono foto dirette
+    const emailForLookup = customerEmail || (session as any).customer_email || (session as any).metadata?.customer_email || ''
+    if (photoPaths.length === 0 && emailForLookup) {
+      const subquizSub = getLatestSubquizByEmail(emailForLookup)
+      if (subquizSub) {
+        photoPaths = JSON.parse(subquizSub.photos || '[]')
+        markSubquizPaid(subquizSub.id)
+      }
     }
 
     // 3. Salva analisi nel database
     insertAnalysis({
       stripe_session_id: sessionId,
-      customer_name: customerName,
-      customer_email: customerEmail,
-      season,
+      customer_name: customerName || (session as any).metadata?.customer_name || '',
+      customer_email: emailForLookup,
+      season: season || (session as any).metadata?.season || '',
       notes,
       photos: photoPaths,
     })
 
     // 4. Email di notifica a Veronica
+    const finalName = customerName || (session as any).metadata?.customer_name || 'Sconosciuto'
+    const finalEmail = emailForLookup
+    const finalSeason = season || (session as any).metadata?.season || ''
+
     await getResend().emails.send({
       from: 'YouGlamour <veronica@youglamour.it>',
       to: process.env.NOTIFY_EMAIL!,
-      subject: `🎨 Nuova analisi da fare — ${customerName} (${season})`,
+      subject: `🎨 Nuova analisi da fare — ${finalName} (${finalSeason})`,
       html: `
         <div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; padding: 32px; color: #1a1614;">
           <h2 style="color: #c9a96e;">Nuova analisi armocromia ricevuta</h2>
           <table style="width:100%; border-collapse:collapse; margin-bottom:24px;">
-            <tr><td style="padding:8px 0; color:#7a6e68; width:140px;">Cliente</td><td style="padding:8px 0; font-weight:bold;">${customerName}</td></tr>
-            <tr><td style="padding:8px 0; color:#7a6e68;">Email</td><td style="padding:8px 0;">${customerEmail}</td></tr>
-            <tr><td style="padding:8px 0; color:#7a6e68;">Stagione quiz</td><td style="padding:8px 0;">${season}</td></tr>
-            <tr><td style="padding:8px 0; color:#7a6e68;">Foto caricate</td><td style="padding:8px 0;">${files.length} foto</td></tr>
+            <tr><td style="padding:8px 0; color:#7a6e68; width:140px;">Cliente</td><td style="padding:8px 0; font-weight:bold;">${finalName}</td></tr>
+            <tr><td style="padding:8px 0; color:#7a6e68;">Email</td><td style="padding:8px 0;">${finalEmail}</td></tr>
+            <tr><td style="padding:8px 0; color:#7a6e68;">Stagione quiz</td><td style="padding:8px 0;">${finalSeason}</td></tr>
+            <tr><td style="padding:8px 0; color:#7a6e68;">Foto caricate</td><td style="padding:8px 0;">${photoPaths.length} foto</td></tr>
             <tr><td style="padding:8px 0; color:#7a6e68;">Pagamento</td><td style="padding:8px 0; color:#2a7a2a;">✓ Confermato (7€)</td></tr>
             ${notes ? `<tr><td style="padding:8px 0; color:#7a6e68; vertical-align:top;">Note</td><td style="padding:8px 0;">${notes}</td></tr>` : ''}
           </table>
@@ -77,14 +93,15 @@ export async function POST(req: NextRequest) {
     })
 
     // 5. Email di conferma all'utente
+    if (finalEmail) {
     await getResend().emails.send({
       from: 'YouGlamour <veronica@youglamour.it>',
-      to: customerEmail,
-      subject: `✨ Abbiamo ricevuto le tue foto — ${customerName}!`,
+      to: finalEmail,
+      subject: `✨ Abbiamo ricevuto le tue foto — ${finalName}!`,
       html: `
         <div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; padding: 32px; color: #1a1614; background: #faf7f2;">
           <h2 style="color: #c9a96e; margin-bottom: 8px;">Le tue foto sono arrivate!</h2>
-          <p style="color: #7a6e68; margin-bottom: 32px; font-size: 15px;">Ciao ${customerName}, grazie per aver acquistato l'analisi personalizzata.</p>
+          <p style="color: #7a6e68; margin-bottom: 32px; font-size: 15px;">Ciao ${finalName}, grazie per aver acquistato l'analisi personalizzata.</p>
 
           <div style="background:#fff9f4; border:1px solid #e8e0d8; border-radius:16px; padding:24px; margin-bottom:32px;">
             <p style="margin:0 0 12px; font-size:15px;"><strong>Cosa succede adesso:</strong></p>
@@ -97,7 +114,7 @@ export async function POST(req: NextRequest) {
 
           <div style="background:#fff9f4; border:1px solid #e8e0d8; border-radius:16px; padding:20px; margin-bottom:32px;">
             <p style="margin:0 0 4px; color:#7a6e68; font-size:13px;">La tua stagione dal quiz</p>
-            <p style="margin:0; font-size:18px; font-weight:bold;">${season}</p>
+            <p style="margin:0; font-size:18px; font-weight:bold;">${finalSeason}</p>
           </div>
 
           <p style="color:#7a6e68; font-size:13px; border-top:1px solid #e8e0d8; padding-top:16px;">
@@ -106,6 +123,7 @@ export async function POST(req: NextRequest) {
         </div>
       `,
     })
+    }
 
     return NextResponse.json({ success: true })
   } catch (err: any) {

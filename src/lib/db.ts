@@ -166,6 +166,57 @@ export function updateWardrobeFrequency(id: number, frequency: string): void {
   db.prepare('UPDATE wardrobe_items SET frequency = ? WHERE id = ?').run(frequency, id)
 }
 
+// ── Subquiz submissions (pre-pagamento, per analytics) ──
+db.exec(`
+  CREATE TABLE IF NOT EXISTS subquiz_submissions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    email TEXT NOT NULL,
+    season TEXT NOT NULL,
+    subgroup_guess TEXT,
+    photos TEXT DEFAULT '[]',
+    paid INTEGER DEFAULT 0,
+    created_at TEXT DEFAULT (datetime('now', 'localtime'))
+  )
+`)
+
+export interface SubquizSubmission {
+  id: number
+  name: string
+  email: string
+  season: string
+  subgroup_guess: string | null
+  photos: string
+  paid: number
+  created_at: string
+}
+
+export function insertSubquizSubmission(data: {
+  name: string
+  email: string
+  season: string
+  subgroup_guess: string
+  photos: string[]
+}): number {
+  const result = db.prepare(`
+    INSERT INTO subquiz_submissions (name, email, season, subgroup_guess, photos)
+    VALUES (?, ?, ?, ?, ?)
+  `).run(data.name, data.email, data.season, data.subgroup_guess, JSON.stringify(data.photos))
+  return result.lastInsertRowid as number
+}
+
+export function getAllSubquizSubmissions(): SubquizSubmission[] {
+  return db.prepare('SELECT * FROM subquiz_submissions ORDER BY created_at DESC').all() as SubquizSubmission[]
+}
+
+export function getLatestSubquizByEmail(email: string): SubquizSubmission | undefined {
+  return db.prepare('SELECT * FROM subquiz_submissions WHERE email = ? ORDER BY created_at DESC LIMIT 1').get(email) as SubquizSubmission | undefined
+}
+
+export function markSubquizPaid(id: number): void {
+  db.prepare('UPDATE subquiz_submissions SET paid = 1 WHERE id = ?').run(id)
+}
+
 export interface Lead {
   id: number
   name: string

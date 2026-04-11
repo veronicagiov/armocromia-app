@@ -23,6 +23,17 @@ interface Lead {
   created_at: string
 }
 
+interface SubquizSubmission {
+  id: number
+  name: string
+  email: string
+  season: string
+  subgroup_guess: string | null
+  photos: string
+  paid: number
+  created_at: string
+}
+
 const SUBGROUPS: Record<string, string[]> = {
   Primavera: ['Primavera Assoluta', 'Spring Light', 'Spring Warm', 'Spring Bright'],
   Estate: ['Estate Assoluta', 'Summer Light', 'Summer Soft', 'Summer Cool'],
@@ -38,10 +49,12 @@ const SEASON_COLORS: Record<string, string> = {
 }
 
 export default function AdminDashboard() {
-  const [tab, setTab] = useState<'analyses' | 'leads'>('analyses')
+  const [tab, setTab] = useState<'analyses' | 'subquiz' | 'leads'>('analyses')
   const [analyses, setAnalyses] = useState<Analysis[]>([])
   const [leads, setLeads] = useState<Lead[]>([])
+  const [subquizSubs, setSubquizSubs] = useState<SubquizSubmission[]>([])
   const [expanded, setExpanded] = useState<number | null>(null)
+  const [expandedSub, setExpandedSub] = useState<number | null>(null)
   const [sending, setSending] = useState<Record<number, boolean>>({})
   const [sent, setSent] = useState<Record<number, boolean>>({})
   const [subgroups, setSubgroups] = useState<Record<number, string>>({})
@@ -58,6 +71,9 @@ export default function AdminDashboard() {
 
     const leadsRes = await fetch('/api/admin/leads')
     if (leadsRes.ok) setLeads(await leadsRes.json())
+
+    const subRes = await fetch('/api/admin/subquiz-submissions')
+    if (subRes.ok) setSubquizSubs(await subRes.json())
   }, [router])
 
   useEffect(() => { load() }, [load])
@@ -113,6 +129,7 @@ export default function AdminDashboard() {
             { label: 'Analisi totali', value: analyses.length, color: '#555' },
             { label: 'In attesa', value: pending, color: '#D4845A' },
             { label: 'Inviate', value: sentCount, color: '#2A7A2A' },
+            { label: 'Subquiz foto', value: subquizSubs.length, color: '#9B7FA6' },
             { label: 'Lead quiz', value: leads.length, color: '#1A3A6E' },
           ].map(s => (
             <div key={s.label} style={{ background: '#fff', border: '1px solid #E8E0D8', borderRadius: 12, padding: '16px 24px', flex: 1, textAlign: 'center' }}>
@@ -126,6 +143,7 @@ export default function AdminDashboard() {
         <div style={{ display: 'flex', gap: 4, marginBottom: 24, borderBottom: '2px solid #E8E0D8' }}>
           {([
             { key: 'analyses', label: `Analisi ricevute (${analyses.length})` },
+            { key: 'subquiz', label: `Subquiz foto (${subquizSubs.length})` },
             { key: 'leads', label: `Lead quiz (${leads.length})` },
           ] as const).map(t => (
             <button
@@ -256,6 +274,87 @@ export default function AdminDashboard() {
                 </div>
               )
             })}
+          </>
+        )}
+
+        {/* ── TAB SUBQUIZ ── */}
+        {tab === 'subquiz' && (
+          <>
+            {subquizSubs.length === 0 && (
+              <div style={{ background: '#fff', border: '1px solid #E8E0D8', borderRadius: 12, padding: 48, textAlign: 'center', color: '#999' }}>
+                Nessuna submission del subquiz ancora ricevuta.
+              </div>
+            )}
+
+            {subquizSubs.length > 0 && (
+              <div style={{ background: '#fff', border: '1px solid #E8E0D8', borderRadius: 12, overflow: 'hidden' }}>
+                {/* Intestazione tabella */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 2fr 1fr 1.5fr 1fr 1fr', gap: 12, padding: '12px 24px', background: '#F5F3F0', borderBottom: '1px solid #E8E0D8' }}>
+                  {['Nome', 'Email', 'Stagione', 'Sottogruppo (quiz)', 'Foto', 'Data'].map(h => (
+                    <div key={h} style={{ fontSize: 11, color: '#999', letterSpacing: 1.5, textTransform: 'uppercase', fontWeight: 600 }}>{h}</div>
+                  ))}
+                </div>
+
+                {subquizSubs.map((s, i) => {
+                  const photos: string[] = JSON.parse(s.photos || '[]')
+                  const seasonKey = Object.keys(SEASON_COLORS).find(k => s.season.includes(k)) || 'Primavera'
+                  const accentColor = SEASON_COLORS[seasonKey] || '#c9a96e'
+                  const isExpSub = expandedSub === s.id
+
+                  return (
+                    <div key={s.id}>
+                      <div
+                        style={{
+                          display: 'grid', gridTemplateColumns: '1.5fr 2fr 1fr 1.5fr 1fr 1fr', gap: 12,
+                          padding: '14px 24px', borderBottom: i < subquizSubs.length - 1 ? '1px solid #F0EBE5' : 'none',
+                          alignItems: 'center',
+                        }}
+                      >
+                        <div style={{ fontSize: 14, fontWeight: 600, color: '#1a1614' }}>{s.name}</div>
+                        <div style={{ fontSize: 13, color: '#666' }}>{s.email}</div>
+                        <div>
+                          <span style={{ display: 'inline-block', padding: '3px 12px', borderRadius: 100, background: accentColor + '22', color: accentColor, fontSize: 12, fontWeight: 600 }}>
+                            {s.season}
+                          </span>
+                        </div>
+                        <div style={{ fontSize: 13, color: '#555' }}>{s.subgroup_guess || '—'}</div>
+                        <div>
+                          {photos.length > 0 ? (
+                            <button
+                              onClick={() => setExpandedSub(isExpSub ? null : s.id)}
+                              style={{ padding: '4px 12px', background: '#F5F3F0', border: '1px solid #E8E0D8', borderRadius: 6, cursor: 'pointer', fontSize: 12, color: '#555' }}
+                            >
+                              {isExpSub ? '▲' : `📷 ${photos.length}`}
+                            </button>
+                          ) : (
+                            <span style={{ fontSize: 12, color: '#ccc' }}>—</span>
+                          )}
+                        </div>
+                        <div style={{ fontSize: 12, color: '#BBB' }}>
+                          {new Date(s.created_at).toLocaleDateString('it-IT', { day: '2-digit', month: 'short', year: 'numeric' })}
+                        </div>
+                      </div>
+
+                      {isExpSub && photos.length > 0 && (
+                        <div style={{ padding: '12px 24px 20px', borderBottom: '1px solid #F0EBE5' }}>
+                          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+                            {photos.map((photo, pi) => (
+                              <a key={pi} href={`/api/admin/photo?file=${encodeURIComponent(photo)}`} target="_blank" rel="noreferrer">
+                                <img
+                                  src={`/api/admin/photo?file=${encodeURIComponent(photo)}`}
+                                  alt={`Foto ${pi + 1}`}
+                                  style={{ width: 100, height: 100, objectFit: 'cover', borderRadius: 8, border: '2px solid #E8E0D8', cursor: 'pointer' }}
+                                />
+                              </a>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+            )}
           </>
         )}
 
