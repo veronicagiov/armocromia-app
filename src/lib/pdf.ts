@@ -619,7 +619,7 @@ export function generatePDF(input: PDFInput): Promise<Buffer> {
 
     // Box libro consigliato
     doc.fontSize(8).font('Helvetica').fillColor('#AAAAAA').text('APPROFONDISCI', MARGIN, 460, { width: CONTENT_W, align: 'center', characterSpacing: 1.5, lineBreak: false })
-    doc.fontSize(10).font('Helvetica').fillColor('#555555').text('📚 Il libro della tua stagione:', MARGIN, 476, { width: CONTENT_W, align: 'center', lineBreak: false })
+    doc.fontSize(10).font('Helvetica').fillColor('#555555').text('Il libro della tua stagione:', MARGIN, 476, { width: CONTENT_W, align: 'center', lineBreak: false })
     doc.fontSize(10).font('Helvetica').fillColor(data.accent)
       .text(data.bookTitle, MARGIN, 492, { width: CONTENT_W, align: 'center', lineBreak: false, link: data.bookLink, underline: true })
     doc.fontSize(9).font('Helvetica').fillColor('#AAAAAA').text('→ Scopri su Amazon', MARGIN, 508, { width: CONTENT_W, align: 'center', lineBreak: false, link: data.bookLink })
