@@ -206,7 +206,7 @@ const SEASON_DATA: Record<string, SeasonInfo> = {
     accent: '#9B7FA6',
     light: '#F8F0FF',
     description:
-      "La donna Estate emana un'eleganza eterea e raffinata. La sua colorazione è caratterizzata da sottotoni freddi e rosati: capelli dal biondo cenere al castano freddo, occhi chiari, grigi-azzurri o nocciola chiaro, pelle con velo rosato e sottotono freddo.",
+      "La donna Estate emana un'eleganza eterea e raffinata. La sua colorazione è caratterizzata da sottotoni freddi e rosati: capelli dal biondo cenere al castano freddo, occhi chiari o grigi-azzurri, pelle con velo rosato e sottotono freddo.",
     characteristics: [
       'Sottotono: freddo e rosato',
       'Contrasto: basso-medio, tutto in sfumatura',
@@ -241,10 +241,10 @@ const SEASON_DATA: Record<string, SeasonInfo> = {
     makeup: [
       { label: 'Fondotinta', value: 'Base con sottotono rosa-freddo, coprenza media e finish satinato. Evita formule con giallo o bronzo.' },
       { label: 'Correttore', value: 'Rosa chiaro freddo sotto gli occhi per una luminosità naturale e delicata.' },
-      { label: 'Blush', value: 'Rosa freddo (#F4C2C2), malva tenue (#D8A8D8), rosa antico (#C08888) — sfumato con mano leggerissima.' },
+      { label: 'Blush', value: 'Rosa freddo, malva tenue, rosa antico — sfumato con mano leggerissima.' },
       { label: 'Illuminante', value: 'Perla fredda o rosa silver: aggiunge luce senza alterare il sottotono.' },
-      { label: 'Labbra', value: 'Rosa freddo (#E8B0B8), malva (#C8A0C8), nude rosato (#C8A0A0), prugna chiara (#B878A0). Evita nude caldi o arancio.' },
-      { label: 'Occhi', value: 'Grigio perla (#CCCCCC), malva (#D8A8D8), blu freddo (#A8CCDC), taupe rosato (#B8A0A0), prugna (#8C6080). Eyeliner grigio o blu midnight.' },
+      { label: 'Labbra', value: 'Rosa freddo, malva, nude rosato, prugna chiara. Evita nude caldi o arancio.' },
+      { label: 'Occhi', value: 'Grigio, malva, blu freddo, taupe rosato, prugna. Eyeliner grigio o blu midnight.' },
     ],
     styleAdvice: [
       'I tessuti fluidi e morbidi come seta, jersey e chiffon esaltano la tua grazia naturale.',
@@ -260,7 +260,7 @@ const SEASON_DATA: Record<string, SeasonInfo> = {
       'Summer Light':
         "La Summer Light è l'Estate più chiara e luminosa. I tuoi colori migliori sono pastelli freddi: lavanda chiarissima, rosa cipria, azzurro nebbia. La tua forza è la leggerezza e la trasparenza dei colori.",
       'Summer Soft':
-        "La Summer Soft tende verso l'Autunno. I tuoi colori naturali sono morbidi e sfumati: occhi nocciola chiaro, verdi smorzati o grigio-azzurri, capelli cenere o castano medio. I tuoi colori migliori sono neutri e smorzati: grigio tortora, malva polveroso, verde salvia. Hai una qualità vellutata e avvolgente.",
+        "La Summer Soft tende verso l'Autunno. I tuoi colori migliori sono neutri e smorzati: grigio tortora, malva polveroso, verde salvia. Hai una qualità vellutata e avvolgente.",
       'Summer Cool':
         "La Summer Cool tende verso l'Inverno. Puoi gestire colori più profondi mantenendo il sottotono freddo: prugna, blu periwinkle, bordeaux rosato. Hai più contrasto rispetto alle altre Estati.",
     },
@@ -683,24 +683,12 @@ function drawCover(doc: PDFKit.PDFDocument, data: SeasonInfo, input: PDFInput) {
   doc.fontSize(15).font('Times-Bold').fillColor('#FFFFFF')
     .text(input.subgroup || input.season, badgeX, y + 13, { width: badgeW, align: 'center', lineBreak: false })
 
-  y += badgeH + 30
-  doc.fontSize(10).font('Times-Roman').fillColor('#888888')
-    .text(
-      'La tua palette completa, i consigli make-up e di stile,\ni colori da evitare e quelli da indossare ogni giorno.',
-      MARGIN + 40, y, { width: CONTENT_W - 80, align: 'center', lineGap: 3, height: 40, lineBreak: true }
-    )
-  doc.y = MARGIN
-
-  y += 50
+  y += badgeH + 50
   doc.fontSize(8.5).font('Helvetica').fillColor('#CCCCCC')
     .text(
       new Date().toLocaleDateString('it-IT', { day: '2-digit', month: 'long', year: 'numeric' }),
       MARGIN, y, { width: CONTENT_W, align: 'center', lineBreak: false }
     )
-
-  y += 24
-  doc.fontSize(8).font('Helvetica').fillColor('#BBBBBB')
-    .text('youglamour.it  --  Analisi personalizzata a cura di Veronica Ferraro', MARGIN, y, { width: CONTENT_W, align: 'center', lineBreak: false })
   doc.y = MARGIN
 }
 
