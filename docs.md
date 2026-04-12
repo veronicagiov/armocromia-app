@@ -69,6 +69,14 @@ Richiede selezione stagione. Tre viste:
 - Export CSV (nuovi dall'ultimo export / tutti)
 - Eliminazione singola e bulk
 
+### Tab: Analytics (KPI)
+- **Funnel di conversione** — barre orizzontali: quiz start → risposta → email → subquiz → foto → pagamento, con % drop-off
+- **Tempo medio per domanda** — barre che evidenziano domande con esitazione (>8s in rosso)
+- **Distribuzione stagioni** — donut chart con percentuali per stagione
+- **Distribuzione risposte** — per ogni domanda quiz e subquiz, barre con % per opzione
+- **Trend giornaliero** — barre impilate (lead/subquiz/pagamenti) ultimi 30 giorni
+- Dati raccolti tramite tracking eventi anonimo (`quiz_events` table, session UUID)
+
 ### Statistiche (barra in alto)
 - Analisi totali, in attesa, inviate, subquiz foto, lead quiz
 
@@ -87,6 +95,7 @@ Richiede selezione stagione. Tre viste:
 | `/api/analyze-color` | POST | Analisi AI colore dominante foto (Claude Haiku). Ritorna hex, nome, in_palette, confidence |
 | `/api/wardrobe` | GET/POST/DELETE | CRUD capi armadio |
 | `/api/wardrobe/photo` | GET | Serve foto capi armadio |
+| `/api/quiz-events` | POST | Salva evento analytics quiz. Body: `{session_id, event, data}` |
 
 ### Admin (protette da cookie)
 
@@ -100,6 +109,7 @@ Richiede selezione stagione. Tre viste:
 | `/api/admin/photo` | GET | Serve foto analisi |
 | `/api/admin/leads` | GET/DELETE | Lista lead / elimina bulk |
 | `/api/admin/subquiz-submissions` | GET/DELETE | Lista subquiz / elimina bulk |
+| `/api/admin/analytics` | GET | Dati aggregati analytics quiz (funnel, tempi, distribuzioni, trend) |
 | `/api/admin/debug` | GET | Info storage e database |
 
 ---
@@ -141,6 +151,15 @@ File: `armocromia.db` in `STORAGE_PATH` o `/storage` o `./data`
 | subgroup_guess | TEXT | Sottogruppo stimato dal quiz |
 | photos | TEXT (JSON) | Array path foto |
 | paid | INTEGER | 0 = non pagato, 1 = pagato |
+| created_at | TEXT | Timestamp |
+
+### Tabella `quiz_events`
+| Campo | Tipo | Descrizione |
+|-------|------|-------------|
+| id | INTEGER PK | Auto-increment |
+| session_id | TEXT | UUID sessione browser (per raggruppare eventi stesso utente) |
+| event | TEXT | Tipo evento (quiz_start, quiz_answer, lead_view, lead_submit, subquiz_start, subquiz_answer, photo_view, photo_confirm, payment_view, payment_click) |
+| data | TEXT (JSON) | Dati extra: question, option, time_ms |
 | created_at | TEXT | Timestamp |
 
 ### Tabella `wardrobe_items`

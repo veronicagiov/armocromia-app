@@ -263,4 +263,129 @@ export function getAllLeads(): Lead[] {
   return db.prepare('SELECT * FROM leads ORDER BY created_at DESC').all() as Lead[]
 }
 
+// ── Quiz Events (analytics tracking) ──────────────────────────────────────
+db.exec(`
+  CREATE TABLE IF NOT EXISTS quiz_events (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    session_id TEXT NOT NULL,
+    event TEXT NOT NULL,
+    data TEXT DEFAULT '{}',
+    created_at TEXT DEFAULT (datetime('now', 'localtime'))
+  )
+`)
+
+export interface QuizEvent {
+  id: number
+  session_id: string
+  event: string
+  data: string
+  created_at: string
+}
+
+export function insertQuizEvent(data: { session_id: string; event: string; data?: Record<string, unknown> }): void {
+  db.prepare(`
+    INSERT INTO quiz_events (session_id, event, data)
+    VALUES (?, ?, ?)
+  `).run(data.session_id, data.event, JSON.stringify(data.data || {}))
+}
+
+export function getQuizEventsAggregated(): {
+  funnel: Record<string, number>
+  quizAnswerTimes: { question: number; avg_ms: number; count: number }[]
+  subquizAnswerTimes: { question: number; avg_ms: number; count: number }[]
+  quizAnswerDistribution: { question: number; option: number; count: number }[]
+  subquizAnswerDistribution: { question: number; option: number; count: number }[]
+  dailyActivity: { date: string; leads: number; subquiz: number; payments: number }[]
+  seasonDistribution: { season: string; count: number }[]
+} {
+  // Funnel: count unique sessions per event
+  const funnelRows = db.prepare(`
+    SELECT event, COUNT(DISTINCT session_id) as cnt
+    FROM quiz_events
+    GROUP BY event
+  `).all() as { event: string; cnt: number }[]
+  const funnel: Record<string, number> = {}
+  for (const r of funnelRows) funnel[r.event] = r.cnt
+
+  // Fetch answer rows and aggregate in JS (avoids json_extract compatibility issues)
+  const quizAnswerRows = db.prepare(`
+    SELECT data FROM quiz_events WHERE event = 'quiz_answer'
+  `).all() as { data: string }[]
+
+  const subquizAnswerRows = db.prepare(`
+    SELECT data FROM quiz_events WHERE event = 'subquiz_answer'
+  `).all() as { data: string }[]
+
+  function aggregateAnswers(rows: { data: string }[]) {
+    const timesMap: Record<number, { total: number; count: number }> = {}
+    const distMap: Record<string, number> = {}
+
+    for (const row of rows) {
+      try {
+        const d = JSON.parse(row.data)
+        const q = d.question as number
+        const opt = d.option as number
+        const timeMs = d.time_ms as number | undefined
+
+        if (q != null && timeMs != null) {
+          if (!timesMap[q]) timesMap[q] = { total: 0, count: 0 }
+          timesMap[q].total += timeMs
+          timesMap[q].count++
+        }
+        if (q != null && opt != null) {
+          const key = `${q}:${opt}`
+          distMap[key] = (distMap[key] || 0) + 1
+        }
+      } catch { /* skip malformed */ }
+    }
+
+    const times = Object.entries(timesMap)
+      .map(([q, v]) => ({ question: Number(q), avg_ms: v.total / v.count, count: v.count }))
+      .sort((a, b) => a.question - b.question)
+
+    const dist = Object.entries(distMap)
+      .map(([key, count]) => {
+        const [q, o] = key.split(':')
+        return { question: Number(q), option: Number(o), count }
+      })
+      .sort((a, b) => a.question - b.question || a.option - b.option)
+
+    return { times, dist }
+  }
+
+  const quizAgg = aggregateAnswers(quizAnswerRows)
+  const subAgg = aggregateAnswers(subquizAnswerRows)
+
+  // Daily activity (last 30 days)
+  const dailyActivity = db.prepare(`
+    SELECT
+      date(created_at) as date,
+      SUM(CASE WHEN event = 'lead_submit' THEN 1 ELSE 0 END) as leads,
+      SUM(CASE WHEN event = 'photo_confirm' THEN 1 ELSE 0 END) as subquiz,
+      SUM(CASE WHEN event = 'payment_click' THEN 1 ELSE 0 END) as payments
+    FROM quiz_events
+    WHERE created_at >= datetime('now', '-30 days', 'localtime')
+    GROUP BY date(created_at)
+    ORDER BY date
+  `).all() as { date: string; leads: number; subquiz: number; payments: number }[]
+
+  // Season distribution from leads table
+  const seasonDistribution = db.prepare(`
+    SELECT season, COUNT(*) as count
+    FROM leads
+    GROUP BY season
+    ORDER BY count DESC
+  `).all() as { season: string; count: number }[]
+
+  return {
+    funnel,
+    quizAnswerTimes: quizAgg.times,
+    subquizAnswerTimes: subAgg.times,
+    quizAnswerDistribution: quizAgg.dist,
+    subquizAnswerDistribution: subAgg.dist,
+    dailyActivity,
+    seasonDistribution,
+  }
+}
+
 export default db

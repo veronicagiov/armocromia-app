@@ -41,6 +41,16 @@ const SUBGROUPS: Record<string, string[]> = {
   Inverno: ['Inverno Assoluto', 'Winter Cool', 'Winter Bright', 'Winter Deep'],
 }
 
+interface AnalyticsData {
+  funnel: Record<string, number>
+  quizAnswerTimes: { question: number; avg_ms: number; count: number }[]
+  subquizAnswerTimes: { question: number; avg_ms: number; count: number }[]
+  quizAnswerDistribution: { question: number; option: number; count: number }[]
+  subquizAnswerDistribution: { question: number; option: number; count: number }[]
+  dailyActivity: { date: string; leads: number; subquiz: number; payments: number }[]
+  seasonDistribution: { season: string; count: number }[]
+}
+
 const SEASON_COLORS: Record<string, string> = {
   Primavera: '#E8895A',
   Estate: '#9B7FA6',
@@ -49,7 +59,7 @@ const SEASON_COLORS: Record<string, string> = {
 }
 
 export default function AdminDashboard() {
-  const [tab, setTab] = useState<'analyses' | 'subquiz' | 'leads'>('analyses')
+  const [tab, setTab] = useState<'analyses' | 'subquiz' | 'leads' | 'analytics'>('analyses')
   const [analyses, setAnalyses] = useState<Analysis[]>([])
   const [leads, setLeads] = useState<Lead[]>([])
   const [subquizSubs, setSubquizSubs] = useState<SubquizSubmission[]>([])
@@ -62,6 +72,7 @@ export default function AdminDashboard() {
   const [selectedSubquiz, setSelectedSubquiz] = useState<Set<number>>(new Set())
   const [selectedLeads, setSelectedLeads] = useState<Set<number>>(new Set())
   const [deleting, setDeleting] = useState(false)
+  const [analytics, setAnalytics] = useState<AnalyticsData | null>(null)
   const router = useRouter()
 
   const load = useCallback(async () => {
@@ -78,6 +89,11 @@ export default function AdminDashboard() {
 
     const subRes = await fetch('/api/admin/subquiz-submissions')
     if (subRes.ok) setSubquizSubs(await subRes.json())
+
+    try {
+      const analyticsRes = await fetch('/api/admin/analytics')
+      if (analyticsRes.ok) setAnalytics(await analyticsRes.json())
+    } catch (e) { console.error('analytics fetch error:', e) }
   }, [router])
 
   useEffect(() => { load() }, [load])
@@ -175,10 +191,11 @@ export default function AdminDashboard() {
         {/* Tabs */}
         <div style={{ display: 'flex', gap: 4, marginBottom: 24, borderBottom: '2px solid #E8E0D8' }}>
           {([
-            { key: 'analyses', label: `Analisi ricevute (${analyses.length})` },
-            { key: 'subquiz', label: `Subquiz foto (${subquizSubs.length})` },
-            { key: 'leads', label: `Lead quiz (${leads.length})` },
-          ] as const).map(t => (
+            { key: 'analyses' as const, label: `Analisi ricevute (${analyses.length})` },
+            { key: 'subquiz' as const, label: `Subquiz foto (${subquizSubs.length})` },
+            { key: 'leads' as const, label: `Lead quiz (${leads.length})` },
+            { key: 'analytics' as const, label: `Analytics` },
+          ]).map(t => (
             <button
               key={t.key}
               onClick={() => setTab(t.key)}
@@ -546,6 +563,347 @@ export default function AdminDashboard() {
               </div>
               </>
             )}
+          </>
+        )}
+
+        {/* ── TAB ANALYTICS ── */}
+        {tab === 'analytics' && (
+          <AnalyticsTab analytics={analytics} />
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ── QUIZ QUESTION LABELS ────────────────────────────────────────────────────
+const QUIZ_QUESTIONS = [
+  'Sottotono pelle', 'Colore occhi', 'Colore capelli',
+  'Preferenza rossetto', 'Reazione al sole', 'Palette attrattiva',
+]
+const SUBQUIZ_QUESTIONS = [
+  'Conferma stagione', 'Livello contrasto', 'Saturazione colori',
+  'Chiarezza/scurezza', 'Preferenza accessori',
+]
+
+const FUNNEL_STEPS: { event: string; label: string }[] = [
+  { event: 'quiz_start', label: 'Quiz iniziato' },
+  { event: 'quiz_answer', label: 'Quiz completato' },
+  { event: 'lead_view', label: 'Form email' },
+  { event: 'lead_submit', label: 'Email inserita' },
+  { event: 'subquiz_start', label: 'Subquiz iniziato' },
+  { event: 'subquiz_answer', label: 'Subquiz completato' },
+  { event: 'photo_view', label: 'Upload foto' },
+  { event: 'photo_confirm', label: 'Foto confermate' },
+  { event: 'payment_view', label: 'Pagina pagamento' },
+  { event: 'payment_click', label: 'Click pagamento' },
+]
+
+function AnalyticsTab({ analytics }: { analytics: AnalyticsData | null }) {
+  if (!analytics) {
+    return (
+      <div style={{ background: '#fff', border: '1px solid #E8E0D8', borderRadius: 12, padding: 48, textAlign: 'center', color: '#999' }}>
+        Caricamento dati analytics...
+      </div>
+    )
+  }
+
+  const { funnel, quizAnswerTimes, subquizAnswerTimes, quizAnswerDistribution, subquizAnswerDistribution, dailyActivity, seasonDistribution } = analytics
+
+  const funnelMax = Math.max(...FUNNEL_STEPS.map(s => funnel[s.event] || 0), 1)
+  const hasData = funnelMax > 0 && Object.keys(funnel).length > 0
+
+  if (!hasData) {
+    return (
+      <div style={{ background: '#fff', border: '1px solid #E8E0D8', borderRadius: 12, padding: 48, textAlign: 'center', color: '#999' }}>
+        <div style={{ fontSize: 40, marginBottom: 16 }}>📊</div>
+        <div style={{ fontSize: 16, fontWeight: 600, color: '#555', marginBottom: 8 }}>Nessun dato analytics ancora disponibile</div>
+        <div style={{ fontSize: 14 }}>I dati compariranno man mano che gli utenti utilizzano il quiz.</div>
+      </div>
+    )
+  }
+
+  // Group quiz answer distribution by question
+  const quizDistByQ: Record<number, { option: number; count: number }[]> = {}
+  for (const row of quizAnswerDistribution) {
+    if (!quizDistByQ[row.question]) quizDistByQ[row.question] = []
+    quizDistByQ[row.question].push(row)
+  }
+  const subDistByQ: Record<number, { option: number; count: number }[]> = {}
+  for (const row of subquizAnswerDistribution) {
+    if (!subDistByQ[row.question]) subDistByQ[row.question] = []
+    subDistByQ[row.question].push(row)
+  }
+
+  const allTimes = [...quizAnswerTimes, ...subquizAnswerTimes]
+  const maxTime = Math.max(...allTimes.map(t => t.avg_ms), 1)
+
+  const dailyMax = Math.max(...dailyActivity.map(d => d.leads + d.subquiz + d.payments), 1)
+
+  const totalSeasons = seasonDistribution.reduce((s, r) => s + r.count, 0) || 1
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+
+      {/* ── FUNNEL ── */}
+      <div style={{ background: '#fff', border: '1px solid #E8E0D8', borderRadius: 12, padding: 28 }}>
+        <div style={{ fontSize: 11, letterSpacing: 2, textTransform: 'uppercase', color: '#999', fontWeight: 600, marginBottom: 20 }}>Funnel di conversione</div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {FUNNEL_STEPS.map((step, i) => {
+            const val = funnel[step.event] || 0
+            const pct = funnelMax > 0 ? (val / funnelMax) * 100 : 0
+            const prevVal = i > 0 ? (funnel[FUNNEL_STEPS[i - 1].event] || 0) : val
+            const dropPct = prevVal > 0 ? Math.round(((prevVal - val) / prevVal) * 100) : 0
+            return (
+              <div key={step.event} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div style={{ width: 140, fontSize: 12, color: '#666', textAlign: 'right', flexShrink: 0 }}>{step.label}</div>
+                <div style={{ flex: 1, height: 28, background: '#F5F3F0', borderRadius: 6, overflow: 'hidden', position: 'relative' }}>
+                  <div style={{
+                    height: '100%', borderRadius: 6,
+                    width: `${Math.max(pct, 1)}%`,
+                    background: `linear-gradient(90deg, #c9a96e, #e8a87c)`,
+                    transition: 'width .5s ease',
+                  }} />
+                  <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', fontSize: 12, fontWeight: 600, color: pct > 15 ? '#fff' : '#555' }}>
+                    {val}
+                  </span>
+                </div>
+                <div style={{ width: 60, fontSize: 11, color: dropPct > 30 ? '#cc4444' : dropPct > 15 ? '#D4845A' : '#2A7A2A', fontWeight: 600, flexShrink: 0 }}>
+                  {i > 0 && val < prevVal ? `−${dropPct}%` : ''}
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      </div>
+
+      {/* ── ROW: TEMPO + STAGIONI ── */}
+      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 24 }}>
+
+        {/* Tempo medio per domanda */}
+        <div style={{ background: '#fff', border: '1px solid #E8E0D8', borderRadius: 12, padding: 28 }}>
+          <div style={{ fontSize: 11, letterSpacing: 2, textTransform: 'uppercase', color: '#999', fontWeight: 600, marginBottom: 20 }}>Tempo medio per domanda (esitazione)</div>
+          {quizAnswerTimes.length === 0 && subquizAnswerTimes.length === 0 ? (
+            <div style={{ color: '#ccc', fontSize: 13, padding: 20, textAlign: 'center' }}>Nessun dato disponibile</div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {quizAnswerTimes.map(t => {
+                const secs = (t.avg_ms / 1000).toFixed(1)
+                const pct = (t.avg_ms / maxTime) * 100
+                const isHigh = t.avg_ms > 8000
+                return (
+                  <div key={`q${t.question}`} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <div style={{ width: 120, fontSize: 11, color: '#888', textAlign: 'right', flexShrink: 0 }}>
+                      Q{t.question} {QUIZ_QUESTIONS[t.question - 1] || ''}
+                    </div>
+                    <div style={{ flex: 1, height: 22, background: '#F5F3F0', borderRadius: 4, overflow: 'hidden' }}>
+                      <div style={{
+                        height: '100%', borderRadius: 4,
+                        width: `${Math.max(pct, 2)}%`,
+                        background: isHigh ? '#cc4444' : '#c9a96e',
+                      }} />
+                    </div>
+                    <div style={{ width: 60, fontSize: 12, fontWeight: 600, color: isHigh ? '#cc4444' : '#555', flexShrink: 0 }}>
+                      {secs}s
+                    </div>
+                  </div>
+                )
+              })}
+              {subquizAnswerTimes.length > 0 && (
+                <div style={{ borderTop: '1px solid #F0EBE5', margin: '4px 0', paddingTop: 8 }}>
+                  <div style={{ fontSize: 10, letterSpacing: 1.5, textTransform: 'uppercase', color: '#BBB', marginBottom: 6 }}>Subquiz</div>
+                </div>
+              )}
+              {subquizAnswerTimes.map(t => {
+                const secs = (t.avg_ms / 1000).toFixed(1)
+                const pct = (t.avg_ms / maxTime) * 100
+                const isHigh = t.avg_ms > 8000
+                return (
+                  <div key={`sq${t.question}`} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <div style={{ width: 120, fontSize: 11, color: '#888', textAlign: 'right', flexShrink: 0 }}>
+                      SQ{t.question} {SUBQUIZ_QUESTIONS[t.question - 1] || ''}
+                    </div>
+                    <div style={{ flex: 1, height: 22, background: '#F5F3F0', borderRadius: 4, overflow: 'hidden' }}>
+                      <div style={{
+                        height: '100%', borderRadius: 4,
+                        width: `${Math.max(pct, 2)}%`,
+                        background: isHigh ? '#cc4444' : '#9B7FA6',
+                      }} />
+                    </div>
+                    <div style={{ width: 60, fontSize: 12, fontWeight: 600, color: isHigh ? '#cc4444' : '#555', flexShrink: 0 }}>
+                      {secs}s
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          )}
+          <div style={{ fontSize: 11, color: '#BBB', marginTop: 12 }}>Le barre rosse indicano esitazione ({'>'}8s)</div>
+        </div>
+
+        {/* Distribuzione stagioni (donut) */}
+        <div style={{ background: '#fff', border: '1px solid #E8E0D8', borderRadius: 12, padding: 28 }}>
+          <div style={{ fontSize: 11, letterSpacing: 2, textTransform: 'uppercase', color: '#999', fontWeight: 600, marginBottom: 20 }}>Distribuzione stagioni</div>
+          {seasonDistribution.length === 0 ? (
+            <div style={{ color: '#ccc', fontSize: 13, padding: 20, textAlign: 'center' }}>Nessun dato</div>
+          ) : (
+            <>
+              <div style={{ position: 'relative', width: 160, height: 160, margin: '0 auto 20px' }}>
+                <svg viewBox="0 0 36 36" style={{ width: '100%', height: '100%', transform: 'rotate(-90deg)' }}>
+                  {(() => {
+                    let offset = 0
+                    return seasonDistribution.map((s) => {
+                      const pct = (s.count / totalSeasons) * 100
+                      const color = SEASON_COLORS[s.season] || '#ccc'
+                      const el = (
+                        <circle
+                          key={s.season}
+                          cx="18" cy="18" r="15.9"
+                          fill="none"
+                          stroke={color}
+                          strokeWidth="3.5"
+                          strokeDasharray={`${pct} ${100 - pct}`}
+                          strokeDashoffset={`${-offset}`}
+                        />
+                      )
+                      offset += pct
+                      return el
+                    })
+                  })()}
+                </svg>
+                <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column' }}>
+                  <div style={{ fontSize: 22, fontWeight: 700, color: '#1a1614' }}>{totalSeasons}</div>
+                  <div style={{ fontSize: 10, color: '#999' }}>lead totali</div>
+                </div>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {seasonDistribution.map(s => {
+                  const color = SEASON_COLORS[s.season] || '#ccc'
+                  return (
+                    <div key={s.season} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <div style={{ width: 12, height: 12, borderRadius: '50%', background: color, flexShrink: 0 }} />
+                      <div style={{ flex: 1, fontSize: 13, color: '#555' }}>{s.season}</div>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: '#1a1614' }}>{s.count}</div>
+                      <div style={{ fontSize: 11, color: '#999', width: 40, textAlign: 'right' }}>{Math.round((s.count / totalSeasons) * 100)}%</div>
+                    </div>
+                  )
+                })}
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* ── DISTRIBUZIONE RISPOSTE QUIZ ── */}
+      <div style={{ background: '#fff', border: '1px solid #E8E0D8', borderRadius: 12, padding: 28 }}>
+        <div style={{ fontSize: 11, letterSpacing: 2, textTransform: 'uppercase', color: '#999', fontWeight: 600, marginBottom: 20 }}>Distribuzione risposte — Quiz principale</div>
+        {Object.keys(quizDistByQ).length === 0 ? (
+          <div style={{ color: '#ccc', fontSize: 13, padding: 20, textAlign: 'center' }}>Nessun dato disponibile</div>
+        ) : (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
+            {Object.entries(quizDistByQ).map(([qNum, opts]) => {
+              const total = opts.reduce((s, o) => s + o.count, 0) || 1
+              const OPT_COLORS = ['#c9a96e', '#E8895A', '#9B7FA6', '#A0522D', '#1A3A6E', '#2A7A2A']
+              return (
+                <div key={qNum} style={{ padding: 12, background: '#FAFAF8', borderRadius: 8 }}>
+                  <div style={{ fontSize: 11, fontWeight: 600, color: '#888', marginBottom: 8 }}>
+                    D{qNum} — {QUIZ_QUESTIONS[Number(qNum) - 1] || ''}
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                    {opts.map(o => {
+                      const pct = Math.round((o.count / total) * 100)
+                      return (
+                        <div key={o.option} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                          <div style={{ width: 30, fontSize: 11, color: '#999', textAlign: 'right' }}>Op {o.option + 1}</div>
+                          <div style={{ flex: 1, height: 16, background: '#F0EBE5', borderRadius: 3, overflow: 'hidden' }}>
+                            <div style={{ height: '100%', width: `${Math.max(pct, 2)}%`, background: OPT_COLORS[o.option % OPT_COLORS.length], borderRadius: 3 }} />
+                          </div>
+                          <div style={{ width: 36, fontSize: 11, fontWeight: 600, color: '#555' }}>{pct}%</div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* ── DISTRIBUZIONE RISPOSTE SUBQUIZ ── */}
+      <div style={{ background: '#fff', border: '1px solid #E8E0D8', borderRadius: 12, padding: 28 }}>
+        <div style={{ fontSize: 11, letterSpacing: 2, textTransform: 'uppercase', color: '#999', fontWeight: 600, marginBottom: 20 }}>Distribuzione risposte — Subquiz</div>
+        {Object.keys(subDistByQ).length === 0 ? (
+          <div style={{ color: '#ccc', fontSize: 13, padding: 20, textAlign: 'center' }}>Nessun dato disponibile</div>
+        ) : (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
+            {Object.entries(subDistByQ).map(([qNum, opts]) => {
+              const total = opts.reduce((s, o) => s + o.count, 0) || 1
+              const OPT_COLORS = ['#9B7FA6', '#E8895A', '#c9a96e', '#1A3A6E', '#A0522D', '#2A7A2A']
+              return (
+                <div key={qNum} style={{ padding: 12, background: '#FAFAF8', borderRadius: 8 }}>
+                  <div style={{ fontSize: 11, fontWeight: 600, color: '#888', marginBottom: 8 }}>
+                    SQ{qNum} — {SUBQUIZ_QUESTIONS[Number(qNum) - 1] || ''}
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                    {opts.map(o => {
+                      const pct = Math.round((o.count / total) * 100)
+                      return (
+                        <div key={o.option} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                          <div style={{ width: 30, fontSize: 11, color: '#999', textAlign: 'right' }}>Op {o.option + 1}</div>
+                          <div style={{ flex: 1, height: 16, background: '#F0EBE5', borderRadius: 3, overflow: 'hidden' }}>
+                            <div style={{ height: '100%', width: `${Math.max(pct, 2)}%`, background: OPT_COLORS[o.option % OPT_COLORS.length], borderRadius: 3 }} />
+                          </div>
+                          <div style={{ width: 36, fontSize: 11, fontWeight: 600, color: '#555' }}>{pct}%</div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* ── TREND GIORNALIERO ── */}
+      <div style={{ background: '#fff', border: '1px solid #E8E0D8', borderRadius: 12, padding: 28 }}>
+        <div style={{ fontSize: 11, letterSpacing: 2, textTransform: 'uppercase', color: '#999', fontWeight: 600, marginBottom: 20 }}>Attivita' ultimi 30 giorni</div>
+        {dailyActivity.length === 0 ? (
+          <div style={{ color: '#ccc', fontSize: 13, padding: 20, textAlign: 'center' }}>Nessun dato disponibile</div>
+        ) : (
+          <>
+            <div style={{ display: 'flex', gap: 16, marginBottom: 16 }}>
+              {[
+                { label: 'Lead', color: '#c9a96e' },
+                { label: 'Subquiz', color: '#9B7FA6' },
+                { label: 'Pagamenti', color: '#2A7A2A' },
+              ].map(l => (
+                <div key={l.label} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#666' }}>
+                  <div style={{ width: 10, height: 10, borderRadius: 2, background: l.color }} />
+                  {l.label}
+                </div>
+              ))}
+            </div>
+            <div style={{ display: 'flex', alignItems: 'flex-end', gap: 3, height: 140 }}>
+              {dailyActivity.map(d => {
+                const total = d.leads + d.subquiz + d.payments
+                const hLead = (d.leads / dailyMax) * 120
+                const hSub = (d.subquiz / dailyMax) * 120
+                const hPay = (d.payments / dailyMax) * 120
+                const dateLabel = new Date(d.date).toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit' })
+                return (
+                  <div key={d.date} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, minWidth: 0 }} title={`${dateLabel}: ${d.leads} lead, ${d.subquiz} subquiz, ${d.payments} pagamenti`}>
+                    <div style={{ fontSize: 9, color: '#BBB', fontWeight: 600 }}>{total > 0 ? total : ''}</div>
+                    <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 1 }}>
+                      {hPay > 0 && <div style={{ height: hPay, background: '#2A7A2A', borderRadius: 2 }} />}
+                      {hSub > 0 && <div style={{ height: hSub, background: '#9B7FA6', borderRadius: 2 }} />}
+                      {hLead > 0 && <div style={{ height: hLead, background: '#c9a96e', borderRadius: 2 }} />}
+                    </div>
+                    <div style={{ fontSize: 8, color: '#BBB', transform: 'rotate(-45deg)', whiteSpace: 'nowrap', marginTop: 4 }}>{dateLabel}</div>
+                  </div>
+                )
+              })}
+            </div>
           </>
         )}
       </div>

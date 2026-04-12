@@ -510,12 +510,39 @@ const seasonData = {
   }
 };
 
+// ─── ANALYTICS TRACKING ─────────────────────────────────────────────────────
+const _sid = (function() {
+  try {
+    let s = sessionStorage.getItem('_qsid');
+    if (!s) {
+      s = (typeof crypto !== 'undefined' && crypto.randomUUID)
+        ? crypto.randomUUID()
+        : 'xxxx-xxxx-xxxx'.replace(/x/g, function() { return (Math.random()*16|0).toString(16); });
+      sessionStorage.setItem('_qsid', s);
+    }
+    return s;
+  } catch(e) { return 'no-session'; }
+})();
+let _qtime = Date.now(); // timestamp inizio domanda corrente
+
+function trackEvent(event, data) {
+  try {
+    fetch('/api/quiz-events', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ session_id: _sid, event, data: data || {} }),
+    }).catch(function(){});
+  } catch(e) {}
+}
+
 // ─── STATE ───────────────────────────────────────────────────────────────────
 let current = 0, answers = [];
 
 const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw08HwiWZ6-BN1BCGPvt_RH5pIEbeG9CKxGh4cksEe3-nFnD3h3w_M467Rk9YPwu8vcZQ/exec";
 
 function startQuiz() {
+  trackEvent('quiz_start');
+  _qtime = Date.now();
   document.getElementById('hero-section').style.display = 'none';
   document.getElementById('quiz-section').style.display = 'block';
   renderQuestion(0);
@@ -571,8 +598,10 @@ function renderQuestion(idx) {
 
 function sel(qIdx, optIdx) {
   answers[qIdx] = optIdx;
+  var elapsed = Date.now() - _qtime;
+  trackEvent('quiz_answer', { question: qIdx + 1, option: optIdx, time_ms: elapsed });
   document.querySelectorAll('.option-card,.option-text').forEach((el,i) => el.classList.toggle('selected', i===optIdx));
-  setTimeout(function() { nextQuestion(); }, 500);
+  setTimeout(function() { nextQuestion(); _qtime = Date.now(); }, 500);
 }
 
 function nextQuestion() {
@@ -583,6 +612,7 @@ function prevQuestion() {
   if (current > 0) { current--; renderQuestion(current); window.scrollTo(0,0); }
 }
 function showLead() {
+  trackEvent('lead_view');
   document.getElementById('quiz-section').style.display = 'none';
   document.getElementById('lead-section').style.display = 'flex';
   window.scrollTo(0,0);
@@ -688,6 +718,7 @@ function showResult() {
   lastSeason = seasonData[season].name;
   lastName = name;
   lastEmail = email;
+  trackEvent('lead_submit');
   saveToGoogleSheet(name, email, seasonData[season].name);
   fetch('/api/leads', {
     method: 'POST',
@@ -774,6 +805,7 @@ let lastName = '';
 let lastEmail = '';
 
 async function startCheckout() {
+  trackEvent('payment_click');
   const btn = document.getElementById('btn-sub-upsell') || document.getElementById('btn-upsell');
   if (btn) {
     btn.disabled = true;
@@ -961,6 +993,8 @@ const subQuestions = [
 let subCurrent = 0, subAnswers = [], selectedSeason = null;
 
 function startSubQuiz() {
+  trackEvent('subquiz_start');
+  _qtime = Date.now();
   // Se l'utente ha già fatto il quiz stagione, pre-selezioniamo
   const seasonMap = { 'Primavera':'spring', 'Estate':'summer', 'Autunno':'autumn', 'Inverno':'winter' };
   selectedSeason = seasonMap[lastSeason] || null;
@@ -1026,12 +1060,14 @@ function renderSubQuestion(idx) {
 
 function selSub(qIdx, optIdx) {
   subAnswers[qIdx] = optIdx;
+  var elapsed = Date.now() - _qtime;
+  trackEvent('subquiz_answer', { question: qIdx + 1, option: optIdx, time_ms: elapsed });
   // Se è la domanda stagione, salva la scelta
   if (qIdx === 0) {
     selectedSeason = subQuestions[0].options[optIdx].value;
   }
   document.querySelectorAll('#sub-question-container .option-card, #sub-question-container .option-text').forEach((el,i) => el.classList.toggle('selected', i===optIdx));
-  setTimeout(function() { nextSubQuestion(); }, 500);
+  setTimeout(function() { nextSubQuestion(); _qtime = Date.now(); }, 500);
 }
 
 function nextSubQuestion() {
@@ -1089,6 +1125,7 @@ let lastSubgroup = '';
 function showSubResult() {
   const subgroup = calculateSubgroup();
   lastSubgroup = subgroup;
+  trackEvent('photo_view');
 
   document.getElementById('subquiz-section').style.display = 'none';
   const el = document.getElementById('subresult-section');
@@ -1183,6 +1220,7 @@ function removePhoto(idx) {
 }
 
 async function confirmPhotos() {
+  trackEvent('photo_confirm');
   const btn = document.getElementById('btn-confirm-photos');
   btn.disabled = true;
   btn.textContent = 'Caricamento in corso...';
@@ -1204,6 +1242,7 @@ async function confirmPhotos() {
 }
 
 function showPaymentPage() {
+  trackEvent('payment_view');
   document.getElementById('subresult-section').style.display = 'none';
   const el = document.getElementById('payment-section');
   el.style.display = 'block';
