@@ -56,7 +56,8 @@ Richiede selezione stagione. Tre viste:
 - Card per ogni analisi con: nome, email, data, stagione, stato (in attesa/inviata)
 - Dropdown per selezionare sottogruppo tra i 4 della stagione
 - Espandi per vedere foto caricate
-- **Invia PDF** — genera PDF personalizzato e lo invia via email
+- **Genera PDF** — genera il PDF personalizzato, lo salva su disco e lo apre in nuova tab per anteprima
+- **Invia PDF** — appare dopo la generazione, invia via email il PDF gia' generato (stesso file dell'anteprima)
 - Eliminazione singola e bulk (checkbox + seleziona tutti)
 
 ### Tab: Subquiz foto
@@ -105,7 +106,9 @@ Richiede selezione stagione. Tre viste:
 | `/api/admin/logout` | POST | Cancella cookie |
 | `/api/admin/analyses` | GET/DELETE | Lista analisi / elimina bulk |
 | `/api/admin/analyses/[id]` | PATCH | Aggiorna sottogruppo |
-| `/api/admin/analyses/[id]/send` | POST | Genera e invia PDF via email |
+| `/api/admin/analyses/[id]/generate-pdf` | POST | Genera PDF e lo salva su disco per anteprima |
+| `/api/admin/analyses/[id]/pdf` | GET | Serve il PDF generato per visualizzazione nel browser |
+| `/api/admin/analyses/[id]/send` | POST | Invia via email il PDF gia' generato |
 | `/api/admin/photo` | GET | Serve foto analisi |
 | `/api/admin/leads` | GET/DELETE | Lista lead / elimina bulk |
 | `/api/admin/subquiz-submissions` | GET/DELETE | Lista subquiz / elimina bulk |
@@ -130,6 +133,7 @@ File: `armocromia.db` in `STORAGE_PATH` o `/storage` o `./data`
 | notes | TEXT | Note del cliente |
 | photos | TEXT (JSON) | Array path foto |
 | status | TEXT | `pending` o `sent` |
+| pdf_path | TEXT | Path del PDF generato su disco (NULL se non ancora generato) |
 | created_at | TEXT | Timestamp |
 
 ### Tabella `leads`

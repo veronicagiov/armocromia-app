@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
+import fs from 'fs'
 import { Resend } from 'resend'
 import { checkAdminAuth } from '@/lib/auth'
 import { getAnalysisById, markAsSent } from '@/lib/db'
-import { generatePDF } from '@/lib/pdf'
 
 export const dynamic = 'force-dynamic'
 
@@ -18,13 +18,11 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     return NextResponse.json({ error: 'Non trovata' }, { status: 404 })
   }
 
-  const pdfBuffer = await generatePDF({
-    customerName: analysis.customer_name,
-    customerEmail: analysis.customer_email,
-    season: analysis.season,
-    subgroup: analysis.subgroup || analysis.season,
-    notes: analysis.notes,
-  })
+  if (!analysis.pdf_path || !fs.existsSync(analysis.pdf_path)) {
+    return NextResponse.json({ error: 'Genera prima l\'anteprima del PDF' }, { status: 400 })
+  }
+
+  const pdfBuffer = fs.readFileSync(analysis.pdf_path)
 
   await getResend().emails.send({
     from: 'YouGlamour <veronica@youglamour.it>',

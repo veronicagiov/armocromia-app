@@ -433,8 +433,9 @@ export function generatePDF(input: PDFInput): Promise<Buffer> {
   return new Promise((resolve, reject) => {
     const doc = new PDFDocument({
       size: 'A4',
-      margin: MARGIN,
+      margins: { top: MARGIN, bottom: 0, left: MARGIN, right: MARGIN },
       autoFirstPage: false,
+      bufferPages: true,
       info: { Title: 'Analisi Armocromia Personalizzata', Author: 'youglamour.it' },
     })
     const chunks: Buffer[] = []
@@ -461,12 +462,10 @@ export function generatePDF(input: PDFInput): Promise<Buffer> {
 
     // Descrizione stagione
     doc.fontSize(20).font('Times-Bold').fillColor(data.accent).text(seasonKey, MARGIN, 112, { lineBreak: false })
+    const descH = 60
     doc.fontSize(10).font('Helvetica').fillColor('#555555')
-      .text(data.description, MARGIN, 140, { width: CONTENT_W, lineGap: 2 })
+      .text(data.description, MARGIN, 140, { width: CONTENT_W, lineGap: 2, height: descH })
 
-    // Calcola altezza descrizione (appross. 3 righe = 48px)
-    const descLines = Math.ceil(data.description.length / 90)
-    const descH = descLines * 15 + 6
     let y2 = 140 + descH
 
     doc.rect(MARGIN, y2, CONTENT_W, 0.8).fill('#E0D8D0')
@@ -475,10 +474,8 @@ export function generatePDF(input: PDFInput): Promise<Buffer> {
     y2 += 15
     doc.fontSize(14).font('Times-Bold').fillColor(data.accent).text(input.subgroup || seasonKey, MARGIN, y2, { lineBreak: false })
     y2 += 22
-    doc.fontSize(10).font('Helvetica').fillColor('#555555').text(subgroupDesc, MARGIN, y2, { width: CONTENT_W, lineGap: 2 })
-
-    const subLines = Math.ceil(subgroupDesc.length / 90)
-    const subH = subLines * 15 + 6
+    const subH = 50
+    doc.fontSize(10).font('Helvetica').fillColor('#555555').text(subgroupDesc, MARGIN, y2, { width: CONTENT_W, lineGap: 2, height: subH })
     y2 += subH
 
     doc.rect(MARGIN, y2, CONTENT_W, 0.8).fill('#E0D8D0')
@@ -600,12 +597,12 @@ export function generatePDF(input: PDFInput): Promise<Buffer> {
     doc.fontSize(11).font('Times-Roman').fillColor('#555555')
       .text(
         'Questo PDF è la tua guida personale — uno strumento pensato per aiutarti\na vestirti con intenzione e piacere, scegliendo ogni giorno i colori che\nti fanno sentire davvero al tuo meglio.',
-        MARGIN + 30, 194, { width: CONTENT_W - 60, lineGap: 4, align: 'center' }
+        MARGIN + 30, 194, { width: CONTENT_W - 60, lineGap: 4, align: 'center', height: 60 }
       )
     doc.fontSize(11).font('Times-Roman').fillColor('#777777')
       .text(
         "Non esistono regole assolute: l'armocromia è un linguaggio,\ne tu ne sei la voce. Usala con curiosità e con gioia.",
-        MARGIN + 30, 264, { width: CONTENT_W - 60, lineGap: 4, align: 'center' }
+        MARGIN + 30, 264, { width: CONTENT_W - 60, lineGap: 4, align: 'center', height: 50 }
       )
 
     // Box riepilogo
@@ -630,6 +627,20 @@ export function generatePDF(input: PDFInput): Promise<Buffer> {
     doc.fontSize(10).font('Helvetica').fillColor('#AAAAAA').text('Hai domande? Scrivici a', MARGIN, 536, { width: CONTENT_W, align: 'center', lineBreak: false })
     doc.fontSize(11).font('Helvetica').fillColor(data.accent).text('veronica@youglamour.it', MARGIN, 554, { width: CONTENT_W, align: 'center', lineBreak: false, link: 'mailto:veronica@youglamour.it' })
 
+    // Remove extra blank pages created by pdfkit text overflow
+    // Extra pages appear at indices 2, 4, 6 (after pages 2, 4, 6 content)
+    // We need to keep indices 0, 1, 3, 5, 7 (cover, season, palette, makeup, conclusion)
+    const range = doc.bufferedPageRange()
+    const total = range.start + range.count
+    if (total > 5) {
+      // @ts-expect-error accessing pdfkit internals
+      const pages = doc._root.data.Pages.data
+      const keep = [0, 1, 3, 5, 7] // indices of real content pages
+      const validKeep = keep.filter(i => i < total)
+      pages.Kids = validKeep.map((i: number) => pages.Kids[i])
+      pages.Count = pages.Kids.length
+    }
+
     doc.end()
   })
 }
@@ -642,41 +653,41 @@ function drawCover(doc: PDFKit.PDFDocument, data: SeasonInfo, input: PDFInput) {
 
   let y = 55
   doc.fontSize(9).font('Helvetica').fillColor('#BBBBBB')
-    .text('youglamour.it', MARGIN, y, { width: CONTENT_W, align: 'center', characterSpacing: 2.5 })
+    .text('youglamour.it', MARGIN, y, { width: CONTENT_W, align: 'center', characterSpacing: 2.5, lineBreak: false })
 
   y = 160
   doc.fontSize(10.5).font('Helvetica').fillColor('#BBBBBB')
-    .text('ANALISI ARMOCROMIA', MARGIN, y, { width: CONTENT_W, align: 'center', characterSpacing: 3 })
+    .text('ANALISI ARMOCROMIA', MARGIN, y, { width: CONTENT_W, align: 'center', characterSpacing: 3, lineBreak: false })
   y += 22
   doc.fontSize(36).font('Times-Bold').fillColor(data.accent)
-    .text('Personalizzata', MARGIN, y, { width: CONTENT_W, align: 'center' })
+    .text('Personalizzata', MARGIN, y, { width: CONTENT_W, align: 'center', lineBreak: false })
 
   y += 66
   doc.rect((PAGE_W - 70) / 2, y, 70, 1.5).fill(data.accent)
 
   y += 24
   doc.fontSize(9.5).font('Helvetica').fillColor('#BBBBBB')
-    .text('PREPARATA PER', MARGIN, y, { width: CONTENT_W, align: 'center', characterSpacing: 2 })
+    .text('PREPARATA PER', MARGIN, y, { width: CONTENT_W, align: 'center', characterSpacing: 2, lineBreak: false })
   y += 18
   doc.fontSize(28).font('Times-Bold').fillColor('#333333')
-    .text(input.customerName, MARGIN, y, { width: CONTENT_W, align: 'center' })
+    .text(input.customerName, MARGIN, y, { width: CONTENT_W, align: 'center', lineBreak: false })
 
   y += 50
   doc.fontSize(9.5).font('Helvetica').fillColor('#BBBBBB')
-    .text('IL TUO SOTTOGRUPPO', MARGIN, y, { width: CONTENT_W, align: 'center', characterSpacing: 2 })
+    .text('IL TUO SOTTOGRUPPO', MARGIN, y, { width: CONTENT_W, align: 'center', characterSpacing: 2, lineBreak: false })
   y += 18
 
   const badgeW = 260, badgeH = 44
   const badgeX = (PAGE_W - badgeW) / 2
   doc.roundedRect(badgeX, y, badgeW, badgeH, 22).fill(data.accent)
   doc.fontSize(15).font('Times-Bold').fillColor('#FFFFFF')
-    .text(input.subgroup || input.season, badgeX, y + 13, { width: badgeW, align: 'center' })
+    .text(input.subgroup || input.season, badgeX, y + 13, { width: badgeW, align: 'center', lineBreak: false })
 
   y += badgeH + 50
   doc.fontSize(8.5).font('Helvetica').fillColor('#CCCCCC')
     .text(
       new Date().toLocaleDateString('it-IT', { day: '2-digit', month: 'long', year: 'numeric' }),
-      MARGIN, y, { width: CONTENT_W, align: 'center' }
+      MARGIN, y, { width: CONTENT_W, align: 'center', lineBreak: false }
     )
 }
 
@@ -684,15 +695,19 @@ function drawPageHeader(doc: PDFKit.PDFDocument, data: SeasonInfo, title: string
   doc.rect(0, 0, PAGE_W, 88).fill(data.accent)
   doc.rect(0, 88, PAGE_W, 4).fill(lightenHex(data.accent, 0.5))
   doc.fontSize(8.5).font('Helvetica').fillColor('rgba(255,255,255,0.6)')
-    .text('youglamour.it  —  ANALISI ARMOCROMIA PERSONALIZZATA', MARGIN, 22, { width: CONTENT_W })
+    .text('youglamour.it  —  ANALISI ARMOCROMIA PERSONALIZZATA', MARGIN, 22, { width: CONTENT_W, lineBreak: false })
   doc.fontSize(21).font('Times-Bold').fillColor('#FFFFFF')
-    .text(title, MARGIN, 42, { width: CONTENT_W })
+    .text(title, MARGIN, 42, { width: CONTENT_W, lineBreak: false })
 }
 
 function drawPageFooter(doc: PDFKit.PDFDocument, data: SeasonInfo) {
+  // Reset Y position to prevent pdfkit from creating an extra page
+  doc.y = MARGIN
   const y = PAGE_H - 38
   doc.rect(MARGIN, y, CONTENT_W, 0.5).fill('#E0D8D0')
   doc.fontSize(8).font('Helvetica').fillColor('#CCCCCC')
     .text('youglamour.it  ·  Analisi Armocromia Personalizzata',
-      MARGIN, y + 8, { width: CONTENT_W, align: 'center' })
+      MARGIN, y + 8, { width: CONTENT_W, align: 'center', lineBreak: false })
+  // Reset again after footer text
+  doc.y = MARGIN
 }

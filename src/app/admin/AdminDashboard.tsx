@@ -12,6 +12,7 @@ interface Analysis {
   notes: string
   photos: string
   status: 'pending' | 'sent'
+  pdf_path: string | null
   created_at: string
 }
 
@@ -67,6 +68,7 @@ export default function AdminDashboard() {
   const [expandedSub, setExpandedSub] = useState<number | null>(null)
   const [sending, setSending] = useState<Record<number, boolean>>({})
   const [sent, setSent] = useState<Record<number, boolean>>({})
+  const [generating, setGenerating] = useState<Record<number, boolean>>({})
   const [subgroups, setSubgroups] = useState<Record<number, string>>({})
   const [selectedAnalyses, setSelectedAnalyses] = useState<Set<number>>(new Set())
   const [selectedSubquiz, setSelectedSubquiz] = useState<Set<number>>(new Set())
@@ -118,6 +120,19 @@ export default function AdminDashboard() {
       alert('Errore: ' + (err.error || 'Invio fallito'))
     }
     setSending(prev => ({ ...prev, [id]: false }))
+  }
+
+  async function handleGeneratePdf(id: number) {
+    setGenerating(prev => ({ ...prev, [id]: true }))
+    const res = await fetch(`/api/admin/analyses/${id}/generate-pdf`, { method: 'POST' })
+    if (res.ok) {
+      setAnalyses(prev => prev.map(a => a.id === id ? { ...a, pdf_path: 'generated' } : a))
+      window.open(`/api/admin/analyses/${id}/pdf`, '_blank')
+    } else {
+      const err = await res.json()
+      alert('Errore: ' + (err.error || 'Generazione fallita'))
+    }
+    setGenerating(prev => ({ ...prev, [id]: false }))
   }
 
   async function handleLogout() {
@@ -301,20 +316,47 @@ export default function AdminDashboard() {
                             {isExpanded ? '▲ Nascondi foto' : `📷 Foto (${photos.length})`}
                           </button>
                         )}
-                        <button
-                          onClick={() => handleSend(a.id)}
-                          disabled={isSending || alreadySent}
-                          style={{
-                            padding: '10px 24px', borderRadius: 100, border: 'none', cursor: alreadySent ? 'default' : 'pointer',
-                            background: alreadySent ? '#E8F5E9' : accentColor,
-                            color: alreadySent ? '#2E7D32' : '#fff',
-                            fontSize: 13, fontWeight: 600,
-                            opacity: isSending ? 0.7 : 1,
-                            minWidth: 130,
-                          }}
-                        >
-                          {isSending ? 'Invio...' : alreadySent ? '✓ Inviata' : 'Invia PDF'}
-                        </button>
+                        {!alreadySent && (
+                          <button
+                            onClick={() => handleGeneratePdf(a.id)}
+                            disabled={generating[a.id]}
+                            style={{
+                              padding: '10px 24px', borderRadius: 100, cursor: 'pointer',
+                              background: a.pdf_path ? '#F5F3F0' : accentColor,
+                              color: a.pdf_path ? accentColor : '#fff',
+                              border: a.pdf_path ? `1.5px solid ${accentColor}` : 'none',
+                              fontSize: 13, fontWeight: 600,
+                              opacity: generating[a.id] ? 0.7 : 1,
+                              minWidth: 160,
+                            }}
+                          >
+                            {generating[a.id] ? 'Generazione...' : a.pdf_path ? '👁 Rivedi PDF' : 'Genera PDF'}
+                          </button>
+                        )}
+                        {a.pdf_path && !alreadySent && (
+                          <button
+                            onClick={() => handleSend(a.id)}
+                            disabled={isSending}
+                            style={{
+                              padding: '10px 24px', borderRadius: 100, border: 'none', cursor: 'pointer',
+                              background: accentColor, color: '#fff',
+                              fontSize: 13, fontWeight: 600,
+                              opacity: isSending ? 0.7 : 1,
+                              minWidth: 160,
+                            }}
+                          >
+                            {isSending ? 'Invio...' : 'Invia PDF'}
+                          </button>
+                        )}
+                        {alreadySent && (
+                          <div style={{
+                            padding: '10px 24px', borderRadius: 100,
+                            background: '#E8F5E9', color: '#2E7D32',
+                            fontSize: 13, fontWeight: 600, minWidth: 130, textAlign: 'center',
+                          }}>
+                            ✓ Inviata
+                          </div>
+                        )}
                         <button
                           onClick={() => handleDeleteSingle('/api/admin/analyses', a.id)}
                           disabled={deleting}

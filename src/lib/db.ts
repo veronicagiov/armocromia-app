@@ -2,7 +2,7 @@ import Database from 'better-sqlite3'
 import path from 'path'
 import fs from 'fs'
 
-const DATA_DIR = process.env.STORAGE_PATH || (fs.existsSync('/storage') ? '/storage' : path.join(process.cwd(), 'data'))
+export const DATA_DIR = process.env.STORAGE_PATH || (fs.existsSync('/storage') ? '/storage' : path.join(process.cwd(), 'data'))
 const DB_PATH = path.join(DATA_DIR, 'armocromia.db')
 
 if (!fs.existsSync(DATA_DIR)) {
@@ -39,6 +39,11 @@ db.exec(`
   )
 `)
 
+// Migration: add pdf_path column if missing
+try {
+  db.exec(`ALTER TABLE analyses ADD COLUMN pdf_path TEXT DEFAULT NULL`)
+} catch { /* column already exists */ }
+
 db.exec(`
   CREATE TABLE IF NOT EXISTS leads (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -59,6 +64,7 @@ export interface Analysis {
   notes: string
   photos: string
   status: 'pending' | 'sent'
+  pdf_path: string | null
   created_at: string
 }
 
@@ -106,6 +112,10 @@ export function updateSubgroup(id: number, subgroup: string): void {
 
 export function markAsSent(id: number): void {
   db.prepare("UPDATE analyses SET status = 'sent' WHERE id = ?").run(id)
+}
+
+export function setPdfPath(id: number, pdfPath: string): void {
+  db.prepare('UPDATE analyses SET pdf_path = ? WHERE id = ?').run(pdfPath, id)
 }
 
 export function deleteAnalysis(id: number): void {
