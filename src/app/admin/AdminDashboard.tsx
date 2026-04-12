@@ -116,8 +116,9 @@ export default function AdminDashboard() {
       setSent(prev => ({ ...prev, [id]: true }))
       setAnalyses(prev => prev.map(a => a.id === id ? { ...a, status: 'sent' } : a))
     } else {
-      const err = await res.json()
-      alert('Errore: ' + (err.error || 'Invio fallito'))
+      let msg = 'Invio fallito'
+      try { const err = await res.json(); msg = err.error || msg } catch {}
+      alert('Errore: ' + msg)
     }
     setSending(prev => ({ ...prev, [id]: false }))
   }
