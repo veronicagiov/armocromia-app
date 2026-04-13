@@ -9,7 +9,7 @@ export default function GraziePage() {
           Tutto ricevuto!
         </h1>
         <p style={{ fontSize: 16, color: '#7a6e68', lineHeight: 1.7, marginBottom: 40 }}>
-          Le tue foto sono al sicuro. Analizzeremo il tuo sottogruppo armocromatico e ti invieremo il PDF personalizzato entro <strong>48 ore</strong>.
+          Le tue foto sono al sicuro. Analizzeremo il tuo sottogruppo armocromatico e presto riceverai il tuo <strong>PDF personalizzato</strong> via email.
         </p>
 
         <div style={{ background: '#ffffff', border: '1px solid #e8e0d8', borderRadius: 16, padding: 24, marginBottom: 40, textAlign: 'left' as const }}>

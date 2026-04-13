@@ -108,7 +108,7 @@ export async function POST(req: NextRequest) {
             <ol style="margin:0; padding-left:20px; color:#7a6e68; line-height:2;">
               <li>Analizziamo le tue foto e determiniamo il tuo <strong>sottogruppo armocromatico</strong></li>
               <li>Creiamo il tuo <strong>PDF personalizzato</strong> con palette, consigli e outfit</li>
-              <li>Ti inviamo tutto per email entro <strong>48 ore</strong></li>
+              <li>Ti inviamo tutto per email entro <strong>24 ore</strong></li>
             </ol>
           </div>
 

@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
               description: `Sottogruppo dettagliato + PDF personalizzato — Stagione ${season}`,
               images: [],
             },
-            unit_amount: 700, // 7.00 €
+            unit_amount: 990, // 9.90 €
           },
           quantity: 1,
         },
