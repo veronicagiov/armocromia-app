@@ -82,7 +82,7 @@ export async function POST(req: NextRequest) {
             <tr><td style="padding:8px 0; color:#7a6e68;">Email</td><td style="padding:8px 0;">${finalEmail}</td></tr>
             <tr><td style="padding:8px 0; color:#7a6e68;">Stagione quiz</td><td style="padding:8px 0;">${finalSeason}</td></tr>
             <tr><td style="padding:8px 0; color:#7a6e68;">Foto caricate</td><td style="padding:8px 0;">${photoPaths.length} foto</td></tr>
-            <tr><td style="padding:8px 0; color:#7a6e68;">Pagamento</td><td style="padding:8px 0; color:#2a7a2a;">✓ Confermato (7€)</td></tr>
+            <tr><td style="padding:8px 0; color:#7a6e68;">Pagamento</td><td style="padding:8px 0; color:#2a7a2a;">✓ Confermato</td></tr>
             ${notes ? `<tr><td style="padding:8px 0; color:#7a6e68; vertical-align:top;">Note</td><td style="padding:8px 0;">${notes}</td></tr>` : ''}
           </table>
           <p style="color:#7a6e68; font-size:13px; border-top:1px solid #e8e0d8; padding-top:16px;">

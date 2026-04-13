@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { insertSubquizSubmission } from '@/lib/db'
+import { scheduleAbandonedCartReminder } from '@/lib/abandoned-cart'
 import fs from 'fs'
 import path from 'path'
 
@@ -30,13 +31,16 @@ export async function POST(req: NextRequest) {
     }
 
     // Salva nel database (pre-pagamento)
-    insertSubquizSubmission({
+    const submissionId = insertSubquizSubmission({
       name,
       email,
       season,
       subgroup_guess: subgroup,
       photos: photoPaths,
     })
+
+    // Schedula reminder email dopo 15 minuti se non paga
+    scheduleAbandonedCartReminder(submissionId)
 
     return NextResponse.json({ success: true })
   } catch (err: any) {

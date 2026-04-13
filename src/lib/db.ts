@@ -199,6 +199,13 @@ db.exec(`
   )
 `)
 
+// Aggiunge colonna reminder_sent se non esiste
+try {
+  db.exec(`ALTER TABLE subquiz_submissions ADD COLUMN reminder_sent INTEGER DEFAULT 0`)
+} catch (e) {
+  // Colonna già esistente, ignora
+}
+
 export interface SubquizSubmission {
   id: number
   name: string
@@ -207,6 +214,7 @@ export interface SubquizSubmission {
   subgroup_guess: string | null
   photos: string
   paid: number
+  reminder_sent: number
   created_at: string
 }
 
@@ -234,6 +242,14 @@ export function getLatestSubquizByEmail(email: string): SubquizSubmission | unde
 
 export function markSubquizPaid(id: number): void {
   db.prepare('UPDATE subquiz_submissions SET paid = 1 WHERE id = ?').run(id)
+}
+
+export function markReminderSent(id: number): void {
+  db.prepare('UPDATE subquiz_submissions SET reminder_sent = 1 WHERE id = ?').run(id)
+}
+
+export function getSubquizById(id: number): SubquizSubmission | undefined {
+  return db.prepare('SELECT * FROM subquiz_submissions WHERE id = ?').get(id) as SubquizSubmission | undefined
 }
 
 export function deleteSubquizSubmission(id: number): void {

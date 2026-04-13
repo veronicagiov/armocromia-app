@@ -90,10 +90,11 @@ Richiede selezione stagione. Tre viste:
 
 | Endpoint | Metodo | Descrizione |
 |----------|--------|-------------|
-| `/api/create-checkout` | POST | Crea sessione Stripe checkout (7 EUR). Body: `{season, name, email}` |
+| `/api/create-checkout` | POST | Crea sessione Stripe checkout (9.90 EUR). Body: `{season, name, email}` |
 | `/api/upload` | POST | Salva analisi post-pagamento. Verifica Stripe, collega foto dal subquiz, invia email conferma |
 | `/api/leads` | POST | Salva lead dal quiz. Body: `{name, email, season}` |
-| `/api/subquiz-upload` | POST | Salva foto e dati subquiz pre-pagamento (FormData con photos, name, email, season, subgroup) |
+| `/api/subquiz-upload` | POST | Salva foto e dati subquiz pre-pagamento (FormData). Schedula reminder abandoned cart dopo 15 min |
+| `/sconto` | GET | Pagina redirect a Stripe con sconto 20% (7 EUR). Params: `?email=...&name=...&season=...` |
 | `/api/analyze-color` | POST | Analisi AI colore dominante foto (Claude Haiku). Ritorna hex, nome, in_palette, confidence |
 | `/api/wardrobe` | GET/POST/DELETE | CRUD capi armadio |
 | `/api/wardrobe/photo` | GET | Serve foto capi armadio |
@@ -218,8 +219,9 @@ Generato con pdfkit (A4). Contenuto per ogni sottogruppo:
 
 ### Resend
 - Email notifica admin (nuova analisi ricevuta)
-- Email conferma cliente (foto ricevute, 48h turnaround)
+- Email conferma cliente (foto ricevute)
 - Email invio PDF (attachment base64)
+- Email abandoned cart reminder (15 min dopo subquiz senza pagamento, link sconto 20%)
 
 ### Claude API (Anthropic)
 - Modello: `claude-haiku-4-5-20251001`
