@@ -612,6 +612,7 @@ function prevQuestion() {
   if (current > 0) { current--; renderQuestion(current); window.scrollTo(0,0); }
 }
 function showLead() {
+  trackEvent('quiz_complete');
   trackEvent('lead_view');
   document.getElementById('quiz-section').style.display = 'none';
   document.getElementById('lead-section').style.display = 'flex';
@@ -757,7 +758,7 @@ function showResult() {
         <p>Hai scoperto di essere una <strong>${d.name}</strong>. Approfondisci con il manuale dedicato alla tua stagione — la guida più completa per sfruttare al massimo la tua palette personale.</p>
       </div>
 
-      <a class="book-card" href="${b.link}" target="_blank" rel="noopener">
+      <a class="book-card" href="${b.link}" target="_blank" rel="noopener" onclick="trackEvent('amazon_book_click', { season: '${d.name}' })">
         <img class="book-cover-img" src="${makeBookSVG(d)}" alt="Copertina ${b.title}">
         <div class="book-info">
           <div class="book-tag">✦ Il libro della tua stagione</div>

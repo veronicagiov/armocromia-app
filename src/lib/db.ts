@@ -333,7 +333,7 @@ export function insertQuizEvent(data: { session_id: string; event: string; data?
   `).run(data.session_id, data.event, JSON.stringify(data.data || {}))
 }
 
-export function getQuizEventsAggregated(): {
+export function getQuizEventsAggregated(dateFrom?: string, dateTo?: string): {
   funnel: Record<string, number>
   quizAnswerTimes: { question: number; avg_ms: number; count: number }[]
   subquizAnswerTimes: { question: number; avg_ms: number; count: number }[]
@@ -342,23 +342,31 @@ export function getQuizEventsAggregated(): {
   dailyActivity: { date: string; leads: number; subquiz: number; payments: number }[]
   seasonDistribution: { season: string; count: number }[]
 } {
+  // Costruisci clausola WHERE per filtro date
+  const dateConditions: string[] = []
+  const dateParams: string[] = []
+  if (dateFrom) { dateConditions.push('created_at >= ?'); dateParams.push(dateFrom + ' 00:00:00') }
+  if (dateTo) { dateConditions.push('created_at <= ?'); dateParams.push(dateTo + ' 23:59:59') }
+  const dateWhere = dateConditions.length > 0 ? ' WHERE ' + dateConditions.join(' AND ') : ''
+  const dateAnd = dateConditions.length > 0 ? ' AND ' + dateConditions.join(' AND ') : ''
+
   // Funnel: count unique sessions per event
   const funnelRows = db.prepare(`
     SELECT event, COUNT(DISTINCT session_id) as cnt
-    FROM quiz_events
+    FROM quiz_events${dateWhere}
     GROUP BY event
-  `).all() as { event: string; cnt: number }[]
+  `).all(...dateParams) as { event: string; cnt: number }[]
   const funnel: Record<string, number> = {}
   for (const r of funnelRows) funnel[r.event] = r.cnt
 
   // Fetch answer rows and aggregate in JS (avoids json_extract compatibility issues)
   const quizAnswerRows = db.prepare(`
-    SELECT data FROM quiz_events WHERE event = 'quiz_answer'
-  `).all() as { data: string }[]
+    SELECT data FROM quiz_events WHERE event = 'quiz_answer'${dateAnd}
+  `).all(...dateParams) as { data: string }[]
 
   const subquizAnswerRows = db.prepare(`
-    SELECT data FROM quiz_events WHERE event = 'subquiz_answer'
-  `).all() as { data: string }[]
+    SELECT data FROM quiz_events WHERE event = 'subquiz_answer'${dateAnd}
+  `).all(...dateParams) as { data: string }[]
 
   function aggregateAnswers(rows: { data: string }[]) {
     const timesMap: Record<number, { total: number; count: number }> = {}
@@ -400,26 +408,35 @@ export function getQuizEventsAggregated(): {
   const quizAgg = aggregateAnswers(quizAnswerRows)
   const subAgg = aggregateAnswers(subquizAnswerRows)
 
-  // Daily activity (last 30 days)
-  const dailyActivity = db.prepare(`
-    SELECT
-      date(created_at) as date,
-      SUM(CASE WHEN event = 'lead_submit' THEN 1 ELSE 0 END) as leads,
-      SUM(CASE WHEN event = 'photo_confirm' THEN 1 ELSE 0 END) as subquiz,
-      SUM(CASE WHEN event = 'payment_click' THEN 1 ELSE 0 END) as payments
-    FROM quiz_events
-    WHERE created_at >= datetime('now', '-30 days', 'localtime')
-    GROUP BY date(created_at)
-    ORDER BY date
-  `).all() as { date: string; leads: number; subquiz: number; payments: number }[]
+  // Daily activity
+  const dailyActivityQuery = dateFrom || dateTo
+    ? `SELECT date(created_at) as date,
+        SUM(CASE WHEN event = 'lead_submit' THEN 1 ELSE 0 END) as leads,
+        SUM(CASE WHEN event = 'photo_confirm' THEN 1 ELSE 0 END) as subquiz,
+        SUM(CASE WHEN event = 'payment_click' THEN 1 ELSE 0 END) as payments
+      FROM quiz_events WHERE 1=1${dateAnd}
+      GROUP BY date(created_at) ORDER BY date`
+    : `SELECT date(created_at) as date,
+        SUM(CASE WHEN event = 'lead_submit' THEN 1 ELSE 0 END) as leads,
+        SUM(CASE WHEN event = 'photo_confirm' THEN 1 ELSE 0 END) as subquiz,
+        SUM(CASE WHEN event = 'payment_click' THEN 1 ELSE 0 END) as payments
+      FROM quiz_events WHERE created_at >= datetime('now', '-30 days', 'localtime')
+      GROUP BY date(created_at) ORDER BY date`
+  const dailyActivity = db.prepare(dailyActivityQuery).all(...(dateFrom || dateTo ? dateParams : [])) as { date: string; leads: number; subquiz: number; payments: number }[]
 
   // Season distribution from leads table
+  const leadsDateConditions: string[] = []
+  const leadsDateParams: string[] = []
+  if (dateFrom) { leadsDateConditions.push('created_at >= ?'); leadsDateParams.push(dateFrom + ' 00:00:00') }
+  if (dateTo) { leadsDateConditions.push('created_at <= ?'); leadsDateParams.push(dateTo + ' 23:59:59') }
+  const leadsDateWhere = leadsDateConditions.length > 0 ? ' WHERE ' + leadsDateConditions.join(' AND ') : ''
+
   const seasonDistribution = db.prepare(`
     SELECT season, COUNT(*) as count
-    FROM leads
+    FROM leads${leadsDateWhere}
     GROUP BY season
     ORDER BY count DESC
-  `).all() as { season: string; count: number }[]
+  `).all(...leadsDateParams) as { season: string; count: number }[]
 
   return {
     funnel,

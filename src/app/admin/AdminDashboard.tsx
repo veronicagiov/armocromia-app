@@ -611,7 +611,7 @@ export default function AdminDashboard() {
 
         {/* ── TAB ANALYTICS ── */}
         {tab === 'analytics' && (
-          <AnalyticsTab analytics={analytics} />
+          <AnalyticsTab initialAnalytics={analytics} />
         )}
       </div>
     </div>
@@ -630,18 +630,45 @@ const SUBQUIZ_QUESTIONS = [
 
 const FUNNEL_STEPS: { event: string; label: string }[] = [
   { event: 'quiz_start', label: 'Quiz iniziato' },
-  { event: 'quiz_answer', label: 'Quiz completato' },
-  { event: 'lead_view', label: 'Form email' },
   { event: 'lead_submit', label: 'Email inserita' },
+  { event: 'quiz_complete', label: 'Quiz stagione completato' },
+  { event: 'amazon_book_click', label: 'Click libro Amazon' },
   { event: 'subquiz_start', label: 'Subquiz iniziato' },
-  { event: 'subquiz_answer', label: 'Subquiz completato' },
-  { event: 'photo_view', label: 'Upload foto' },
-  { event: 'photo_confirm', label: 'Foto confermate' },
-  { event: 'payment_view', label: 'Pagina pagamento' },
-  { event: 'payment_click', label: 'Click pagamento' },
+  { event: 'photo_confirm', label: 'Foto caricate' },
+  { event: 'subquiz_answer', label: 'Quiz sottogruppo completato' },
+  { event: 'payment_view', label: 'Banner prezzo analisi' },
+  { event: 'payment_click', label: 'Pagina Stripe' },
 ]
 
-function AnalyticsTab({ analytics }: { analytics: AnalyticsData | null }) {
+function AnalyticsTab({ initialAnalytics }: { initialAnalytics: AnalyticsData | null }) {
+  const [analytics, setAnalytics] = useState<AnalyticsData | null>(initialAnalytics)
+  const [dateFrom, setDateFrom] = useState('')
+  const [dateTo, setDateTo] = useState('')
+  const [loading, setLoading] = useState(false)
+
+  // Aggiorna quando initialAnalytics cambia
+  useEffect(() => { setAnalytics(initialAnalytics) }, [initialAnalytics])
+
+  async function applyFilter() {
+    setLoading(true)
+    try {
+      const params = new URLSearchParams()
+      if (dateFrom) params.set('from', dateFrom)
+      if (dateTo) params.set('to', dateTo)
+      const res = await fetch(`/api/admin/analytics?${params}`)
+      if (res.ok) setAnalytics(await res.json())
+    } catch (e) { console.error('analytics filter error:', e) }
+    setLoading(false)
+  }
+
+  function resetFilter() {
+    setDateFrom('')
+    setDateTo('')
+    setAnalytics(initialAnalytics)
+  }
+
+  const hasFilter = dateFrom || dateTo
+
   if (!analytics) {
     return (
       <div style={{ background: '#fff', border: '1px solid #E8E0D8', borderRadius: 12, padding: 48, textAlign: 'center', color: '#999' }}>
@@ -655,13 +682,44 @@ function AnalyticsTab({ analytics }: { analytics: AnalyticsData | null }) {
   const funnelMax = Math.max(...FUNNEL_STEPS.map(s => funnel[s.event] || 0), 1)
   const hasData = funnelMax > 0 && Object.keys(funnel).length > 0
 
+  const dateFilterBar = (
+    <div style={{ background: '#fff', border: '1px solid #E8E0D8', borderRadius: 12, padding: '16px 24px', marginBottom: 24, display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+      <span style={{ fontSize: 12, fontWeight: 600, color: '#999', letterSpacing: 1.5, textTransform: 'uppercase' }}>Periodo</span>
+      <input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)}
+        style={{ padding: '8px 12px', border: '1.5px solid #E8E0D8', borderRadius: 8, fontSize: 13, fontFamily: 'DM Sans, sans-serif', color: '#1a1614', background: '#faf7f2' }}
+      />
+      <span style={{ color: '#999', fontSize: 13 }}>—</span>
+      <input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)}
+        style={{ padding: '8px 12px', border: '1.5px solid #E8E0D8', borderRadius: 8, fontSize: 13, fontFamily: 'DM Sans, sans-serif', color: '#1a1614', background: '#faf7f2' }}
+      />
+      <button onClick={applyFilter} disabled={loading}
+        style={{ padding: '8px 20px', background: '#1a1614', color: '#fff', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer', opacity: loading ? 0.5 : 1 }}>
+        {loading ? 'Carico...' : 'Filtra'}
+      </button>
+      {hasFilter && (
+        <button onClick={resetFilter}
+          style={{ padding: '8px 16px', background: 'none', border: '1.5px solid #E8E0D8', borderRadius: 8, fontSize: 12, color: '#999', cursor: 'pointer' }}>
+          Resetta
+        </button>
+      )}
+      {hasFilter && (
+        <span style={{ fontSize: 12, color: '#c9a96e', fontWeight: 500 }}>
+          {dateFrom && dateTo ? `${dateFrom} — ${dateTo}` : dateFrom ? `Dal ${dateFrom}` : `Fino al ${dateTo}`}
+        </span>
+      )}
+    </div>
+  )
+
   if (!hasData) {
     return (
-      <div style={{ background: '#fff', border: '1px solid #E8E0D8', borderRadius: 12, padding: 48, textAlign: 'center', color: '#999' }}>
-        <div style={{ fontSize: 40, marginBottom: 16 }}>📊</div>
-        <div style={{ fontSize: 16, fontWeight: 600, color: '#555', marginBottom: 8 }}>Nessun dato analytics ancora disponibile</div>
-        <div style={{ fontSize: 14 }}>I dati compariranno man mano che gli utenti utilizzano il quiz.</div>
-      </div>
+      <>
+        {dateFilterBar}
+        <div style={{ background: '#fff', border: '1px solid #E8E0D8', borderRadius: 12, padding: 48, textAlign: 'center', color: '#999' }}>
+          <div style={{ fontSize: 40, marginBottom: 16 }}>📊</div>
+          <div style={{ fontSize: 16, fontWeight: 600, color: '#555', marginBottom: 8 }}>{hasFilter ? 'Nessun dato nel periodo selezionato' : 'Nessun dato analytics ancora disponibile'}</div>
+          <div style={{ fontSize: 14 }}>{hasFilter ? 'Prova a cambiare le date del filtro.' : 'I dati compariranno man mano che gli utenti utilizzano il quiz.'}</div>
+        </div>
+      </>
     )
   }
 
@@ -686,6 +744,7 @@ function AnalyticsTab({ analytics }: { analytics: AnalyticsData | null }) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+      {dateFilterBar}
 
       {/* ── FUNNEL ── */}
       <div style={{ background: '#fff', border: '1px solid #E8E0D8', borderRadius: 12, padding: 28 }}>
