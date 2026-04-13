@@ -67,6 +67,7 @@ Richiede selezione stagione. Tre viste:
 
 ### Tab: Lead quiz
 - Tabella lead dal quiz stagione: nome, email, stagione, data
+- La stagione viene risolta automaticamente: se il lead ha ancora il placeholder 'sottogruppo-quiz', viene mostrata la stagione dalla submission subquiz (se presente)
 - Export CSV (nuovi dall'ultimo export / tutti)
 - Eliminazione singola e bulk
 

@@ -269,8 +269,26 @@ export function insertLead(data: { name: string; email: string; season: string }
   `).run(data.name, data.email, data.season)
 }
 
+export function updateLeadSeason(email: string, season: string): void {
+  db.prepare('UPDATE leads SET season = ? WHERE email = ? AND season = ?').run(season, email, 'sottogruppo-quiz')
+}
+
 export function getAllLeads(): Lead[] {
-  return db.prepare('SELECT * FROM leads ORDER BY created_at DESC').all() as Lead[]
+  return db.prepare(`
+    SELECT l.id, l.name, l.email,
+      CASE
+        WHEN l.season = 'sottogruppo-quiz' AND s.season IS NOT NULL THEN s.season
+        ELSE l.season
+      END AS season,
+      l.created_at
+    FROM leads l
+    LEFT JOIN (
+      SELECT email, season,
+        ROW_NUMBER() OVER (PARTITION BY email ORDER BY created_at DESC) AS rn
+      FROM subquiz_submissions
+    ) s ON s.email = l.email AND s.rn = 1
+    ORDER BY l.created_at DESC
+  `).all() as Lead[]
 }
 
 // ── Quiz Events (analytics tracking) ──────────────────────────────────────
