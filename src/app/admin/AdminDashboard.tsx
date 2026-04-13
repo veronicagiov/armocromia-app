@@ -645,9 +645,37 @@ function AnalyticsTab({ initialAnalytics }: { initialAnalytics: AnalyticsData | 
   const [dateFrom, setDateFrom] = useState('')
   const [dateTo, setDateTo] = useState('')
   const [loading, setLoading] = useState(false)
+  const [trendPeriod, setTrendPeriod] = useState<'30d' | '3m' | '6m' | '12m'>('30d')
+  const [trendData, setTrendData] = useState(initialAnalytics?.dailyActivity || [])
+  const [trendLoading, setTrendLoading] = useState(false)
 
   // Aggiorna quando initialAnalytics cambia
-  useEffect(() => { setAnalytics(initialAnalytics) }, [initialAnalytics])
+  useEffect(() => {
+    setAnalytics(initialAnalytics)
+    setTrendData(initialAnalytics?.dailyActivity || [])
+  }, [initialAnalytics])
+
+  async function loadTrend(period: '30d' | '3m' | '6m' | '12m') {
+    setTrendPeriod(period)
+    setTrendLoading(true)
+    try {
+      const now = new Date()
+      const from = new Date()
+      if (period === '30d') from.setDate(now.getDate() - 30)
+      else if (period === '3m') from.setMonth(now.getMonth() - 3)
+      else if (period === '6m') from.setMonth(now.getMonth() - 6)
+      else from.setFullYear(now.getFullYear() - 1)
+      const params = new URLSearchParams()
+      params.set('from', from.toISOString().slice(0, 10))
+      params.set('to', now.toISOString().slice(0, 10))
+      const res = await fetch(`/api/admin/analytics?${params}`)
+      if (res.ok) {
+        const data = await res.json()
+        setTrendData(data.dailyActivity || [])
+      }
+    } catch (e) { console.error('trend load error:', e) }
+    setTrendLoading(false)
+  }
 
   async function applyFilter() {
     setLoading(true)
@@ -737,8 +765,6 @@ function AnalyticsTab({ initialAnalytics }: { initialAnalytics: AnalyticsData | 
 
   const allTimes = [...quizAnswerTimes, ...subquizAnswerTimes]
   const maxTime = Math.max(...allTimes.map(t => t.avg_ms), 1)
-
-  const dailyMax = Math.max(...dailyActivity.map(d => d.leads + d.subquiz + d.payments), 1)
 
   const totalSeasons = seasonDistribution.reduce((s, r) => s + r.count, 0) || 1
 
@@ -969,45 +995,133 @@ function AnalyticsTab({ initialAnalytics }: { initialAnalytics: AnalyticsData | 
 
       {/* ── TREND GIORNALIERO ── */}
       <div style={{ background: '#fff', border: '1px solid #E8E0D8', borderRadius: 12, padding: 28 }}>
-        <div style={{ fontSize: 11, letterSpacing: 2, textTransform: 'uppercase', color: '#999', fontWeight: 600, marginBottom: 20 }}>Attivita' ultimi 30 giorni</div>
-        {dailyActivity.length === 0 ? (
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 12 }}>
+          <div style={{ fontSize: 11, letterSpacing: 2, textTransform: 'uppercase', color: '#999', fontWeight: 600 }}>Attività nel tempo</div>
+          <div style={{ display: 'flex', gap: 4 }}>
+            {([
+              { key: '30d', label: '30gg' },
+              { key: '3m', label: '3 mesi' },
+              { key: '6m', label: '6 mesi' },
+              { key: '12m', label: '12 mesi' },
+            ] as { key: '30d' | '3m' | '6m' | '12m'; label: string }[]).map(p => (
+              <button key={p.key} onClick={() => loadTrend(p.key)}
+                style={{
+                  padding: '6px 14px', border: trendPeriod === p.key ? '1.5px solid #c9a96e' : '1.5px solid #E8E0D8',
+                  borderRadius: 8, fontSize: 12, fontWeight: trendPeriod === p.key ? 600 : 400,
+                  background: trendPeriod === p.key ? '#faf5ed' : '#fff',
+                  color: trendPeriod === p.key ? '#c9a96e' : '#999', cursor: 'pointer',
+                }}>
+                {p.label}
+              </button>
+            ))}
+          </div>
+        </div>
+        {trendLoading ? (
+          <div style={{ color: '#ccc', fontSize: 13, padding: 40, textAlign: 'center' }}>Caricamento...</div>
+        ) : trendData.length === 0 ? (
           <div style={{ color: '#ccc', fontSize: 13, padding: 20, textAlign: 'center' }}>Nessun dato disponibile</div>
-        ) : (
-          <>
-            <div style={{ display: 'flex', gap: 16, marginBottom: 16 }}>
-              {[
-                { label: 'Lead', color: '#c9a96e' },
-                { label: 'Subquiz', color: '#9B7FA6' },
-                { label: 'Pagamenti', color: '#2A7A2A' },
-              ].map(l => (
-                <div key={l.label} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#666' }}>
-                  <div style={{ width: 10, height: 10, borderRadius: 2, background: l.color }} />
-                  {l.label}
-                </div>
-              ))}
-            </div>
-            <div style={{ display: 'flex', alignItems: 'flex-end', gap: 3, height: 140 }}>
-              {dailyActivity.map(d => {
-                const total = d.leads + d.subquiz + d.payments
-                const hLead = (d.leads / dailyMax) * 120
-                const hSub = (d.subquiz / dailyMax) * 120
-                const hPay = (d.payments / dailyMax) * 120
-                const dateLabel = new Date(d.date).toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit' })
-                return (
-                  <div key={d.date} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, minWidth: 0 }} title={`${dateLabel}: ${d.leads} lead, ${d.subquiz} subquiz, ${d.payments} pagamenti`}>
-                    <div style={{ fontSize: 9, color: '#BBB', fontWeight: 600 }}>{total > 0 ? total : ''}</div>
-                    <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 1 }}>
-                      {hPay > 0 && <div style={{ height: hPay, background: '#2A7A2A', borderRadius: 2 }} />}
-                      {hSub > 0 && <div style={{ height: hSub, background: '#9B7FA6', borderRadius: 2 }} />}
-                      {hLead > 0 && <div style={{ height: hLead, background: '#c9a96e', borderRadius: 2 }} />}
-                    </div>
-                    <div style={{ fontSize: 8, color: '#BBB', transform: 'rotate(-45deg)', whiteSpace: 'nowrap', marginTop: 4 }}>{dateLabel}</div>
+        ) : (() => {
+          const CHART_W = 700, CHART_H = 180, PAD_L = 36, PAD_R = 12, PAD_T = 16, PAD_B = 32
+          const w = CHART_W - PAD_L - PAD_R
+          const h = CHART_H - PAD_T - PAD_B
+          const maxVal = Math.max(...trendData.map(d => Math.max(d.leads, d.subquiz, d.payments)), 1)
+          const n = trendData.length
+
+          function makePath(key: 'leads' | 'subquiz' | 'payments') {
+            return trendData.map((d, i) => {
+              const x = PAD_L + (n > 1 ? (i / (n - 1)) * w : w / 2)
+              const y = PAD_T + h - (d[key] / maxVal) * h
+              return `${i === 0 ? 'M' : 'L'}${x.toFixed(1)},${y.toFixed(1)}`
+            }).join(' ')
+          }
+
+          function makeArea(key: 'leads' | 'subquiz' | 'payments') {
+            const baseline = PAD_T + h
+            const pts = trendData.map((d, i) => {
+              const x = PAD_L + (n > 1 ? (i / (n - 1)) * w : w / 2)
+              const y = PAD_T + h - (d[key] / maxVal) * h
+              return `${x.toFixed(1)},${y.toFixed(1)}`
+            })
+            const firstX = PAD_L + (n > 1 ? 0 : w / 2)
+            const lastX = PAD_L + (n > 1 ? w : w / 2)
+            return `M${firstX.toFixed(1)},${baseline} L${pts.join(' L')} L${lastX.toFixed(1)},${baseline} Z`
+          }
+
+          // Y axis labels (5 steps)
+          const ySteps = 4
+          const yLabels = Array.from({ length: ySteps + 1 }, (_, i) => Math.round((maxVal / ySteps) * i))
+
+          // X axis labels (max ~8 labels)
+          const labelEvery = Math.max(1, Math.floor(n / 8))
+          const xLabels = trendData.filter((_, i) => i % labelEvery === 0 || i === n - 1)
+
+          const series: { key: 'leads' | 'subquiz' | 'payments'; label: string; color: string }[] = [
+            { key: 'leads', label: 'Lead', color: '#c9a96e' },
+            { key: 'subquiz', label: 'Subquiz', color: '#9B7FA6' },
+            { key: 'payments', label: 'Pagamenti', color: '#2A7A2A' },
+          ]
+
+          return (
+            <>
+              <div style={{ display: 'flex', gap: 16, marginBottom: 16 }}>
+                {series.map(s => (
+                  <div key={s.key} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#666' }}>
+                    <div style={{ width: 16, height: 3, borderRadius: 2, background: s.color }} />
+                    {s.label}
                   </div>
-                )
-              })}
-            </div>
-          </>
-        )}
+                ))}
+              </div>
+              <div style={{ width: '100%', overflowX: 'auto' }}>
+                <svg viewBox={`0 0 ${CHART_W} ${CHART_H}`} style={{ width: '100%', height: 'auto', minWidth: 400 }}>
+                  {/* Grid lines */}
+                  {yLabels.map((val, i) => {
+                    const y = PAD_T + h - (val / maxVal) * h
+                    return (
+                      <g key={i}>
+                        <line x1={PAD_L} y1={y} x2={CHART_W - PAD_R} y2={y} stroke="#F0EDE8" strokeWidth={1} />
+                        <text x={PAD_L - 6} y={y + 3} textAnchor="end" fontSize={9} fill="#BBB">{val}</text>
+                      </g>
+                    )
+                  })}
+                  {/* Area fills */}
+                  {series.map(s => (
+                    <path key={`area-${s.key}`} d={makeArea(s.key)} fill={s.color} opacity={0.08} />
+                  ))}
+                  {/* Lines */}
+                  {series.map(s => (
+                    <path key={`line-${s.key}`} d={makePath(s.key)} fill="none" stroke={s.color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+                  ))}
+                  {/* Dots */}
+                  {n <= 60 && series.map(s =>
+                    trendData.map((d, i) => {
+                      const x = PAD_L + (n > 1 ? (i / (n - 1)) * w : w / 2)
+                      const y = PAD_T + h - (d[s.key] / maxVal) * h
+                      return d[s.key] > 0 ? <circle key={`dot-${s.key}-${i}`} cx={x} cy={y} r={2.5} fill={s.color} /> : null
+                    })
+                  )}
+                  {/* X axis labels */}
+                  {xLabels.map(d => {
+                    const i = trendData.indexOf(d)
+                    const x = PAD_L + (n > 1 ? (i / (n - 1)) * w : w / 2)
+                    const label = new Date(d.date).toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit' })
+                    return <text key={d.date} x={x} y={CHART_H - 4} textAnchor="middle" fontSize={9} fill="#BBB">{label}</text>
+                  })}
+                  {/* Hover areas with tooltips */}
+                  {trendData.map((d, i) => {
+                    const x = PAD_L + (n > 1 ? (i / (n - 1)) * w : w / 2)
+                    const sliceW = n > 1 ? w / (n - 1) : w
+                    const dateLabel = new Date(d.date).toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit' })
+                    return (
+                      <rect key={`hover-${i}`} x={x - sliceW / 2} y={PAD_T} width={sliceW} height={h} fill="transparent" cursor="crosshair">
+                        <title>{`${dateLabel}: ${d.leads} lead, ${d.subquiz} subquiz, ${d.payments} pagamenti`}</title>
+                      </rect>
+                    )
+                  })}
+                </svg>
+              </div>
+            </>
+          )
+        })()}
       </div>
     </div>
   )
