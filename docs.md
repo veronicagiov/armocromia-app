@@ -198,6 +198,7 @@ File: `armocromia.db` in `STORAGE_PATH` o `/storage` o `./data`
 ## PDF personalizzato
 
 Generato con pdfkit (A4). Contenuto per ogni sottogruppo:
+- Se il sottogruppo non e' specificato o e' uguale al nome della stagione, viene automaticamente mappato alla variante "Assoluta/Assoluto" (es. "Primavera" → "Primavera Assoluta")
 - Copertina con nome stagione e sottogruppo
 - Descrizione dettagliata del sottogruppo
 - 4 caratteristiche chiave

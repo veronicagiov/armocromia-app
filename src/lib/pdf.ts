@@ -429,6 +429,20 @@ export interface PDFInput {
   notes?: string
 }
 
+const SEASON_TO_ASSOLUTO: Record<string, string> = {
+  'Primavera': 'Primavera Assoluta',
+  'Estate': 'Estate Assoluta',
+  'Autunno': 'Autunno Assoluto',
+  'Inverno': 'Inverno Assoluto',
+}
+
+function normalizeSubgroup(subgroup: string | undefined, season: string): string {
+  if (!subgroup) return SEASON_TO_ASSOLUTO[season] || season
+  // Se il subgroup è solo il nome della stagione, mappalo alla variante Assoluta
+  if (SEASON_TO_ASSOLUTO[subgroup]) return SEASON_TO_ASSOLUTO[subgroup]
+  return subgroup
+}
+
 export function generatePDF(input: PDFInput): Promise<Buffer> {
   return new Promise((resolve, reject) => {
     const doc = new PDFDocument({
@@ -443,18 +457,24 @@ export function generatePDF(input: PDFInput): Promise<Buffer> {
     doc.on('end', () => resolve(Buffer.concat(chunks)))
     doc.on('error', reject)
 
+    // Normalizza il sottogruppo: se è solo il nome della stagione, usa la variante Assoluta
+    const normalizedSubgroup = normalizeSubgroup(input.subgroup, input.season)
+
     const seasonKey = Object.keys(SEASON_DATA).find(k =>
       input.season.toLowerCase().includes(k.toLowerCase()) ||
-      input.subgroup?.toLowerCase().includes(k.toLowerCase())
+      normalizedSubgroup?.toLowerCase().includes(k.toLowerCase())
     ) || 'Primavera'
 
     const data = SEASON_DATA[seasonKey]
-    const subgroupDesc = data.subgroups[input.subgroup] || data.subgroups[Object.keys(data.subgroups)[0]]
-    const neighbor = SUBGROUP_NEIGHBORS[input.subgroup]
+    const subgroupDesc = data.subgroups[normalizedSubgroup] || data.subgroups[Object.keys(data.subgroups)[0]]
+    const neighbor = SUBGROUP_NEIGHBORS[normalizedSubgroup]
+
+    // Input normalizzato con il sottogruppo corretto
+    const normalizedInput = { ...input, subgroup: normalizedSubgroup }
 
     // ── PAG 1: COPERTINA ─────────────────────────────────────────────────────
     doc.addPage({ size: 'A4' })
-    drawCover(doc, data, input)
+    drawCover(doc, data, normalizedInput)
 
     // ── PAG 2: LA TUA STAGIONE ───────────────────────────────────────────────
     doc.addPage({ size: 'A4' })
@@ -472,7 +492,7 @@ export function generatePDF(input: PDFInput): Promise<Buffer> {
     y2 += 12
     doc.fontSize(8).font('Helvetica').fillColor('#AAAAAA').text('IL TUO SOTTOGRUPPO', MARGIN, y2, { characterSpacing: 1.5, lineBreak: false })
     y2 += 15
-    doc.fontSize(14).font('Times-Bold').fillColor(data.accent).text(input.subgroup || seasonKey, MARGIN, y2, { lineBreak: false })
+    doc.fontSize(14).font('Times-Bold').fillColor(data.accent).text(normalizedSubgroup, MARGIN, y2, { lineBreak: false })
     y2 += 22
     const subH = 50
     doc.fontSize(10).font('Helvetica').fillColor('#555555').text(subgroupDesc, MARGIN, y2, { width: CONTENT_W, lineGap: 2, height: subH })

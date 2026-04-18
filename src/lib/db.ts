@@ -83,6 +83,17 @@ export function getAnalysisById(id: number): Analysis | undefined {
   return db.prepare('SELECT * FROM analyses WHERE id = ?').get(id) as Analysis | undefined
 }
 
+const SEASON_TO_ASSOLUTO: Record<string, string> = {
+  'Primavera': 'Primavera Assoluta',
+  'Estate': 'Estate Assoluta',
+  'Autunno': 'Autunno Assoluto',
+  'Inverno': 'Inverno Assoluto',
+}
+
+export function seasonToAssoluto(season: string): string {
+  return SEASON_TO_ASSOLUTO[season] || season
+}
+
 export function insertAnalysis(data: {
   stripe_session_id: string
   customer_name: string
@@ -99,7 +110,7 @@ export function insertAnalysis(data: {
     data.customer_name,
     data.customer_email,
     data.season,
-    data.season, // subgroup iniziale = stagione principale
+    seasonToAssoluto(data.season), // subgroup iniziale = variante Assoluta della stagione
     data.notes,
     JSON.stringify(data.photos)
   )

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import path from 'path'
 import fs from 'fs'
 import { checkAdminAuth } from '@/lib/auth'
-import { getAnalysisById, setPdfPath, DATA_DIR } from '@/lib/db'
+import { getAnalysisById, setPdfPath, DATA_DIR, seasonToAssoluto } from '@/lib/db'
 import { generatePDF } from '@/lib/pdf'
 
 export const dynamic = 'force-dynamic'
@@ -22,7 +22,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
       customerName: analysis.customer_name,
       customerEmail: analysis.customer_email,
       season: analysis.season,
-      subgroup: analysis.subgroup || analysis.season,
+      subgroup: analysis.subgroup || seasonToAssoluto(analysis.season),
       notes: analysis.notes,
     })
 

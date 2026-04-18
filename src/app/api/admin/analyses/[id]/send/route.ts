@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import fs from 'fs'
 import { Resend } from 'resend'
 import { checkAdminAuth } from '@/lib/auth'
-import { getAnalysisById, markAsSent } from '@/lib/db'
+import { getAnalysisById, markAsSent, seasonToAssoluto } from '@/lib/db'
 
 export const dynamic = 'force-dynamic'
 
@@ -36,7 +36,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
 
           <div style="background:#fff9f4; border:1px solid #e8e0d8; border-radius:16px; padding:20px; margin-bottom:24px;">
             <p style="margin:0 0 4px; color:#7a6e68; font-size:13px;">Il tuo sottogruppo armocromatico</p>
-            <p style="margin:0; font-size:20px; font-weight:bold; color:#1a1614;">${analysis.subgroup || analysis.season}</p>
+            <p style="margin:0; font-size:20px; font-weight:bold; color:#1a1614;">${analysis.subgroup || seasonToAssoluto(analysis.season)}</p>
           </div>
 
           <p style="color:#7a6e68; font-size:13px;">
