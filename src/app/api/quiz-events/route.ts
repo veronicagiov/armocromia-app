@@ -2,8 +2,11 @@ import { NextRequest, NextResponse } from 'next/server'
 import { insertQuizEvent } from '@/lib/db'
 
 const VALID_EVENTS = [
-  'quiz_start', 'quiz_answer', 'lead_view', 'lead_submit',
-  'subquiz_start', 'subquiz_answer', 'photo_view', 'photo_confirm',
+  'quiz_start', 'quiz_answer', 'quiz_complete',
+  'lead_view', 'lead_submit',
+  'amazon_book_click',
+  'subquiz_start', 'subquiz_answer',
+  'photo_view', 'photo_confirm',
   'payment_view', 'payment_click',
 ]
 

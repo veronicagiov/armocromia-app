@@ -271,6 +271,31 @@
 <section id="payment-section"></section>
 
 <script>
+// ─── ANALYTICS TRACKING ─────────────────────────────────────────────────────
+var _sid = (function() {
+  try {
+    var s = sessionStorage.getItem('_qsid');
+    if (!s) {
+      s = (window.crypto && crypto.randomUUID)
+        ? crypto.randomUUID()
+        : 'xxxx-xxxx-xxxx'.replace(/x/g, function() { return (Math.random()*16|0).toString(16); });
+      sessionStorage.setItem('_qsid', s);
+    }
+    return s;
+  } catch(e) { return 'no-session'; }
+})();
+var _qtime = Date.now();
+
+function trackEvent(event, data) {
+  try {
+    fetch('/api/quiz-events', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ session_id: _sid, event: event, data: data || {} }),
+    }).catch(function(){});
+  } catch(e) {}
+}
+
 // ─── GOOGLE SHEETS ──────────────────────────────────────────────────────────
 const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw08HwiWZ6-BN1BCGPvt_RH5pIEbeG9CKxGh4cksEe3-nFnD3h3w_M467Rk9YPwu8vcZQ/exec";
 
@@ -440,6 +465,7 @@ let lastSubgroup = '';
 
 // ─── FLOW ───────────────────────────────────────────────────────────────────
 function showLeadCapture() {
+  trackEvent('lead_view');
   document.getElementById('hero-section').style.display = 'none';
   document.getElementById('lead-section').style.display = 'flex';
   window.scrollTo(0,0);
@@ -501,6 +527,8 @@ function submitLead() {
   lastName = name;
   lastEmail = email;
 
+  trackEvent('lead_submit');
+
   // Save lead
   saveToGoogleSheet(name, email, 'sottogruppo-quiz');
   fetch('/api/leads', {
@@ -515,6 +543,8 @@ function submitLead() {
   current = 0;
   answers = [];
   selectedSeason = null;
+  trackEvent('subquiz_start');
+  _qtime = Date.now();
   renderQuestion(0);
   window.scrollTo(0,0);
 }
@@ -566,13 +596,15 @@ function renderQuestion(idx) {
 
 function sel(qIdx, optIdx) {
   answers[qIdx] = optIdx;
+  var elapsed = Date.now() - _qtime;
+  trackEvent('subquiz_answer', { question: qIdx + 1, option: optIdx, time_ms: elapsed });
   // Se è la domanda stagione (Q1), salva la scelta
   if (qIdx === 0) {
     selectedSeason = questions[0].options[optIdx].value;
   }
   var els = document.querySelectorAll('#question-container .option-card, #question-container .option-text');
   els.forEach(function(el,i) { el.classList.toggle('selected', i===optIdx); });
-  setTimeout(function() { nextQuestion(); }, 500);
+  setTimeout(function() { nextQuestion(); _qtime = Date.now(); }, 500);
 }
 
 function nextQuestion() {
@@ -625,6 +657,7 @@ function calculateSubgroup() {
 
 // ─── PHOTO UPLOAD ───────────────────────────────────────────────────────────
 function showSubResult() {
+  trackEvent('photo_view');
   var subgroup = calculateSubgroup();
   lastSubgroup = subgroup;
 
@@ -729,6 +762,7 @@ function removePhoto(idx) {
 }
 
 function confirmPhotos() {
+  trackEvent('photo_confirm');
   var btn = document.getElementById('btn-confirm-photos');
   btn.disabled = true;
   btn.textContent = 'Caricamento in corso...';
@@ -747,6 +781,7 @@ function confirmPhotos() {
 
 // ─── PAYMENT ────────────────────────────────────────────────────────────────
 function showPaymentPage() {
+  trackEvent('payment_view');
   document.getElementById('subresult-section').style.display = 'none';
   var el = document.getElementById('payment-section');
   el.style.display = 'block';
@@ -841,6 +876,7 @@ function updateSocialProof() {
 
 // ─── CHECKOUT ───────────────────────────────────────────────────────────────
 function startCheckout() {
+  trackEvent('payment_click');
   var btn = document.getElementById('btn-sub-upsell');
   if (btn) {
     btn.disabled = true;

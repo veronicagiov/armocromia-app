@@ -46,8 +46,8 @@ interface AnalyticsData {
   funnel: Record<string, number>
   quizAnswerTimes: { question: number; avg_ms: number; count: number }[]
   subquizAnswerTimes: { question: number; avg_ms: number; count: number }[]
-  quizAnswerDistribution: { question: number; option: number; count: number }[]
-  subquizAnswerDistribution: { question: number; option: number; count: number }[]
+  leadFormTime: { avg_ms: number; count: number } | null
+  photoUploadTime: { avg_ms: number; count: number } | null
   dailyActivity: { date: string; leads: number; subquiz: number; payments: number }[]
   seasonDistribution: { season: string; count: number }[]
 }
@@ -631,14 +631,16 @@ const SUBQUIZ_QUESTIONS = [
 const FUNNEL_STEPS: { event: string; label: string }[] = [
   { event: 'quiz_start', label: 'Quiz iniziato' },
   { event: 'lead_submit', label: 'Email inserita' },
-  { event: 'quiz_complete', label: 'Quiz stagione completato' },
-  { event: 'amazon_book_click', label: 'Click libro Amazon' },
+  { event: 'quiz_complete', label: 'Risultato stagione visto' },
   { event: 'subquiz_start', label: 'Subquiz iniziato' },
+  { event: 'photo_view', label: 'Pagina foto vista' },
   { event: 'photo_confirm', label: 'Foto caricate' },
-  { event: 'subquiz_answer', label: 'Quiz sottogruppo completato' },
   { event: 'payment_view', label: 'Banner prezzo analisi' },
-  { event: 'payment_click', label: 'Pagina Stripe' },
+  { event: 'payment_click', label: 'Click paga' },
+  { event: 'payment_success', label: 'Pagamento completato' },
 ]
+
+type Preset = 'today' | 'yesterday' | 'last_week' | 'current_month' | 'last_month' | 'last_30d' | 'last_60d' | 'last_90d'
 
 function AnalyticsTab({ initialAnalytics }: { initialAnalytics: AnalyticsData | null }) {
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(initialAnalytics)
@@ -648,6 +650,7 @@ function AnalyticsTab({ initialAnalytics }: { initialAnalytics: AnalyticsData | 
   const [trendPeriod, setTrendPeriod] = useState<'30d' | '3m' | '6m' | '12m'>('30d')
   const [trendData, setTrendData] = useState(initialAnalytics?.dailyActivity || [])
   const [trendLoading, setTrendLoading] = useState(false)
+  const [activePreset, setActivePreset] = useState<Preset | null>(null)
 
   // Aggiorna quando initialAnalytics cambia
   useEffect(() => {
@@ -677,12 +680,14 @@ function AnalyticsTab({ initialAnalytics }: { initialAnalytics: AnalyticsData | 
     setTrendLoading(false)
   }
 
-  async function applyFilter() {
+  async function applyFilter(override?: { from?: string; to?: string }) {
+    const from = override?.from ?? dateFrom
+    const to = override?.to ?? dateTo
     setLoading(true)
     try {
       const params = new URLSearchParams()
-      if (dateFrom) params.set('from', dateFrom)
-      if (dateTo) params.set('to', dateTo)
+      if (from) params.set('from', from)
+      if (to) params.set('to', to)
       const res = await fetch(`/api/admin/analytics?${params}`)
       if (res.ok) setAnalytics(await res.json())
     } catch (e) { console.error('analytics filter error:', e) }
@@ -692,7 +697,66 @@ function AnalyticsTab({ initialAnalytics }: { initialAnalytics: AnalyticsData | 
   function resetFilter() {
     setDateFrom('')
     setDateTo('')
+    setActivePreset(null)
     setAnalytics(initialAnalytics)
+  }
+
+  // Preset di periodo rapido
+  function fmtDate(d: Date) {
+    const y = d.getFullYear()
+    const m = String(d.getMonth() + 1).padStart(2, '0')
+    const day = String(d.getDate()).padStart(2, '0')
+    return `${y}-${m}-${day}`
+  }
+
+  function computePreset(p: Preset): { from: string; to: string } {
+    const today = new Date()
+    const clone = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate())
+    switch (p) {
+      case 'today':
+        return { from: fmtDate(today), to: fmtDate(today) }
+      case 'yesterday': {
+        const y = clone(today); y.setDate(today.getDate() - 1)
+        return { from: fmtDate(y), to: fmtDate(y) }
+      }
+      case 'last_week': {
+        // Settimana precedente completa (lun-dom)
+        const dayOfWeek = today.getDay() // 0 = domenica
+        const monThis = clone(today); monThis.setDate(today.getDate() - ((dayOfWeek + 6) % 7))
+        const monLast = clone(monThis); monLast.setDate(monThis.getDate() - 7)
+        const sunLast = clone(monLast); sunLast.setDate(monLast.getDate() + 6)
+        return { from: fmtDate(monLast), to: fmtDate(sunLast) }
+      }
+      case 'current_month': {
+        const first = new Date(today.getFullYear(), today.getMonth(), 1)
+        return { from: fmtDate(first), to: fmtDate(today) }
+      }
+      case 'last_month': {
+        const first = new Date(today.getFullYear(), today.getMonth() - 1, 1)
+        const last = new Date(today.getFullYear(), today.getMonth(), 0)
+        return { from: fmtDate(first), to: fmtDate(last) }
+      }
+      case 'last_30d': {
+        const from = clone(today); from.setDate(today.getDate() - 29)
+        return { from: fmtDate(from), to: fmtDate(today) }
+      }
+      case 'last_60d': {
+        const from = clone(today); from.setDate(today.getDate() - 59)
+        return { from: fmtDate(from), to: fmtDate(today) }
+      }
+      case 'last_90d': {
+        const from = clone(today); from.setDate(today.getDate() - 89)
+        return { from: fmtDate(from), to: fmtDate(today) }
+      }
+    }
+  }
+
+  function applyPreset(p: Preset) {
+    const { from, to } = computePreset(p)
+    setDateFrom(from)
+    setDateTo(to)
+    setActivePreset(p)
+    applyFilter({ from, to })
   }
 
   const hasFilter = dateFrom || dateTo
@@ -705,36 +769,72 @@ function AnalyticsTab({ initialAnalytics }: { initialAnalytics: AnalyticsData | 
     )
   }
 
-  const { funnel, quizAnswerTimes, subquizAnswerTimes, quizAnswerDistribution, subquizAnswerDistribution, dailyActivity, seasonDistribution } = analytics
+  const { funnel, quizAnswerTimes, subquizAnswerTimes, leadFormTime, photoUploadTime, dailyActivity, seasonDistribution } = analytics
 
   const funnelMax = Math.max(...FUNNEL_STEPS.map(s => funnel[s.event] || 0), 1)
   const hasData = funnelMax > 0 && Object.keys(funnel).length > 0
 
+  const PRESET_BUTTONS: { id: Preset; label: string }[] = [
+    { id: 'today', label: 'Oggi' },
+    { id: 'yesterday', label: 'Ieri' },
+    { id: 'last_week', label: 'Ultima settimana' },
+    { id: 'current_month', label: 'Mese corrente' },
+    { id: 'last_month', label: 'Mese precedente' },
+    { id: 'last_30d', label: 'Ultimi 30 giorni' },
+    { id: 'last_60d', label: 'Ultimi 60 giorni' },
+    { id: 'last_90d', label: 'Ultimi 90 giorni' },
+  ]
+
   const dateFilterBar = (
-    <div style={{ background: '#fff', border: '1px solid #E8E0D8', borderRadius: 12, padding: '16px 24px', marginBottom: 24, display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-      <span style={{ fontSize: 12, fontWeight: 600, color: '#999', letterSpacing: 1.5, textTransform: 'uppercase' }}>Periodo</span>
-      <input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)}
-        style={{ padding: '8px 12px', border: '1.5px solid #E8E0D8', borderRadius: 8, fontSize: 13, fontFamily: 'DM Sans, sans-serif', color: '#1a1614', background: '#faf7f2' }}
-      />
-      <span style={{ color: '#999', fontSize: 13 }}>—</span>
-      <input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)}
-        style={{ padding: '8px 12px', border: '1.5px solid #E8E0D8', borderRadius: 8, fontSize: 13, fontFamily: 'DM Sans, sans-serif', color: '#1a1614', background: '#faf7f2' }}
-      />
-      <button onClick={applyFilter} disabled={loading}
-        style={{ padding: '8px 20px', background: '#1a1614', color: '#fff', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer', opacity: loading ? 0.5 : 1 }}>
-        {loading ? 'Carico...' : 'Filtra'}
-      </button>
-      {hasFilter && (
-        <button onClick={resetFilter}
-          style={{ padding: '8px 16px', background: 'none', border: '1.5px solid #E8E0D8', borderRadius: 8, fontSize: 12, color: '#999', cursor: 'pointer' }}>
-          Resetta
+    <div style={{ background: '#fff', border: '1px solid #E8E0D8', borderRadius: 12, padding: '16px 24px', marginBottom: 24, display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+        <span style={{ fontSize: 12, fontWeight: 600, color: '#999', letterSpacing: 1.5, textTransform: 'uppercase', marginRight: 4 }}>Periodo</span>
+        {PRESET_BUTTONS.map(p => {
+          const active = activePreset === p.id
+          return (
+            <button key={p.id} onClick={() => applyPreset(p.id)} disabled={loading}
+              style={{
+                padding: '6px 12px',
+                background: active ? '#1a1614' : '#faf7f2',
+                color: active ? '#fff' : '#1a1614',
+                border: active ? '1.5px solid #1a1614' : '1.5px solid #E8E0D8',
+                borderRadius: 999,
+                fontSize: 12,
+                fontWeight: 500,
+                fontFamily: 'DM Sans, sans-serif',
+                cursor: loading ? 'default' : 'pointer',
+                opacity: loading ? 0.5 : 1,
+                transition: 'all .15s',
+              }}>
+              {p.label}
+            </button>
+          )
+        })}
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+        <input type="date" value={dateFrom} onChange={e => { setDateFrom(e.target.value); setActivePreset(null) }}
+          style={{ padding: '8px 12px', border: '1.5px solid #E8E0D8', borderRadius: 8, fontSize: 13, fontFamily: 'DM Sans, sans-serif', color: '#1a1614', background: '#faf7f2' }}
+        />
+        <span style={{ color: '#999', fontSize: 13 }}>—</span>
+        <input type="date" value={dateTo} onChange={e => { setDateTo(e.target.value); setActivePreset(null) }}
+          style={{ padding: '8px 12px', border: '1.5px solid #E8E0D8', borderRadius: 8, fontSize: 13, fontFamily: 'DM Sans, sans-serif', color: '#1a1614', background: '#faf7f2' }}
+        />
+        <button onClick={() => applyFilter()} disabled={loading}
+          style={{ padding: '8px 20px', background: '#1a1614', color: '#fff', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer', opacity: loading ? 0.5 : 1 }}>
+          {loading ? 'Carico...' : 'Filtra'}
         </button>
-      )}
-      {hasFilter && (
-        <span style={{ fontSize: 12, color: '#c9a96e', fontWeight: 500 }}>
-          {dateFrom && dateTo ? `${dateFrom} — ${dateTo}` : dateFrom ? `Dal ${dateFrom}` : `Fino al ${dateTo}`}
-        </span>
-      )}
+        {hasFilter && (
+          <button onClick={resetFilter}
+            style={{ padding: '8px 16px', background: 'none', border: '1.5px solid #E8E0D8', borderRadius: 8, fontSize: 12, color: '#999', cursor: 'pointer' }}>
+            Resetta
+          </button>
+        )}
+        {hasFilter && (
+          <span style={{ fontSize: 12, color: '#c9a96e', fontWeight: 500 }}>
+            {dateFrom && dateTo ? `${dateFrom} — ${dateTo}` : dateFrom ? `Dal ${dateFrom}` : `Fino al ${dateTo}`}
+          </span>
+        )}
+      </div>
     </div>
   )
 
@@ -751,20 +851,8 @@ function AnalyticsTab({ initialAnalytics }: { initialAnalytics: AnalyticsData | 
     )
   }
 
-  // Group quiz answer distribution by question
-  const quizDistByQ: Record<number, { option: number; count: number }[]> = {}
-  for (const row of quizAnswerDistribution) {
-    if (!quizDistByQ[row.question]) quizDistByQ[row.question] = []
-    quizDistByQ[row.question].push(row)
-  }
-  const subDistByQ: Record<number, { option: number; count: number }[]> = {}
-  for (const row of subquizAnswerDistribution) {
-    if (!subDistByQ[row.question]) subDistByQ[row.question] = []
-    subDistByQ[row.question].push(row)
-  }
-
   const allTimes = [...quizAnswerTimes, ...subquizAnswerTimes]
-  const maxTime = Math.max(...allTimes.map(t => t.avg_ms), 1)
+  const maxTime = Math.max(...allTimes.map(t => t.avg_ms), photoUploadTime?.avg_ms || 0, leadFormTime?.avg_ms || 0, 1)
 
   const totalSeasons = seasonDistribution.reduce((s, r) => s + r.count, 0) || 1
 
@@ -836,6 +924,39 @@ function AnalyticsTab({ initialAnalytics }: { initialAnalytics: AnalyticsData | 
                   </div>
                 )
               })}
+              {leadFormTime && (
+                <>
+                  <div style={{ borderTop: '1px solid #F0EBE5', margin: '4px 0', paddingTop: 8 }}>
+                    <div style={{ fontSize: 10, letterSpacing: 1.5, textTransform: 'uppercase', color: '#BBB', marginBottom: 6 }}>Inserimento email</div>
+                  </div>
+                  {(() => {
+                    const secs = (leadFormTime.avg_ms / 1000)
+                    const pct = (leadFormTime.avg_ms / maxTime) * 100
+                    const isHigh = leadFormTime.avg_ms > 20000
+                    const display = secs < 60 ? `${secs.toFixed(1)}s` : `${Math.floor(secs / 60)}m ${Math.round(secs % 60)}s`
+                    return (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                        <div style={{ width: 120, fontSize: 11, color: '#888', textAlign: 'right', flexShrink: 0 }}>
+                          ✉️ Inserisci email
+                        </div>
+                        <div style={{ flex: 1, height: 22, background: '#F5F3F0', borderRadius: 4, overflow: 'hidden' }}>
+                          <div style={{
+                            height: '100%', borderRadius: 4,
+                            width: `${Math.max(pct, 2)}%`,
+                            background: isHigh ? '#cc4444' : '#c9a96e',
+                          }} />
+                        </div>
+                        <div style={{ width: 60, fontSize: 12, fontWeight: 600, color: isHigh ? '#cc4444' : '#555', flexShrink: 0 }}>
+                          {display}
+                        </div>
+                      </div>
+                    )
+                  })()}
+                  <div style={{ fontSize: 10, color: '#BBB', marginTop: 2, paddingLeft: 130 }}>
+                    tempo medio tra "form email visto" e "email inviata" · {leadFormTime.count} session{leadFormTime.count === 1 ? 'e' : 'i'}
+                  </div>
+                </>
+              )}
               {subquizAnswerTimes.length > 0 && (
                 <div style={{ borderTop: '1px solid #F0EBE5', margin: '4px 0', paddingTop: 8 }}>
                   <div style={{ fontSize: 10, letterSpacing: 1.5, textTransform: 'uppercase', color: '#BBB', marginBottom: 6 }}>Subquiz</div>
@@ -863,9 +984,42 @@ function AnalyticsTab({ initialAnalytics }: { initialAnalytics: AnalyticsData | 
                   </div>
                 )
               })}
+              {photoUploadTime && (
+                <>
+                  <div style={{ borderTop: '1px solid #F0EBE5', margin: '4px 0', paddingTop: 8 }}>
+                    <div style={{ fontSize: 10, letterSpacing: 1.5, textTransform: 'uppercase', color: '#BBB', marginBottom: 6 }}>Upload foto</div>
+                  </div>
+                  {(() => {
+                    const secs = (photoUploadTime.avg_ms / 1000)
+                    const pct = (photoUploadTime.avg_ms / maxTime) * 100
+                    const isHigh = photoUploadTime.avg_ms > 30000
+                    const display = secs < 60 ? `${secs.toFixed(1)}s` : `${Math.floor(secs / 60)}m ${Math.round(secs % 60)}s`
+                    return (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                        <div style={{ width: 120, fontSize: 11, color: '#888', textAlign: 'right', flexShrink: 0 }}>
+                          📸 Carica foto
+                        </div>
+                        <div style={{ flex: 1, height: 22, background: '#F5F3F0', borderRadius: 4, overflow: 'hidden' }}>
+                          <div style={{
+                            height: '100%', borderRadius: 4,
+                            width: `${Math.max(pct, 2)}%`,
+                            background: isHigh ? '#cc4444' : '#E8895A',
+                          }} />
+                        </div>
+                        <div style={{ width: 60, fontSize: 12, fontWeight: 600, color: isHigh ? '#cc4444' : '#555', flexShrink: 0 }}>
+                          {display}
+                        </div>
+                      </div>
+                    )
+                  })()}
+                  <div style={{ fontSize: 10, color: '#BBB', marginTop: 2, paddingLeft: 130 }}>
+                    tempo medio tra "pagina foto vista" e "foto caricate" · {photoUploadTime.count} session{photoUploadTime.count === 1 ? 'e' : 'i'}
+                  </div>
+                </>
+              )}
             </div>
           )}
-          <div style={{ fontSize: 11, color: '#BBB', marginTop: 12 }}>Le barre rosse indicano esitazione ({'>'}8s)</div>
+          <div style={{ fontSize: 11, color: '#BBB', marginTop: 12 }}>Le barre rosse indicano esitazione ({'>'}8s sulle domande, {'>'}20s sull'inserimento email, {'>'}30s sull'upload foto)</div>
         </div>
 
         {/* Distribuzione stagioni (donut) */}
@@ -919,78 +1073,6 @@ function AnalyticsTab({ initialAnalytics }: { initialAnalytics: AnalyticsData | 
             </>
           )}
         </div>
-      </div>
-
-      {/* ── DISTRIBUZIONE RISPOSTE QUIZ ── */}
-      <div style={{ background: '#fff', border: '1px solid #E8E0D8', borderRadius: 12, padding: 28 }}>
-        <div style={{ fontSize: 11, letterSpacing: 2, textTransform: 'uppercase', color: '#999', fontWeight: 600, marginBottom: 20 }}>Distribuzione risposte — Quiz principale</div>
-        {Object.keys(quizDistByQ).length === 0 ? (
-          <div style={{ color: '#ccc', fontSize: 13, padding: 20, textAlign: 'center' }}>Nessun dato disponibile</div>
-        ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
-            {Object.entries(quizDistByQ).map(([qNum, opts]) => {
-              const total = opts.reduce((s, o) => s + o.count, 0) || 1
-              const OPT_COLORS = ['#c9a96e', '#E8895A', '#9B7FA6', '#A0522D', '#1A3A6E', '#2A7A2A']
-              return (
-                <div key={qNum} style={{ padding: 12, background: '#FAFAF8', borderRadius: 8 }}>
-                  <div style={{ fontSize: 11, fontWeight: 600, color: '#888', marginBottom: 8 }}>
-                    D{qNum} — {QUIZ_QUESTIONS[Number(qNum) - 1] || ''}
-                  </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                    {opts.map(o => {
-                      const pct = Math.round((o.count / total) * 100)
-                      return (
-                        <div key={o.option} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                          <div style={{ width: 30, fontSize: 11, color: '#999', textAlign: 'right' }}>Op {o.option + 1}</div>
-                          <div style={{ flex: 1, height: 16, background: '#F0EBE5', borderRadius: 3, overflow: 'hidden' }}>
-                            <div style={{ height: '100%', width: `${Math.max(pct, 2)}%`, background: OPT_COLORS[o.option % OPT_COLORS.length], borderRadius: 3 }} />
-                          </div>
-                          <div style={{ width: 36, fontSize: 11, fontWeight: 600, color: '#555' }}>{pct}%</div>
-                        </div>
-                      )
-                    })}
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-        )}
-      </div>
-
-      {/* ── DISTRIBUZIONE RISPOSTE SUBQUIZ ── */}
-      <div style={{ background: '#fff', border: '1px solid #E8E0D8', borderRadius: 12, padding: 28 }}>
-        <div style={{ fontSize: 11, letterSpacing: 2, textTransform: 'uppercase', color: '#999', fontWeight: 600, marginBottom: 20 }}>Distribuzione risposte — Subquiz</div>
-        {Object.keys(subDistByQ).length === 0 ? (
-          <div style={{ color: '#ccc', fontSize: 13, padding: 20, textAlign: 'center' }}>Nessun dato disponibile</div>
-        ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
-            {Object.entries(subDistByQ).map(([qNum, opts]) => {
-              const total = opts.reduce((s, o) => s + o.count, 0) || 1
-              const OPT_COLORS = ['#9B7FA6', '#E8895A', '#c9a96e', '#1A3A6E', '#A0522D', '#2A7A2A']
-              return (
-                <div key={qNum} style={{ padding: 12, background: '#FAFAF8', borderRadius: 8 }}>
-                  <div style={{ fontSize: 11, fontWeight: 600, color: '#888', marginBottom: 8 }}>
-                    SQ{qNum} — {SUBQUIZ_QUESTIONS[Number(qNum) - 1] || ''}
-                  </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                    {opts.map(o => {
-                      const pct = Math.round((o.count / total) * 100)
-                      return (
-                        <div key={o.option} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                          <div style={{ width: 30, fontSize: 11, color: '#999', textAlign: 'right' }}>Op {o.option + 1}</div>
-                          <div style={{ flex: 1, height: 16, background: '#F0EBE5', borderRadius: 3, overflow: 'hidden' }}>
-                            <div style={{ height: '100%', width: `${Math.max(pct, 2)}%`, background: OPT_COLORS[o.option % OPT_COLORS.length], borderRadius: 3 }} />
-                          </div>
-                          <div style={{ width: 36, fontSize: 11, fontWeight: 600, color: '#555' }}>{pct}%</div>
-                        </div>
-                      )
-                    })}
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-        )}
       </div>
 
       {/* ── TREND GIORNALIERO ── */}

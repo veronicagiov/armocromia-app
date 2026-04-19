@@ -612,7 +612,6 @@ function prevQuestion() {
   if (current > 0) { current--; renderQuestion(current); window.scrollTo(0,0); }
 }
 function showLead() {
-  trackEvent('quiz_complete');
   trackEvent('lead_view');
   document.getElementById('quiz-section').style.display = 'none';
   document.getElementById('lead-section').style.display = 'flex';
@@ -731,6 +730,7 @@ function showResult() {
   document.getElementById('lead-section').style.display = 'none';
   const el = document.getElementById('result-section');
   el.style.display = 'block';
+  trackEvent('quiz_complete', { season: d.name });
   window.scrollTo(0,0);
 
   const b = d.book;

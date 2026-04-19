@@ -72,12 +72,14 @@ Richiede selezione stagione. Tre viste:
 - Eliminazione singola e bulk
 
 ### Tab: Analytics (KPI)
-- **Funnel di conversione** — barre orizzontali: quiz start → risposta → email → subquiz → foto → pagamento, con % drop-off
-- **Tempo medio per domanda** — barre che evidenziano domande con esitazione (>8s in rosso)
+- **Funnel di conversione** — barre orizzontali con % drop-off: quiz start → email inserita → risultato stagione visto → subquiz start → pagina foto → foto caricate → banner prezzo → click paga → **pagamento completato**
+- **Tempo medio per domanda** — barre che evidenziano domande con esitazione (>8s in rosso). Contiene anche due metriche non-domanda:
+  - Tra le domande quiz e il subquiz: **"✉️ Inserisci email"** = tempo medio tra `lead_view` e `lead_submit` (rosso se >20s)
+  - In coda alla sezione subquiz: **"📸 Carica foto"** = tempo medio tra `photo_view` e `photo_confirm` (rosso se >30s). Utile per capire se l'upload foto e' un collo di bottiglia.
 - **Distribuzione stagioni** — donut chart con percentuali per stagione
-- **Distribuzione risposte** — per ogni domanda quiz e subquiz, barre con % per opzione
 - **Trend giornaliero** — barre impilate (lead/subquiz/pagamenti) ultimi 30 giorni
-- Dati raccolti tramite tracking eventi anonimo (`quiz_events` table, session UUID)
+- **Filtro periodo** — input data "da/a" + preset rapidi: oggi, ieri, ultima settimana (lun-dom precedente), mese corrente, mese precedente, ultimi 30/60/90 giorni. Il preset attivo viene evidenziato; modificare le date manualmente deseleziona il preset.
+- Dati raccolti tramite tracking eventi anonimo (`quiz_events` table, session UUID). Il count **"Pagamento completato"** e il conteggio pagamenti del trend giornaliero vengono dalla tabella `analyses` (fonte di verita' Stripe-verificata) — include anche le vendite via link sconto `/sconto` che bypassano il tracking browser
 
 ### Statistiche (barra in alto)
 - Analisi totali, in attesa, inviate, subquiz foto, lead quiz
@@ -164,7 +166,7 @@ File: `armocromia.db` in `STORAGE_PATH` o `/storage` o `./data`
 |-------|------|-------------|
 | id | INTEGER PK | Auto-increment |
 | session_id | TEXT | UUID sessione browser (per raggruppare eventi stesso utente) |
-| event | TEXT | Tipo evento (quiz_start, quiz_answer, lead_view, lead_submit, subquiz_start, subquiz_answer, photo_view, photo_confirm, payment_view, payment_click) |
+| event | TEXT | Tipo evento (quiz_start, quiz_answer, quiz_complete, lead_view, lead_submit, amazon_book_click, subquiz_start, subquiz_answer, photo_view, photo_confirm, payment_view, payment_click). Tracciati sia da `quiz.html` sia da `analisi.html` (quest'ultimo non emette `quiz_start`/`quiz_complete` perche' parte direttamente dal subquiz). |
 | data | TEXT (JSON) | Dati extra: question, option, time_ms |
 | created_at | TEXT | Timestamp |
 
