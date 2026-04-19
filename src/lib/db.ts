@@ -125,6 +125,35 @@ export function markAsSent(id: number): void {
   db.prepare("UPDATE analyses SET status = 'sent' WHERE id = ?").run(id)
 }
 
+/**
+ * Cancella fisicamente i file foto di un'analisi e svuota il campo photos nel DB.
+ * Chiamato dopo l'invio del PDF al cliente per onorare la promessa di privacy
+ * ("le tue foto vengono cancellate dopo l'analisi"). Le directory vuote parent
+ * vengono pure rimosse se possibile. Non lancia errori: ogni failure e' silente.
+ */
+export function clearAnalysisPhotoFiles(id: number): void {
+  const row = db.prepare('SELECT photos FROM analyses WHERE id = ?').get(id) as { photos: string } | undefined
+  if (!row) return
+  let paths: string[] = []
+  try { paths = JSON.parse(row.photos || '[]') } catch { /* malformed */ }
+  const uploadsRoot = path.join(DATA_DIR, 'uploads')
+  const parents = new Set<string>()
+  for (const p of paths) {
+    try {
+      const full = path.join(uploadsRoot, p)
+      if (fs.existsSync(full)) fs.unlinkSync(full)
+      parents.add(path.dirname(full))
+    } catch { /* skip */ }
+  }
+  // Se la cartella parent e' vuota, rimuovila
+  for (const dir of parents) {
+    try {
+      if (fs.existsSync(dir) && fs.readdirSync(dir).length === 0) fs.rmdirSync(dir)
+    } catch { /* skip */ }
+  }
+  db.prepare("UPDATE analyses SET photos = '[]' WHERE id = ?").run(id)
+}
+
 export function setPdfPath(id: number, pdfPath: string): void {
   db.prepare('UPDATE analyses SET pdf_path = ? WHERE id = ?').run(pdfPath, id)
 }

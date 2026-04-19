@@ -17,19 +17,19 @@ Carica `quiz.html` in iframe. Punto di ingresso principale.
 Flusso completo:
 1. **Hero** — "Qual e' la tua stagione armocromatica?"
 2. **Quiz stagione** — 6 domande (carnagione, occhi, capelli, rossetto, sole, palette)
-3. **Lead capture** — nome, email, privacy checkbox
+3. **Lead capture** — solo email (preview offuscato del risultato "Sei una ▓▓▓▓▓" + palette blurrata, counter social proof dinamico, trust signals). Il nome non viene chiesto qui per ridurre friction
 4. **Risultato stagione** — nome stagione, descrizione, palette colori, libro Amazon
 5. **CTA sottogruppo** — "Ora scopri il tuo sottogruppo!"
 6. **Quiz sottogruppo** — 4 domande (contrasto, vivacita', chiaro/scuro, accessori). La stagione e' gia' nota, quindi viene saltata la prima domanda
-7. **Upload foto** — 1-2 selfie in luce naturale, conferma e salvataggio pre-pagamento
+7. **Upload foto** — 1-2 selfie in luce naturale + **campo nome** (chiesto qui invece che nella lead capture). La pagina offre due bottoni "📸 Fai selfie" (apre fotocamera frontale via `capture="user"`) e "🖼 Dalla galleria". Le foto vengono **compresse client-side** (max 1600px, JPEG 0.85) e **caricate in background** su `/api/subquiz-photo` appena selezionate — il click "Conferma" diventa istantaneo perche' le foto sono gia' sul server. Ogni thumb mostra un progress ring in tempo reale, con retry in caso di errore. Il campo nome appare solo dopo la prima foto (progressive disclosure). Su mobile il bottone "Conferma" e' sticky in fondo allo schermo. **Badge privacy** ("Le tue foto sono al sicuro: usate solo per il sottogruppo e cancellate dopo l'invio") — vedi sezione Privacy foto piu' sotto
 8. **Pagamento** — upsell PDF 7 EUR, checkout Stripe
 9. **Redirect** → `/upload` → `/grazie`
 
 ### `/analisi.html` — Quiz sottogruppo standalone
 Versione per utenti che arrivano dalle newsletter. Stessa logica del subquiz ma:
-- Ha la propria hero e lead capture
+- Ha la propria hero e lead capture (solo email, counter social proof, trust signals — nome chiesto poi nella pagina foto)
 - Il quiz parte dalla domanda 1 "Che stagione sei?" (5 domande totali)
-- Stesso flusso upload foto + pagamento
+- Stesso flusso upload foto (con **campo nome**) + pagamento
 - **URL:** `https://armocromia-app-production.up.railway.app/analisi.html`
 
 ### `/upload` — Conferma pagamento
@@ -95,7 +95,8 @@ Richiede selezione stagione. Tre viste:
 | `/api/create-checkout` | POST | Crea sessione Stripe checkout (9.90 EUR). Body: `{season, name, email}` |
 | `/api/upload` | POST | Salva analisi post-pagamento. Verifica Stripe, collega foto dal subquiz, invia email conferma |
 | `/api/leads` | POST | Salva lead dal quiz. Body: `{name, email, season}` |
-| `/api/subquiz-upload` | POST | Salva foto e dati subquiz pre-pagamento (FormData). Schedula reminder abandoned cart dopo 15 min |
+| `/api/subquiz-photo` | POST | Upload di una singola foto (FormData, campo `photo`). Scrive in cartella temp, ritorna `{ path }`. Usato dal client per l'upload in background mentre l'utente compila la pagina |
+| `/api/subquiz-upload` | POST | Finalizza la submission subquiz pre-pagamento. Due modalita': JSON `{name, email, season, subgroup, photoPaths}` con path gia' caricati via `/api/subquiz-photo` (nuovo flusso), oppure FormData con foto binary (legacy, retrocompatibile). Schedula reminder abandoned cart dopo 15 min |
 | `/sconto` | GET | Pagina redirect a Stripe con sconto 20% (7 EUR). Params: `?email=...&name=...&season=...` |
 | `/api/analyze-color` | POST | Analisi AI colore dominante foto (Claude Haiku). Ritorna hex, nome, in_palette, confidence |
 | `/api/wardrobe` | GET/POST/DELETE | CRUD capi armadio |
@@ -225,6 +226,19 @@ Generato con pdfkit (A4). Contenuto per ogni sottogruppo:
 - Email conferma cliente (foto ricevute)
 - Email invio PDF (attachment base64)
 - Email abandoned cart reminder (15 min dopo subquiz senza pagamento, link sconto 20%)
+
+---
+
+## Privacy foto (GDPR compliance)
+
+**Promessa all'utente** (mostrata nel badge sulla pagina upload): "Le tue foto sono usate solo per identificare il sottogruppo e cancellate automaticamente dal nostro server dopo l'invio dell'analisi".
+
+**Implementazione** ([src/lib/db.ts](src/lib/db.ts) funzione `clearAnalysisPhotoFiles`):
+- Quando l'admin clicca "Invia PDF" ([/api/admin/analyses/[id]/send](src/app/api/admin/analyses/[id]/send/route.ts)), dopo l'invio email riuscito:
+  1. `markAsSent(id)` — status passa a `sent`
+  2. `clearAnalysisPhotoFiles(id)` — cancella i file dal disco (`/storage/uploads/subquiz_xxx/*.jpg`), rimuove la cartella se vuota, svuota il campo `photos` nel DB (`'[]'`)
+- Se la cancellazione fallisce per qualche file (race condition, permessi), l'errore viene loggato ma non blocca il flow — il cliente ha comunque ricevuto il PDF.
+- Nel pannello admin, le foto non sono piu' visualizzabili dopo l'invio (coerenza tra UI e DB).
 
 ### Claude API (Anthropic)
 - Modello: `claude-haiku-4-5-20251001`

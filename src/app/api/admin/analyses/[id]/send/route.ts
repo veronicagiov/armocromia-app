@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import fs from 'fs'
 import { Resend } from 'resend'
 import { checkAdminAuth } from '@/lib/auth'
-import { getAnalysisById, markAsSent, seasonToAssoluto } from '@/lib/db'
+import { getAnalysisById, markAsSent, seasonToAssoluto, clearAnalysisPhotoFiles } from '@/lib/db'
 
 export const dynamic = 'force-dynamic'
 
@@ -57,6 +57,9 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     })
 
     markAsSent(Number(params.id))
+    // Onora la promessa di privacy: una volta inviata l'analisi, cancella
+    // i file foto dal disco e svuota il campo photos nel DB.
+    try { clearAnalysisPhotoFiles(Number(params.id)) } catch (e) { console.error('cleanup photos failed:', e) }
     return NextResponse.json({ ok: true })
   } catch (e) {
     console.error('send error:', e)

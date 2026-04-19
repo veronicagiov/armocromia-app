@@ -94,6 +94,21 @@
   .btn-reveal:hover { background: var(--gold); transform: translateY(-1px); }
   .privacy-note { font-size: 12px; color: var(--muted); margin-top: 16px; line-height: 1.5; }
 
+  /* Trust signals */
+  .trust-reward { font-size: 13px; color: var(--gold); font-weight: 500; margin-top: 14px; text-align: center; }
+  .trust-row { display: flex; gap: 14px; justify-content: center; margin-top: 14px; flex-wrap: wrap; font-size: 11px; color: var(--muted); }
+  .trust-row span { display: inline-flex; align-items: center; gap: 4px; }
+  .privacy-micro { font-size: 11px; color: var(--muted); margin-top: 14px; line-height: 1.5; opacity: .85; }
+  .privacy-micro a { color: var(--gold); text-decoration: underline; }
+
+  /* Campo nome nella photo upload */
+  .photo-name-group { text-align: left; max-width: 420px; opacity: 0; max-height: 0; overflow: hidden; transition: opacity .35s ease, max-height .35s ease, margin .35s ease; margin: 0 auto; }
+  .photo-name-group.visible { opacity: 1; max-height: 140px; margin: 20px auto 24px; }
+  .photo-name-group label { display: block; font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; font-weight: 500; }
+  .photo-name-group input { width: 100%; padding: 14px 18px; border: 1.5px solid var(--border); border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 15px; background: var(--cream); color: var(--charcoal); outline: none; transition: border-color .2s; box-sizing: border-box; }
+  .photo-name-group input:focus { border-color: var(--gold); }
+  .photo-name-group input.input-error { border-color: #cc4444 !important; }
+
   /* ── SUBQUIZ RESULT / PHOTO UPLOAD ── */
   #subresult-section { display: none; padding: 60px 24px 100px; max-width: 860px; margin: 0 auto; animation: fadeUp .6s ease forwards; }
 
@@ -102,8 +117,8 @@
   .subquiz-cta-section {
     margin: 0 auto;
     max-width: 540px;
-    background: var(--warm-white);
-    border: 1px solid var(--border);
+    background: #F0E8FF;
+    border: 1px solid #DED2F5;
     border-radius: 24px;
     padding: 32px 28px 28px;
     color: var(--charcoal);
@@ -139,6 +154,17 @@
     font-size: 12px; color: var(--muted); text-align: left; line-height: 1.5;
   }
   .upsell-badge { display: inline-block; padding: 7px 18px; border-radius: 100px; background: rgba(201,169,110,0.1); border: 1px solid rgba(201,169,110,0.3); font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); margin-bottom: 16px; }
+
+  /* Toast conferma foto ricevute */
+  .payment-done-toast { display: inline-flex; align-items: center; gap: 8px; padding: 8px 18px; background: rgba(42,122,42,0.1); border: 1px solid rgba(42,122,42,0.3); border-radius: 100px; font-size: 12px; color: #2a7a2a; font-weight: 600; letter-spacing: .5px; margin: 0 auto 20px; }
+  .payment-done-toast::before { content: '\2713'; background: #2a7a2a; color: #fff; width: 18px; height: 18px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; }
+
+  /* Trust note sotto il bottone */
+  .payment-trust-note { margin-top: 12px; margin-bottom: 20px; font-size: 12px; color: var(--muted); text-align: center; }
+
+
+  /* Separatore prima della bullet list */
+  .subquiz-cta-divider { border-top: 1px solid rgba(26,22,20,0.1); margin: 0 auto 16px; max-width: 420px; padding-top: 14px; font-size: 12px; color: var(--charcoal); font-weight: 600; text-align: center; line-height: 1.4; }
   .social-proof {
     display: flex; align-items: center; justify-content: center; gap: 10px;
     margin-bottom: 16px; padding: 8px 16px;
@@ -192,10 +218,53 @@
   }
   .photo-tips { max-width: 420px; margin: 24px auto 0; text-align: left; }
   .photo-tips li { font-size: 13px; color: var(--muted); line-height: 1.6; padding: 4px 0; }
-  .btn-confirm-photos { background: var(--charcoal); color: var(--cream); border: none; padding: 17px 48px; border-radius: 100px; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 500; cursor: pointer; transition: all .3s; margin-top: 32px; display: none; }
-  .btn-confirm-photos:hover:not(:disabled) { background: var(--gold); transform: translateY(-1px); }
-  .btn-confirm-photos:disabled { opacity: .4; cursor: not-allowed; }
+  .btn-confirm-photos { background: var(--charcoal); color: var(--cream); border: none; padding: 20px 56px; border-radius: 100px; font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 600; cursor: pointer; transition: all .3s; margin: 28px auto 0; display: inline-block; letter-spacing: .3px; box-shadow: 0 6px 22px rgba(26,22,20,0.18); min-width: 280px; }
+  .btn-confirm-photos:hover:not(:disabled) { background: var(--gold); transform: translateY(-1px); box-shadow: 0 8px 26px rgba(201,169,110,0.25); }
+  .btn-confirm-photos:disabled { opacity: .4; cursor: not-allowed; box-shadow: none; background: #c4bdb3; }
+
+  /* Bottoni camera/galleria */
+  .photo-action-row { display: flex; gap: 10px; max-width: 480px; margin: 0 auto 16px; }
+  .photo-action-btn { flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 18px 16px; border: 1.5px solid var(--border); border-radius: 14px; background: var(--warm-white); color: var(--charcoal); cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; transition: all .2s; }
+  .photo-action-btn:hover { border-color: var(--gold); background: rgba(201,169,110,0.06); transform: translateY(-1px); }
+  .photo-action-btn .icon { font-size: 22px; }
+  .photo-action-btn.primary { background: var(--gold); color: #fff; border-color: var(--gold); }
+  .photo-action-btn.primary:hover { background: #b8956a; border-color: #b8956a; }
+
+  /* Meta row: contatore + tips compatti su una riga */
+  .photo-meta-row { display: flex; gap: 8px; justify-content: center; align-items: center; flex-wrap: wrap; max-width: 520px; margin: 0 auto 18px; }
+  .photo-counter { font-size: 11px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; font-weight: 700; padding: 6px 12px; background: var(--warm-white); border: 1px solid var(--border); border-radius: 100px; }
+  .photo-counter strong { color: var(--gold); font-size: 13px; }
+  .photo-tip-chip { font-size: 11px; color: var(--muted); padding: 6px 12px; background: rgba(201,169,110,0.08); border-radius: 100px; }
+
+  /* Blocco conferma: nome + bottone, subito dopo le foto */
+  .photo-confirm-block { margin-top: 8px; }
+
+  /* Badge privacy compact in alto tra tips e bottoni */
+  .photo-privacy-badge-compact { max-width: 520px; margin: 0 auto 18px; padding: 10px 14px; background: #f5efe1; border: 1px solid #e5d9bf; border-radius: 10px; text-align: center; font-size: 11px; color: #6b5e4a; line-height: 1.5; }
+  .photo-privacy-badge-compact u { color: #4a3b24; font-weight: 600; text-decoration: underline; text-underline-offset: 2px; }
+
+  /* Preview item con progress/state */
+  .photo-preview-item .upload-overlay { position: absolute; inset: 0; background: rgba(0,0,0,.45); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: #fff; font-size: 12px; }
+  .photo-preview-item.state-uploaded .upload-overlay { background: rgba(42,122,42,.15); }
+  .photo-preview-item.state-uploaded .upload-overlay::after { content: '✓'; position: absolute; top: 6px; left: 6px; width: 24px; height: 24px; background: #2a7a2a; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; }
+  .photo-preview-item.state-uploaded .upload-overlay > * { display: none; }
+  .photo-preview-item.state-error .upload-overlay { background: rgba(204,68,68,.75); }
+  .upload-progress-ring { width: 36px; height: 36px; position: relative; }
+  .upload-progress-ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+  .upload-progress-ring circle { fill: none; stroke-width: 3; }
+  .upload-progress-ring .bg { stroke: rgba(255,255,255,.25); }
+  .upload-progress-ring .fg { stroke: #fff; stroke-linecap: round; stroke-dasharray: 100; transition: stroke-dashoffset .2s; }
+  .upload-progress-label { font-size: 11px; opacity: .9; }
+  .photo-preview-retry { background: #fff; color: #cc4444; border: none; padding: 5px 10px; border-radius: 100px; font-size: 11px; font-weight: 600; cursor: pointer; margin-top: 4px; }
+
   #payment-section { display: none; padding: 60px 24px 100px; max-width: 860px; margin: 0 auto; animation: fadeUp .6s ease forwards; }
+
+  @media (max-width: 600px) {
+    .photo-upload-sub { font-size: 14px; margin-bottom: 22px; padding: 0 8px; }
+    .photo-upload-title { font-size: 26px; margin-bottom: 10px; }
+    .photo-action-row { flex-direction: column; gap: 8px; }
+    .btn-confirm-photos { min-width: 0; width: calc(100% - 32px); padding: 18px 20px; }
+  }
 
   .restart-wrap { text-align: center; margin-top: 64px; padding-top: 40px; border-top: 1px solid var(--border); }
   .btn-restart { background: transparent; border: 1.5px solid var(--charcoal); color: var(--charcoal); padding: 14px 40px; border-radius: 100px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; transition: all .2s; }
@@ -206,6 +275,20 @@
     .btn-upsell { width: 100%; }
     .options-grid.cols-2 { grid-template-columns: 1fr; }
     .options-grid.cols-3 { grid-template-columns: 1fr; }
+
+    /* Sticky CTA su mobile: bottone principale ancorato in basso */
+    #btn-sub-upsell {
+      position: fixed;
+      left: 12px; right: 12px; bottom: 12px;
+      max-width: none !important;
+      width: auto !important;
+      margin: 0 !important;
+      z-index: 100;
+      box-shadow: 0 8px 28px rgba(26,22,20,0.3);
+      padding: 18px 20px;
+      font-size: 16px;
+    }
+    #payment-section { padding-bottom: 140px; }
   }
 </style>
 </head>
@@ -229,23 +312,28 @@
 <section id="lead-section">
   <div class="lead-card">
     <h2>Scopri il tuo sottogruppo</h2>
-    <p>Inserisci il tuo nome e la tua email per iniziare il test del sottogruppo.</p>
-    <div class="form-group">
-      <label>Il tuo nome</label>
-      <input type="text" id="user-name" placeholder="Es. Sofia">
+    <p>Inserisci la tua email per iniziare il test: 5 domande in 2 minuti.</p>
+
+    <!-- Social proof -->
+    <div class="social-proof" id="sp-lead-wrap" style="margin: 8px 0 22px;">
+      <div class="social-proof-avatars" id="sp-lead-avatars"></div>
+      <div class="social-proof-text"><strong id="sp-lead-count">50+</strong> <span id="sp-lead-label">persone hanno scoperto il<br>proprio sottogruppo oggi</span></div>
     </div>
+
     <div class="form-group">
       <label>La tua email</label>
       <input type="email" id="user-email" placeholder="Es. sofia@email.com">
     </div>
-    <div style="display:flex; align-items:flex-start; gap:10px; margin-bottom:20px; text-align:left;">
-      <input type="checkbox" id="privacy-check" style="margin-top:3px; accent-color:var(--gold); width:16px; height:16px; flex-shrink:0; cursor:pointer;">
-      <label for="privacy-check" style="font-size:12px; color:var(--muted); line-height:1.6; cursor:pointer;">
-        Acconsento a ricevere email con contenuti e offerte sull'armocromia da YouGlamour. Puoi disiscriverti in qualsiasi momento. <a href="https://www.youglamour.it/privacy" target="_blank" style="color:var(--gold); text-decoration:underline;">Privacy policy</a>.
-      </label>
+
+    <button class="btn-reveal" onclick="submitLead()">Inizia il test &#10022;</button>
+    <div class="trust-reward">&#10024; Risultato immediato &middot; gratuito</div>
+    <div class="trust-row">
+      <span>&#128236; Newsletter settimanale</span>
+      <span>&#128070; 1 click per disiscriverti</span>
     </div>
-    <button class="btn-reveal" onclick="submitLead()">Inizia il Test &#10022;</button>
-    <p class="privacy-note">&#128274; I tuoi dati sono al sicuro.</p>
+    <p class="privacy-micro">
+      Cliccando accetti di ricevere la newsletter settimanale YouGlamour sull'armocromia. <a href="https://www.youglamour.it/privacy" target="_blank">Privacy policy</a>.
+    </p>
   </div>
 </section>
 
@@ -468,6 +556,7 @@ function showLeadCapture() {
   trackEvent('lead_view');
   document.getElementById('hero-section').style.display = 'none';
   document.getElementById('lead-section').style.display = 'flex';
+  updateSocialProof();
   window.scrollTo(0,0);
 }
 
@@ -510,20 +599,14 @@ function saveToGoogleSheet(name, email, season) {
 
 function submitLead() {
   const emailEl = document.getElementById('user-email');
-  const name = document.getElementById('user-name').value.trim() || 'cara';
   const email = emailEl.value.trim();
   emailEl.classList.remove('input-error');
   if (!email || !email.includes('@') || !email.includes('.')) {
     emailEl.classList.add('input-error'); emailEl.focus(); return;
   }
-  const privacyCheck = document.getElementById('privacy-check');
-  if (!privacyCheck.checked) {
-    privacyCheck.style.outline = '2px solid #cc4444';
-    privacyCheck.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    return;
-  }
-  privacyCheck.style.outline = '';
 
+  // Nome viene chiesto piu' avanti (pagina upload foto). Lead iniziale email-only.
+  const name = '';
   lastName = name;
   lastEmail = email;
 
@@ -658,6 +741,7 @@ function calculateSubgroup() {
 // ─── PHOTO UPLOAD ───────────────────────────────────────────────────────────
 function showSubResult() {
   trackEvent('photo_view');
+  _scrolledToConfirm = false;
   var subgroup = calculateSubgroup();
   lastSubgroup = subgroup;
 
@@ -680,101 +764,280 @@ function showSubResult() {
   window.scrollTo(0,0);
 
   el.innerHTML =
-    '<div class="photo-upload-section">' +
+    '<div class="photo-upload-section" id="photo-upload-section">' +
       '<div class="sub-result-eyebrow">\u2726 Ultimo passo</div>' +
-      '<h2 class="photo-upload-title">Carica un <em>selfie</em><br>per l\'analisi dei tuoi colori</h2>' +
-      '<p class="photo-upload-sub">Per determinare con precisione il tuo sottogruppo, abbiamo bisogno di analizzare i tuoi colori naturali. Carica 1 o 2 foto del viso in luce naturale, senza filtri.</p>' +
-      '<div class="photo-dropzone" id="photo-dropzone" onclick="document.getElementById(\'photo-input\').click()">' +
-        '<div class="photo-dropzone-icon">\uD83D\uDCF8</div>' +
-        '<div class="photo-dropzone-text">Tocca per caricare le tue foto</div>' +
-        '<div class="photo-dropzone-hint">oppure trascina qui \u2022 max 2 foto \u2022 JPG o PNG</div>' +
+      '<h2 class="photo-upload-title">Un <em>selfie</em> per l\'analisi</h2>' +
+      '<div class="photo-meta-row">' +
+        '<span class="photo-counter" id="photo-counter"><strong>0</strong>/2 foto</span>' +
+        '<span class="photo-tip-chip">\uD83D\uDCF7 Luce naturale</span>' +
+        '<span class="photo-tip-chip">\uD83D\uDEAB No filtri</span>' +
+        '<span class="photo-tip-chip">\uD83D\uDE42 Viso visibile</span>' +
       '</div>' +
-      '<input type="file" id="photo-input" accept="image/jpeg,image/png" multiple style="display:none" onchange="handlePhotoSelect(event)">' +
+      '<div class="photo-privacy-badge-compact">' +
+        '\uD83D\uDD12 <u>Le tue foto sono al sicuro</u>: vengono usate solo per identificare il sottogruppo e cancellate dopo l\'invio dell\'analisi.' +
+      '</div>' +
+      '<div class="photo-action-row">' +
+        '<button type="button" class="photo-action-btn primary" onclick="document.getElementById(\'photo-input-camera\').click()">' +
+          '<span class="icon">\uD83D\uDCF8</span> Fai selfie' +
+        '</button>' +
+        '<button type="button" class="photo-action-btn" onclick="document.getElementById(\'photo-input-gallery\').click()">' +
+          '<span class="icon">\uD83D\uDDBC</span> Dalla galleria' +
+        '</button>' +
+      '</div>' +
+      '<input type="file" id="photo-input-camera" accept="image/*" capture="user" style="display:none" onchange="handlePhotoSelect(event)">' +
+      '<input type="file" id="photo-input-gallery" accept="image/*" multiple style="display:none" onchange="handlePhotoSelect(event)">' +
       '<div class="photo-previews" id="photo-previews"></div>' +
-      '<ul class="photo-tips">' +
-        '<li>\uD83D\uDCF7 Scatta in luce naturale (vicino a una finestra)</li>' +
-        '<li>\uD83D\uDEAB Senza filtri, senza trucco pesante</li>' +
-        '<li>\uD83D\uDE42 Viso ben visibile, capelli sciolti se possibile</li>' +
-      '</ul>' +
-      '<button class="btn-confirm-photos" id="btn-confirm-photos" onclick="confirmPhotos()" disabled>' +
-        'Conferma e prosegui \u2726' +
-      '</button>' +
+      '<div class="photo-confirm-block" id="photo-confirm-block">' +
+        '<div class="photo-name-group" id="photo-name-wrap">' +
+          '<label>Come ti chiami?</label>' +
+          '<input type="text" id="photo-user-name" placeholder="Es. Sofia" autocomplete="given-name">' +
+        '</div>' +
+        '<button class="btn-confirm-photos" id="btn-confirm-photos" onclick="confirmPhotos()" style="display:none" disabled>' +
+          'Conferma e prosegui \u2726' +
+        '</button>' +
+      '</div>' +
     '</div>';
 
-  // Setup drag & drop
-  var dropzone = document.getElementById('photo-dropzone');
-  dropzone.addEventListener('dragover', function(e) { e.preventDefault(); dropzone.classList.add('dragover'); });
-  dropzone.addEventListener('dragleave', function() { dropzone.classList.remove('dragover'); });
-  dropzone.addEventListener('drop', function(e) {
-    e.preventDefault();
-    dropzone.classList.remove('dragover');
-    handleFiles(e.dataTransfer.files);
-  });
 }
 
 function handlePhotoSelect(e) {
   handleFiles(e.target.files);
+  e.target.value = '';
+}
+
+// Compressione client-side: max 1600px lato lungo, JPEG quality 0.85.
+function compressImage(file) {
+  var MAX = 1600;
+  var QUALITY = 0.85;
+  return new Promise(function(resolve) {
+    try {
+      var reader = new FileReader();
+      reader.onerror = function() { resolve(file); };
+      reader.onload = function() {
+        var img = new Image();
+        img.onerror = function() { resolve(file); };
+        img.onload = function() {
+          var w = img.width, h = img.height;
+          if (w > MAX || h > MAX) {
+            if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+            else { w = Math.round(w * MAX / h); h = MAX; }
+          }
+          var canvas = document.createElement('canvas');
+          canvas.width = w; canvas.height = h;
+          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+          canvas.toBlob(function(blob) { resolve(blob || file); }, 'image/jpeg', QUALITY);
+        };
+        img.src = reader.result;
+      };
+      reader.readAsDataURL(file);
+    } catch(e) { resolve(file); }
+  });
+}
+
+function startBackgroundUpload(photo) {
+  return new Promise(function(resolve) {
+    var xhr = new XMLHttpRequest();
+    var fd = new FormData();
+    var filename = (photo.originalName || 'photo.jpg').replace(/\.[^.]+$/, '') + '.jpg';
+    fd.append('photo', photo.blob, filename);
+    photo.xhr = xhr;
+    xhr.open('POST', '/api/subquiz-photo', true);
+    xhr.upload.onprogress = function(e) {
+      if (e.lengthComputable) {
+        photo.progress = Math.round((e.loaded / e.total) * 100);
+        updateThumbState(photo);
+      }
+    };
+    xhr.onload = function() {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        try {
+          var res = JSON.parse(xhr.responseText);
+          photo.serverPath = res.path;
+          photo.state = 'uploaded';
+          photo.progress = 100;
+        } catch(e) { photo.state = 'error'; }
+      } else { photo.state = 'error'; }
+      updateThumbState(photo);
+      updateControlsState();
+      scrollToConfirmIfReady(photo);
+      resolve();
+    };
+    xhr.onerror = function() {
+      photo.state = 'error';
+      updateThumbState(photo);
+      updateControlsState();
+      resolve();
+    };
+    xhr.send(fd);
+  });
 }
 
 function handleFiles(files) {
   var maxPhotos = 2;
   for (var i = 0; i < files.length && uploadedPhotos.length < maxPhotos; i++) {
     var file = files[i];
-    if (!file.type.match('image/(jpeg|png)')) continue;
-    if (file.size > 10 * 1024 * 1024) continue;
-    uploadedPhotos.push(file);
+    if (!file.type || file.type.indexOf('image/') !== 0) continue;
+    var photo = {
+      id: Math.random().toString(36).slice(2),
+      originalName: file.name,
+      state: 'compressing',
+      progress: 0,
+      previewUrl: URL.createObjectURL(file),
+      blob: null,
+      serverPath: null,
+      xhr: null,
+    };
+    uploadedPhotos.push(photo);
+    renderPhotoPreviews();
+    updateControlsState();
+    (function(p) {
+      compressImage(file).then(function(blob) {
+        p.blob = blob;
+        p.state = 'uploading';
+        p.progress = 0;
+        updateThumbState(p);
+        startBackgroundUpload(p);
+      });
+    })(photo);
   }
-  renderPhotoPreviews();
+}
+
+function updateThumbState(photo) {
+  var el = document.querySelector('.photo-preview-item[data-id="' + photo.id + '"]');
+  if (!el) return;
+  el.classList.remove('state-compressing','state-uploading','state-uploaded','state-error');
+  el.classList.add('state-' + photo.state);
+  var label = el.querySelector('.upload-progress-label');
+  if (label) {
+    if (photo.state === 'compressing') label.textContent = 'Ottimizzo...';
+    else if (photo.state === 'uploading') label.textContent = photo.progress + '%';
+    else if (photo.state === 'error') label.textContent = '';
+  }
+  var ring = el.querySelector('.upload-progress-ring .fg');
+  if (ring) ring.setAttribute('stroke-dashoffset', String(100 - (photo.progress || 0)));
+}
+
+// Quando la prima foto e' "uploaded", porta in vista nome+bottone conferma.
+var _scrolledToConfirm = false;
+function scrollToConfirmIfReady(photo) {
+  if (!photo || photo.state !== 'uploaded') return;
+  if (_scrolledToConfirm) return;
+  _scrolledToConfirm = true;
+  var block = document.getElementById('photo-confirm-block');
+  if (block) {
+    setTimeout(function() {
+      block.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      var nameInput = document.getElementById('photo-user-name');
+      if (nameInput) setTimeout(function() { nameInput.focus({ preventScroll: true }); }, 400);
+    }, 200);
+  }
+}
+
+function updateControlsState() {
+  var counter = document.getElementById('photo-counter');
+  if (counter) counter.innerHTML = '<strong>' + uploadedPhotos.length + '</strong>/2 foto';
+
+  var nameWrap = document.getElementById('photo-name-wrap');
+  if (nameWrap) {
+    if (uploadedPhotos.length > 0) nameWrap.classList.add('visible');
+    else nameWrap.classList.remove('visible');
+  }
+
+  var btn = document.getElementById('btn-confirm-photos');
+  if (!btn) return;
+  var hasPhotos = uploadedPhotos.length > 0;
+  var allUploaded = hasPhotos && uploadedPhotos.every(function(p) { return p.state === 'uploaded'; });
+
+  // Bottone nascosto finche' non c'e' almeno una foto. Poi appare.
+  if (!hasPhotos) {
+    btn.style.display = 'none';
+    btn.disabled = true;
+  } else if (!allUploaded) {
+    btn.style.display = 'inline-block';
+    btn.disabled = true;
+    btn.textContent = 'Carico le foto...';
+  } else {
+    btn.style.display = 'inline-block';
+    btn.disabled = false;
+    btn.textContent = 'Conferma e prosegui \u2726';
+  }
+
+  var actionRow = document.querySelector('.photo-action-row');
+  if (actionRow) actionRow.style.display = uploadedPhotos.length >= 2 ? 'none' : 'flex';
 }
 
 function renderPhotoPreviews() {
   var container = document.getElementById('photo-previews');
-  container.innerHTML = uploadedPhotos.map(function(file, i) {
-    var url = URL.createObjectURL(file);
-    return '<div class="photo-preview-item">' +
-      '<img src="' + url + '" alt="Foto ' + (i+1) + '">' +
-      '<button class="photo-preview-remove" onclick="removePhoto(' + i + ')">\u2715</button>' +
-    '</div>';
+  container.innerHTML = uploadedPhotos.map(function(photo) {
+    return '<div class="photo-preview-item state-' + photo.state + '" data-id="' + photo.id + '">'
+      + '<img src="' + photo.previewUrl + '" alt="Foto">'
+      + '<button class="photo-preview-remove" onclick="removePhoto(\'' + photo.id + '\')" aria-label="Rimuovi">\u2715</button>'
+      + '<div class="upload-overlay">'
+        + '<div class="upload-progress-ring">'
+          + '<svg viewBox="0 0 36 36"><circle class="bg" cx="18" cy="18" r="15.9"/><circle class="fg" cx="18" cy="18" r="15.9" stroke-dashoffset="100"/></svg>'
+        + '</div>'
+        + '<div class="upload-progress-label">Ottimizzo...</div>'
+        + (photo.state === 'error' ? '<button class="photo-preview-retry" onclick="retryPhoto(\'' + photo.id + '\')">Riprova</button>' : '')
+      + '</div>'
+    + '</div>';
   }).join('');
-
-  var dropzone = document.getElementById('photo-dropzone');
-  if (uploadedPhotos.length >= 2) {
-    dropzone.style.display = 'none';
-  } else {
-    dropzone.style.display = 'block';
-    dropzone.querySelector('.photo-dropzone-text').textContent =
-      uploadedPhotos.length === 0 ? 'Tocca per caricare le tue foto' : 'Aggiungi un\'altra foto';
-  }
-
-  var btn = document.getElementById('btn-confirm-photos');
-  if (uploadedPhotos.length > 0) {
-    btn.style.display = 'inline-block';
-    btn.disabled = false;
-  } else {
-    btn.style.display = 'none';
-    btn.disabled = true;
-  }
+  uploadedPhotos.forEach(updateThumbState);
 }
 
-function removePhoto(idx) {
+function removePhoto(id) {
+  var idx = uploadedPhotos.findIndex(function(p) { return p.id === id; });
+  if (idx < 0) return;
+  var photo = uploadedPhotos[idx];
+  if (photo.xhr) { try { photo.xhr.abort(); } catch(e){} }
+  if (photo.previewUrl) { try { URL.revokeObjectURL(photo.previewUrl); } catch(e){} }
   uploadedPhotos.splice(idx, 1);
   renderPhotoPreviews();
+  updateControlsState();
+}
+
+function retryPhoto(id) {
+  var photo = uploadedPhotos.find(function(p) { return p.id === id; });
+  if (!photo || !photo.blob) return;
+  photo.state = 'uploading';
+  photo.progress = 0;
+  updateThumbState(photo);
+  updateControlsState();
+  startBackgroundUpload(photo);
 }
 
 function confirmPhotos() {
+  var nameEl = document.getElementById('photo-user-name');
+  var name = (nameEl && nameEl.value || '').trim();
+  if (!name) {
+    if (nameEl) {
+      nameEl.classList.add('input-error');
+      nameEl.focus();
+      nameEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    return;
+  }
+  if (nameEl) nameEl.classList.remove('input-error');
+  lastName = name;
+
+  var allUploaded = uploadedPhotos.length > 0 && uploadedPhotos.every(function(p) { return p.state === 'uploaded'; });
+  if (!allUploaded) return;
+
   trackEvent('photo_confirm');
   var btn = document.getElementById('btn-confirm-photos');
   btn.disabled = true;
-  btn.textContent = 'Caricamento in corso...';
+  btn.textContent = 'Quasi fatto...';
 
-  var formData = new FormData();
-  formData.append('name', lastName);
-  formData.append('email', lastEmail);
-  formData.append('season', lastSeason);
-  formData.append('subgroup', lastSubgroup);
-  uploadedPhotos.forEach(function(f) { formData.append('photos', f); });
-
-  fetch('/api/subquiz-upload', { method: 'POST', body: formData })
+  fetch('/api/subquiz-upload', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      name: lastName,
+      email: lastEmail,
+      season: lastSeason,
+      subgroup: lastSubgroup,
+      photoPaths: uploadedPhotos.map(function(p) { return p.serverPath; }),
+    }),
+  })
     .catch(function() { /* silenzioso */ })
     .finally(function() { showPaymentPage(); });
 }
@@ -788,33 +1051,39 @@ function showPaymentPage() {
   window.scrollTo(0,0);
 
   el.innerHTML =
+    '<div style="text-align:center;margin-bottom:10px;">' +
+      '<div class="payment-done-toast">Foto ricevute</div>' +
+    '</div>' +
     '<div class="subquiz-cta-section">' +
-      '<div class="upsell-badge">\u2713 Foto caricate con successo</div>' +
-      '<h2 class="subquiz-cta-title">La tua <em>analisi personalizzata</em><br>ti aspetta</h2>' +
-      '<p style="font-size:13px;color:var(--muted);margin-bottom:14px;">Riceverai un PDF con:</p>' +
-      '<ul class="subquiz-cta-list">' +
-        '<li><span class="icon">\uD83D\uDD0D</span> Il tuo sottogruppo preciso tra i 16 possibili</li>' +
-        '<li><span class="icon">\uD83C\uDFA8</span> Palette 30+ colori e consigli make-up personalizzati</li>' +
-        '<li><span class="icon">\uD83D\uDC57</span> Guida outfit: abbinamenti e colori da indossare</li>' +
-        '<li><span class="icon">\uD83D\uDC8E</span> Colori da evitare e in "prestito" dalle stagioni vicine</li>' +
-      '</ul>' +
+      '<div class="upsell-badge">La tua analisi personalizzata</div>' +
+      '<h2 class="subquiz-cta-title">\u00c8 tutto <em>pronto</em></h2>' +
+
       '<div class="subquiz-cta-price-bar">' +
-        '<div class="price-tag"><span class="price-label">a soli</span>9,90\u20AC</div>' +
+        '<div class="price-tag"><span class="price-label">pagamento unico</span>9,90\u20AC</div>' +
         '<div class="price-sep"></div>' +
-        '<div class="price-details">Pagamento unico<br>PDF via email</div>' +
+        '<div class="price-details">Analisi via email<br>entro 24h</div>' +
       '</div>' +
+
       '<button class="btn-upsell" onclick="startCheckout()" id="btn-sub-upsell" style="max-width:400px;margin:0 auto;display:block;">' +
-        'Ricevi la tua analisi \u2726' +
+        'Voglio la mia analisi personalizzata' +
       '</button>' +
-      '<p style="font-size:11px;color:var(--muted);margin-top:12px;margin-bottom:16px;">\uD83D\uDD12 Pagamento sicuro con Stripe</p>' +
+
+      '<p class="payment-trust-note">\uD83D\uDD12 Pagamento sicuro Stripe</p>' +
+
       '<div class="social-proof">' +
         '<div class="social-proof-avatars" id="sp-avatars"></div>' +
         '<div class="social-proof-text"><strong id="sp-count">50+</strong> <span id="sp-label">persone hanno scoperto il<br>proprio sottogruppo oggi</span></div>' +
       '</div>' +
-    '</div>' +
-    '<div class="restart-wrap">' +
-      '<p style="font-size:14px;color:var(--muted);margin-bottom:20px;">Vuoi rifare il test o condividerlo con un\'amica?</p>' +
-      '<button class="btn-restart" onclick="restartQuiz()">\u21BA Rifai il Test</button>' +
+
+      '<div class="subquiz-cta-divider">Riceverai una guida in PDF con:</div>' +
+      '<ul class="subquiz-cta-list">' +
+        '<li><span class="icon">\uD83D\uDD0D</span> Il tuo sottogruppo preciso tra i 16 possibili</li>' +
+        '<li><span class="icon">\uD83C\uDFA8</span> Palette 30+ colori personalizzata</li>' +
+        '<li><span class="icon">\uD83D\uDC84</span> Consigli make-up: fondotinta, blush, rossetto</li>' +
+        '<li><span class="icon">\uD83D\uDC57</span> Guida outfit: abbinamenti e colori ideali</li>' +
+        '<li><span class="icon">\uD83D\uDEAB</span> I colori da evitare</li>' +
+        '<li><span class="icon">\uD83D\uDC8E</span> Colori "prestito" dalle stagioni vicine</li>' +
+      '</ul>' +
     '</div>';
 
   updateSocialProof();
@@ -850,28 +1119,33 @@ function updateSocialProof() {
   var letters = 'ABCDEFGHILMNOPRSTV';
   var colors = ['#c9a96e','#b8860b','#a0785a','#8b7355','#9c7c5b','#b09060'];
   var seed = now.getDay() * 100 + Math.floor(hour / 2); // cambia ogni ~2 ore
-  var avatarsEl = document.getElementById('sp-avatars');
-  if (avatarsEl) {
+
+  function renderAvatars(el) {
+    if (!el) return;
     var html = '';
     for (var a = 0; a < 4; a++) {
       var idx = (seed * 7 + a * 13 + a * a * 3) % letters.length;
       var cIdx = (seed * 3 + a * 5) % colors.length;
       html += '<span style="background:' + colors[cIdx] + ';">' + letters.charAt(idx) + '</span>';
     }
-    avatarsEl.innerHTML = html;
+    el.innerHTML = html;
   }
-
-  var el = document.getElementById('sp-count');
-  var lbl = document.getElementById('sp-label');
-  if (el && lbl) {
+  function renderCount(countEl, labelEl) {
+    if (!countEl || !labelEl) return;
     if (rounded <= 0) {
-      el.textContent = '';
-      lbl.innerHTML = 'Scopri il tuo sottogruppo<br>come tante altre persone';
+      countEl.textContent = '';
+      labelEl.innerHTML = 'Scopri il tuo sottogruppo<br>come tante altre persone';
     } else {
-      el.textContent = rounded + '+';
-      lbl.innerHTML = 'persone hanno scoperto il<br>proprio sottogruppo oggi';
+      countEl.textContent = rounded + '+';
+      labelEl.innerHTML = 'persone hanno scoperto il<br>proprio sottogruppo oggi';
     }
   }
+
+  // Payment section (sp-*) e lead-section (sp-lead-*)
+  renderAvatars(document.getElementById('sp-avatars'));
+  renderAvatars(document.getElementById('sp-lead-avatars'));
+  renderCount(document.getElementById('sp-count'), document.getElementById('sp-label'));
+  renderCount(document.getElementById('sp-lead-count'), document.getElementById('sp-lead-label'));
 }
 
 // ─── CHECKOUT ───────────────────────────────────────────────────────────────
@@ -921,9 +1195,8 @@ function restartQuiz() {
   document.getElementById('subresult-section').style.display = 'none';
   document.getElementById('payment-section').style.display = 'none';
   document.getElementById('lead-section').style.display = 'none';
-  document.getElementById('user-name').value = '';
-  document.getElementById('user-email').value = '';
-  document.getElementById('privacy-check').checked = false;
+  var emailEl = document.getElementById('user-email');
+  if (emailEl) emailEl.value = '';
   document.getElementById('hero-section').style.display = 'flex';
   window.scrollTo(0,0);
 }

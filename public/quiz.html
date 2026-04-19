@@ -94,19 +94,59 @@
   .btn-reveal:hover { background: var(--gold); transform: translateY(-1px); }
   .privacy-note { font-size: 12px; color: var(--muted); margin-top: 16px; line-height: 1.5; }
 
+  /* Preview offuscato del risultato */
+  .result-preview { background: linear-gradient(180deg, #f9f4eb 0%, #faf7f2 100%); border-radius: 18px; padding: 28px 24px 24px; margin-bottom: 28px; border: 1px solid var(--border); position: relative; overflow: hidden; }
+  .preview-eyebrow { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); font-weight: 600; margin-bottom: 14px; }
+  .preview-eyebrow .pct { font-weight: 700; }
+  .preview-season-line { font-family: 'Cormorant Garamond', serif; font-size: 30px; font-weight: 300; line-height: 1.2; color: var(--charcoal); margin-bottom: 16px; }
+  .preview-season-line .blur-label { display: inline-block; background: var(--charcoal); color: var(--charcoal); border-radius: 6px; padding: 2px 16px; letter-spacing: 6px; filter: blur(3px); user-select: none; margin-left: 4px; }
+  .preview-palette { display: flex; gap: 8px; justify-content: center; margin-bottom: 4px; }
+  .preview-palette span { width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg, #d4a574, #c9a96e, #a0785a); filter: blur(6px); opacity: .6; box-shadow: 0 2px 8px rgba(0,0,0,.1); }
+  .preview-palette span:nth-child(2) { background: linear-gradient(135deg, #9B7FA6, #7a5c88); }
+  .preview-palette span:nth-child(3) { background: linear-gradient(135deg, #E8895A, #c96d42); }
+  .preview-palette span:nth-child(4) { background: linear-gradient(135deg, #1A3A6E, #2a5a9e); }
+  .preview-palette span:nth-child(5) { background: linear-gradient(135deg, #A0522D, #8b4513); }
+  .preview-unlock-hint { font-size: 12px; color: var(--muted); margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 6px; }
+
+  /* Social proof counter */
+  .sp-wrap { display: flex; align-items: center; gap: 10px; justify-content: center; margin: 18px 0 20px; padding: 12px 14px; background: #faf7f2; border-radius: 12px; border: 1px solid var(--border); }
+  .sp-avatars { display: flex; }
+  .sp-avatars span { width: 26px; height: 26px; border-radius: 50%; background: #c9a96e; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; font-family: 'DM Sans', sans-serif; margin-left: -6px; border: 2px solid #faf7f2; }
+  .sp-avatars span:first-child { margin-left: 0; }
+  .sp-text { font-size: 12px; color: var(--muted); line-height: 1.4; text-align: left; }
+  .sp-text strong { color: var(--charcoal); font-weight: 600; font-size: 13px; }
+
+  /* Trust signals sotto il bottone */
+  .trust-reward { font-size: 13px; color: var(--gold); font-weight: 500; margin-top: 14px; text-align: center; }
+  .trust-row { display: flex; gap: 14px; justify-content: center; margin-top: 14px; flex-wrap: wrap; font-size: 11px; color: var(--muted); }
+  .trust-row span { display: inline-flex; align-items: center; gap: 4px; }
+  .privacy-micro { font-size: 11px; color: var(--muted); margin-top: 14px; line-height: 1.5; opacity: .85; }
+  .privacy-micro a { color: var(--gold); text-decoration: underline; }
+
+  /* Progress cue sotto al titolo */
+  .progress-cue { display: inline-flex; align-items: center; gap: 8px; background: #f3ede0; color: var(--gold); font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; font-weight: 600; padding: 6px 14px; border-radius: 100px; margin-bottom: 18px; }
+  .progress-cue .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--gold); animation: pulse 1.5s infinite; }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .4; } }
+
+  /* Campo nome nella photo upload */
+  .photo-name-group { text-align: left; margin: 20px auto 24px; max-width: 420px; }
+  .photo-name-group label { display: block; font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; font-weight: 500; }
+  .photo-name-group input { width: 100%; padding: 14px 18px; border: 1.5px solid var(--border); border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 15px; background: var(--cream); color: var(--charcoal); outline: none; transition: border-color .2s; box-sizing: border-box; }
+  .photo-name-group input:focus { border-color: var(--gold); }
+
   /* ── RESULT ── */
-  #result-section { display: none; padding: 60px 24px 100px; max-width: 860px; margin: 0 auto; animation: fadeUp .6s ease forwards; }
-  .result-header { text-align: center; margin-bottom: 56px; }
-  .result-season-badge { display: inline-block; padding: 10px 28px; border-radius: 100px; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; font-weight: 500; margin-bottom: 24px; }
-  .result-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(56px,10vw,110px); font-weight: 300; line-height: 1; margin-bottom: 8px; letter-spacing: -2px; }
-  .result-subtitle { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-style: italic; color: var(--muted); margin-bottom: 40px; }
-  .result-divider { width: 60px; height: 1px; margin: 0 auto 40px; }
-  .result-description { font-size: 16px; line-height: 1.85; color: var(--charcoal); max-width: 640px; margin: 0 auto; text-align: left; }
-  .result-description p { margin-bottom: 18px; }
+  #result-section { display: none; padding: 40px 24px 80px; max-width: 860px; margin: 0 auto; animation: fadeUp .6s ease forwards; }
+  .result-header { text-align: center; margin-bottom: 36px; }
+  .result-season-badge { display: inline-block; padding: 9px 24px; border-radius: 100px; font-size: 11px; letter-spacing: 2.5px; text-transform: uppercase; font-weight: 500; margin-bottom: 18px; }
+  .result-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(48px,9vw,92px); font-weight: 300; line-height: 1; margin-bottom: 6px; letter-spacing: -1.5px; }
+  .result-subtitle { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-style: italic; color: var(--muted); margin-bottom: 28px; }
+  .result-divider { width: 50px; height: 1px; margin: 0 auto 28px; }
+  .result-description { font-size: 15px; line-height: 1.7; color: var(--charcoal); max-width: 640px; margin: 0 auto; text-align: left; }
+  .result-description p { margin-bottom: 14px; }
 
   /* Palette */
-  .palette-section { margin: 48px 0; text-align: center; }
-  .palette-label { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); margin-bottom: 20px; }
+  .palette-section { margin: 40px 0; text-align: center; }
+  .palette-label { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); margin-bottom: 18px; }
   .palette-swatches { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
   .swatch { width: 52px; height: 52px; border-radius: 50%; box-shadow: 0 2px 12px rgba(0,0,0,.12); transition: transform .2s; }
   .swatch:hover { transform: scale(1.2); }
@@ -156,26 +196,16 @@
 
   /* ── UPSELL ── */
   .upsell-section {
-    margin: 64px 0 0;
-    background: var(--charcoal);
-    border-radius: 24px;
-    padding: 48px 40px;
-    color: var(--cream);
+    margin: 72px 0 0;
+    padding: 0;
+    text-align: center;
     position: relative;
-    overflow: hidden;
   }
-  .upsell-section::before {
-    content: '';
-    position: absolute; inset: 0;
-    background: radial-gradient(ellipse 80% 60% at 100% 0%, rgba(201,169,110,0.15) 0%, transparent 60%),
-                radial-gradient(ellipse 60% 50% at 0% 100%, rgba(201,169,110,0.08) 0%, transparent 60%);
-    pointer-events: none;
-  }
-  .upsell-badge { display: inline-block; padding: 7px 18px; border-radius: 100px; background: rgba(201,169,110,0.15); border: 1px solid rgba(201,169,110,0.35); font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); margin-bottom: 20px; }
-  .upsell-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(28px,5vw,48px); font-weight: 300; line-height: 1.15; margin-bottom: 16px; }
+  .upsell-badge { display: inline-block; padding: 7px 18px; border-radius: 100px; background: rgba(201,169,110,0.12); border: 1px solid rgba(201,169,110,0.3); font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); margin-bottom: 16px; }
+  .upsell-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(26px,4.5vw,40px); font-weight: 300; line-height: 1.2; margin-bottom: 14px; color: var(--charcoal); }
   .upsell-title em { font-style: italic; color: var(--gold); }
-  .upsell-sub { font-size: 15px; line-height: 1.7; color: rgba(250,247,242,0.75); margin-bottom: 36px; max-width: 540px; }
-  .upsell-sub strong { color: var(--cream); }
+  .upsell-sub { font-size: 15px; line-height: 1.7; color: var(--muted); margin: 0 auto 28px; max-width: 540px; }
+  .upsell-sub strong { color: var(--charcoal); font-weight: 600; }
   .upsell-features { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 40px; }
   .upsell-feat { display: flex; gap: 14px; align-items: flex-start; background: rgba(255,255,255,0.05); border-radius: 12px; padding: 16px; }
   .upsell-feat-icon { font-size: 22px; flex-shrink: 0; }
@@ -185,8 +215,8 @@
   .upsell-price { display: flex; flex-direction: column; }
   .upsell-price-num { font-family: 'Cormorant Garamond', serif; font-size: 48px; font-weight: 300; color: var(--gold); line-height: 1; }
   .upsell-price-note { font-size: 12px; color: rgba(250,247,242,0.5); margin-top: 4px; }
-  .btn-upsell { background: var(--gold); color: var(--charcoal); border: none; padding: 16px 36px; border-radius: 100px; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 500; cursor: pointer; transition: all .3s; flex: 1; min-width: 240px; }
-  .btn-upsell:hover { background: #d4b878; transform: translateY(-2px); box-shadow: 0 8px 32px rgba(201,169,110,0.35); }
+  .btn-upsell { background: var(--charcoal); color: var(--cream); border: none; padding: 18px 36px; border-radius: 100px; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; transition: all .3s; flex: 1; min-width: 240px; box-shadow: 0 6px 20px rgba(26,22,20,0.18); letter-spacing: .3px; }
+  .btn-upsell:hover { background: var(--gold); color: #fff; transform: translateY(-2px); box-shadow: 0 8px 28px rgba(201,169,110,0.3); }
   .btn-upsell:disabled { opacity: .5; cursor: not-allowed; transform: none; }
   .upsell-guarantee { font-size: 12px; color: rgba(250,247,242,0.45); }
 
@@ -195,6 +225,23 @@
     .upsell-section { padding: 32px 24px; }
     .upsell-cta-wrap { flex-direction: column; align-items: flex-start; gap: 16px; }
     .btn-upsell { width: 100%; }
+
+    /* Sticky CTA su mobile per la payment page: il bottone principale
+       rimane ancorato in basso mentre l'utente scorre i bullet.
+       #btn-sub-upsell e' il bottone PRIMARIO dentro la card pagamento. */
+    #btn-sub-upsell {
+      position: fixed;
+      left: 12px; right: 12px; bottom: 12px;
+      max-width: none !important;
+      width: auto !important;
+      margin: 0 !important;
+      z-index: 100;
+      box-shadow: 0 8px 28px rgba(26,22,20,0.3);
+      padding: 18px 20px;
+      font-size: 16px;
+    }
+    /* Spazio in fondo alla pagina pagamento per non nascondere contenuti */
+    #payment-section { padding-bottom: 140px; }
   }
 
   /* ── SUBQUIZ ── */
@@ -217,31 +264,37 @@
   .sub-result-more { font-size: 13px; color: var(--muted); font-style: italic; }
 
   .subquiz-cta-section {
-    margin: 56px auto 0;
+    margin: 20px auto 0;
     max-width: 640px;
-    background: var(--charcoal);
+    background: #F0E8FF;
+    border: 1px solid #DED2F5;
     border-radius: 24px;
-    padding: 48px 40px;
-    color: var(--cream);
+    padding: 36px 32px;
+    color: var(--charcoal);
     position: relative;
     overflow: hidden;
     text-align: center;
   }
-  .subquiz-cta-section::before {
-    content: '';
-    position: absolute; inset: 0;
-    background: radial-gradient(ellipse 80% 60% at 100% 0%, rgba(201,169,110,0.15) 0%, transparent 60%),
-                radial-gradient(ellipse 60% 50% at 0% 100%, rgba(201,169,110,0.08) 0%, transparent 60%);
-    pointer-events: none;
-  }
-  .subquiz-cta-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(24px,4vw,36px); font-weight: 300; line-height: 1.2; margin-bottom: 20px; position: relative; }
+  .subquiz-cta-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(24px,4vw,36px); font-weight: 300; line-height: 1.2; margin-bottom: 20px; position: relative; color: var(--charcoal); }
   .subquiz-cta-title em { font-style: italic; color: var(--gold); }
-  .subquiz-cta-list { list-style: none; text-align: left; max-width: 400px; margin: 0 auto 32px; position: relative; }
-  .subquiz-cta-list li { padding: 10px 0; font-size: 15px; color: rgba(250,247,242,0.85); border-bottom: 1px solid rgba(255,255,255,0.06); display: flex; align-items: center; gap: 12px; }
+  .subquiz-cta-list { list-style: none; text-align: left; max-width: 420px; margin: 0 auto 24px; position: relative; }
+  .subquiz-cta-list li { padding: 9px 0; font-size: 14px; color: var(--charcoal); border-bottom: 1px solid rgba(26,22,20,0.08); display: flex; align-items: center; gap: 12px; line-height: 1.4; }
+  .subquiz-cta-list li:last-child { border-bottom: none; }
   .subquiz-cta-list li span.icon { font-size: 18px; flex-shrink: 0; }
-  .subquiz-cta-price { position: relative; display: flex; align-items: center; justify-content: center; gap: 24px; flex-wrap: wrap; margin-bottom: 24px; }
-  .subquiz-cta-price .price-big { font-family: 'Cormorant Garamond', serif; font-size: 52px; font-weight: 300; color: var(--gold); line-height: 1; }
-  .subquiz-cta-price .price-note { font-size: 13px; color: rgba(250,247,242,0.5); text-align: left; }
+  .subquiz-cta-price { position: relative; display: flex; align-items: center; justify-content: center; gap: 24px; flex-wrap: wrap; margin-bottom: 20px; }
+  .subquiz-cta-price .price-big { font-family: 'Cormorant Garamond', serif; font-size: 52px; font-weight: 300; color: var(--charcoal); line-height: 1; }
+  .subquiz-cta-price .price-note { font-size: 13px; color: var(--muted); text-align: left; }
+
+  /* Toast conferma foto ricevute */
+  .payment-done-toast { display: inline-flex; align-items: center; gap: 8px; padding: 8px 18px; background: rgba(42,122,42,0.12); border: 1px solid rgba(42,122,42,0.3); border-radius: 100px; font-size: 12px; color: #2a7a2a; font-weight: 600; letter-spacing: .5px; margin: 0 auto 10px; }
+  .payment-done-toast::before { content: '✓'; background: #2a7a2a; color: #fff; width: 18px; height: 18px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; }
+
+  /* Trust note sotto il bottone */
+  .payment-trust-note { margin-top: 14px; margin-bottom: 22px; font-size: 12px; color: var(--muted); text-align: center; }
+
+  /* Separatore prima della bullet list */
+  .subquiz-cta-divider { border-top: 1px solid rgba(26,22,20,0.1); margin: 0 auto 16px; max-width: 420px; padding-top: 14px; font-size: 13px; color: var(--charcoal); font-weight: 600; text-align: center; line-height: 1.4; }
+
 
   /* ── PHOTO UPLOAD ── */
   .photo-upload-section { text-align: center; margin-bottom: 48px; animation: fadeUp .5s ease; }
@@ -268,13 +321,79 @@
   }
   .photo-tips { max-width: 420px; margin: 24px auto 0; text-align: left; }
   .photo-tips li { font-size: 13px; color: var(--muted); line-height: 1.6; padding: 4px 0; }
-  .btn-confirm-photos { background: var(--charcoal); color: var(--cream); border: none; padding: 17px 48px; border-radius: 100px; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 500; cursor: pointer; transition: all .3s; margin-top: 32px; display: none; }
-  .btn-confirm-photos:hover:not(:disabled) { background: var(--gold); transform: translateY(-1px); }
-  .btn-confirm-photos:disabled { opacity: .4; cursor: not-allowed; }
-  #payment-section { display: none; padding: 60px 24px 100px; max-width: 860px; margin: 0 auto; animation: fadeUp .6s ease forwards; }
+  .btn-confirm-photos { background: var(--charcoal); color: var(--cream); border: none; padding: 20px 56px; border-radius: 100px; font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 600; cursor: pointer; transition: all .3s; margin: 28px auto 0; display: inline-block; letter-spacing: .3px; box-shadow: 0 6px 22px rgba(26,22,20,0.18); min-width: 280px; }
+  .btn-confirm-photos:hover:not(:disabled) { background: var(--gold); transform: translateY(-1px); box-shadow: 0 8px 26px rgba(201,169,110,0.25); }
+  .btn-confirm-photos:disabled { opacity: .4; cursor: not-allowed; box-shadow: none; background: #c4bdb3; }
+
+  /* Bottoni camera/galleria mobile */
+  .photo-action-row { display: flex; gap: 10px; max-width: 480px; margin: 0 auto 16px; }
+  .photo-action-btn {
+    flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 18px 16px; border: 1.5px solid var(--border); border-radius: 14px;
+    background: var(--warm-white); color: var(--charcoal); cursor: pointer;
+    font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500;
+    transition: all .2s;
+  }
+  .photo-action-btn:hover { border-color: var(--gold); background: rgba(201,169,110,0.06); transform: translateY(-1px); }
+  .photo-action-btn:active { transform: translateY(0); }
+  .photo-action-btn .icon { font-size: 22px; }
+  .photo-action-btn.primary { background: var(--gold); color: #fff; border-color: var(--gold); }
+  .photo-action-btn.primary:hover { background: #b8956a; border-color: #b8956a; }
+
+  /* Meta row: contatore + tips compatti su una riga */
+  .photo-meta-row { display: flex; gap: 8px; justify-content: center; align-items: center; flex-wrap: wrap; max-width: 520px; margin: 0 auto 18px; }
+  .photo-counter { font-size: 11px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; font-weight: 700; padding: 6px 12px; background: var(--warm-white); border: 1px solid var(--border); border-radius: 100px; }
+  .photo-counter strong { color: var(--gold); font-size: 13px; }
+  .photo-tip-chip { font-size: 11px; color: var(--muted); padding: 6px 12px; background: rgba(201,169,110,0.08); border-radius: 100px; }
+
+  /* Blocco conferma: nome + bottone. Posizionato sopra il badge privacy
+     cosi' il CTA e' visibile subito dopo le foto, non in fondo */
+  .photo-confirm-block { margin-top: 8px; }
+
+  /* Badge privacy compact: singola riga, in alto tra tips e bottoni */
+  .photo-privacy-badge-compact {
+    max-width: 520px; margin: 0 auto 18px; padding: 10px 14px;
+    background: #f5efe1; border: 1px solid #e5d9bf; border-radius: 10px;
+    text-align: center; font-size: 11px; color: #6b5e4a; line-height: 1.5;
+  }
+  .photo-privacy-badge-compact u { color: #4a3b24; font-weight: 600; text-decoration: underline; text-underline-offset: 2px; }
+
+  /* Preview item: progress + state */
+  .photo-preview-item .upload-overlay {
+    position: absolute; inset: 0; background: rgba(0,0,0,.45); display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 8px; color: #fff; font-size: 12px;
+  }
+  .photo-preview-item.state-uploaded .upload-overlay { background: rgba(42,122,42,.15); }
+  .photo-preview-item.state-uploaded .upload-overlay::after {
+    content: '✓'; position: absolute; top: 6px; left: 6px; width: 24px; height: 24px; background: #2a7a2a;
+    color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700;
+  }
+  .photo-preview-item.state-uploaded .upload-overlay > * { display: none; }
+  .photo-preview-item.state-error .upload-overlay { background: rgba(204,68,68,.75); }
+  .upload-progress-ring { width: 36px; height: 36px; position: relative; }
+  .upload-progress-ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+  .upload-progress-ring circle { fill: none; stroke-width: 3; }
+  .upload-progress-ring .bg { stroke: rgba(255,255,255,.25); }
+  .upload-progress-ring .fg { stroke: #fff; stroke-linecap: round; stroke-dasharray: 100; transition: stroke-dashoffset .2s; }
+  .upload-progress-label { font-size: 11px; opacity: .9; }
+  .photo-preview-retry {
+    background: #fff; color: #cc4444; border: none; padding: 5px 10px; border-radius: 100px;
+    font-size: 11px; font-weight: 600; cursor: pointer; margin-top: 4px;
+  }
+
+  #payment-section { display: none; padding: 28px 24px 80px; max-width: 860px; margin: 0 auto; animation: fadeUp .6s ease forwards; }
+
+  /* Fade-in progressivo per campo nome (progressive disclosure) */
+  .photo-name-group { opacity: 0; max-height: 0; overflow: hidden; transition: opacity .35s ease, max-height .35s ease, margin .35s ease; margin: 0 auto; }
+  .photo-name-group.visible { opacity: 1; max-height: 140px; margin: 20px auto 24px; }
+  .photo-name-group input.input-error { border-color: #cc4444 !important; }
 
   @media (max-width: 600px) {
     .subquiz-cta-section { padding: 32px 24px; }
+    .photo-upload-sub { font-size: 14px; margin-bottom: 22px; padding: 0 8px; }
+    .photo-upload-title { font-size: 26px; margin-bottom: 10px; }
+    .photo-action-row { flex-direction: column; gap: 8px; }
+    .btn-confirm-photos { min-width: 0; width: calc(100% - 32px); padding: 18px 20px; }
   }
 </style>
 </head>
@@ -312,24 +431,39 @@
 <!-- LEAD -->
 <section id="lead-section">
   <div class="lead-card">
-    <h2>Il tuo risultato è pronto!</h2>
-    <p>Inserisci il tuo nome e la tua email per scoprire la tua stagione armocromatica.</p>
-    <div class="form-group">
-      <label>Il tuo nome</label>
-      <input type="text" id="user-name" placeholder="Es. Sofia">
+    <div class="progress-cue"><span class="dot"></span> Quiz completato · Ultimo passo</div>
+    <h2>La tua stagione ti aspetta</h2>
+
+    <!-- Preview offuscato del risultato -->
+    <div class="result-preview">
+      <div class="preview-eyebrow">✦ Stagione identificata</div>
+      <div class="preview-season-line">Sei una<span class="blur-label">Primavera</span></div>
+      <div class="preview-palette">
+        <span></span><span></span><span></span><span></span><span></span>
+      </div>
+      <div class="preview-unlock-hint">🔓 Inserisci l'email per scoprire la tua stagione</div>
     </div>
+
+    <!-- Social proof -->
+    <div class="sp-wrap">
+      <div class="sp-avatars" id="sp-avatars"></div>
+      <div class="sp-text"><strong id="sp-count">70+</strong> <span id="sp-label">donne hanno scoperto la loro stagione oggi</span></div>
+    </div>
+
     <div class="form-group">
       <label>La tua email</label>
       <input type="email" id="user-email" placeholder="Es. sofia@email.com">
     </div>
-    <div style="display:flex; align-items:flex-start; gap:10px; margin-bottom:20px; text-align:left;">
-      <input type="checkbox" id="privacy-check" style="margin-top:3px; accent-color:var(--gold); width:16px; height:16px; flex-shrink:0; cursor:pointer;">
-      <label for="privacy-check" style="font-size:12px; color:var(--muted); line-height:1.6; cursor:pointer;">
-        Acconsento a ricevere email con contenuti e offerte sull'armocromia da YouGlamour. Puoi disiscriverti in qualsiasi momento. <a href="https://www.youglamour.it/privacy" target="_blank" style="color:var(--gold); text-decoration:underline;">Privacy policy</a>.
-      </label>
+
+    <button class="btn-reveal" onclick="showResult()">Rivelami la mia stagione →</button>
+    <div class="trust-reward">✨ Risultato immediato · gratuito</div>
+    <div class="trust-row">
+      <span>📬 Newsletter settimanale</span>
+      <span>👆 1 click per disiscriverti</span>
     </div>
-    <button class="btn-reveal" onclick="showResult()">Scopri la Tua Stagione ✦</button>
-    <p class="privacy-note">🔒 I tuoi dati sono al sicuro.</p>
+    <p class="privacy-micro">
+      Cliccando accetti di ricevere la newsletter settimanale YouGlamour sull'armocromia. <a href="https://www.youglamour.it/privacy" target="_blank">Privacy policy</a>.
+    </p>
   </div>
 </section>
 
@@ -615,7 +749,52 @@ function showLead() {
   trackEvent('lead_view');
   document.getElementById('quiz-section').style.display = 'none';
   document.getElementById('lead-section').style.display = 'flex';
+  updateSocialProof();
   window.scrollTo(0,0);
+}
+
+// Social proof counter dinamico (copiato da analisi.html)
+function updateSocialProof() {
+  var dailyTargets = [40, 50, 40, 70, 100, 60, 50]; // dom(0)..sab(6)
+  var now = new Date();
+  var target = dailyTargets[now.getDay()];
+  var hour = now.getHours() + now.getMinutes() / 60;
+  var curve = [[0,0],[6,0.15],[8,0.30],[10,0.45],[12,0.58],[14,0.68],[16,0.78],[18,0.85],[21,0.90],[24,1]];
+  var pct = 1;
+  for (var i = 0; i < curve.length - 1; i++) {
+    if (hour >= curve[i][0] && hour < curve[i+1][0]) {
+      var span = curve[i+1][0] - curve[i][0];
+      var t = (hour - curve[i][0]) / span;
+      pct = curve[i][1] + t * (curve[i+1][1] - curve[i][1]);
+      break;
+    }
+  }
+  var count = Math.floor(target * pct);
+  var rounded = Math.floor(count / 10) * 10;
+  var letters = 'ABCDEFGHILMNOPRSTV';
+  var colors = ['#c9a96e','#b8860b','#a0785a','#8b7355','#9c7c5b','#b09060'];
+  var seed = now.getDay() * 100 + Math.floor(hour / 2);
+  var avatarsEl = document.getElementById('sp-avatars');
+  if (avatarsEl) {
+    var html = '';
+    for (var a = 0; a < 4; a++) {
+      var idx = (seed * 7 + a * 13 + a * a * 3) % letters.length;
+      var cIdx = (seed * 3 + a * 5) % colors.length;
+      html += '<span style="background:' + colors[cIdx] + ';">' + letters.charAt(idx) + '</span>';
+    }
+    avatarsEl.innerHTML = html;
+  }
+  var el = document.getElementById('sp-count');
+  var lbl = document.getElementById('sp-label');
+  if (el && lbl) {
+    if (rounded <= 0) {
+      el.textContent = '';
+      lbl.innerHTML = 'donne stanno scoprendo<br>la loro stagione con noi';
+    } else {
+      el.textContent = rounded + '+';
+      lbl.innerHTML = 'donne hanno scoperto la loro<br>stagione oggi';
+    }
+  }
 }
 
 function calculateSeason() {
@@ -700,20 +879,15 @@ function makeBookSVG(d) {
 
 function showResult() {
   const emailEl = document.getElementById('user-email');
-  const name = document.getElementById('user-name').value.trim() || 'cara';
   const email = emailEl.value.trim();
   emailEl.classList.remove('input-error');
   if (!email || !email.includes('@') || !email.includes('.')) {
     emailEl.classList.add('input-error'); emailEl.focus(); return;
   }
-  const privacyCheck = document.getElementById('privacy-check');
-  if (!privacyCheck.checked) {
-    privacyCheck.style.outline = '2px solid #cc4444';
-    privacyCheck.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    return;
-  }
-  privacyCheck.style.outline = '';
 
+  // Nome viene chiesto piu' avanti (pagina upload foto). Per il lead iniziale
+  // salviamo email-only; il nome verra' raccolto e aggiornato nel subquiz-upload.
+  const name = '';
   const season = calculateSeason();
   lastSeason = seasonData[season].name;
   lastName = name;
@@ -742,7 +916,7 @@ function showResult() {
       <div class="result-subtitle">Armocromia ${d.en}</div>
       <div class="result-divider" style="background:${d.badge_color};"></div>
       <div class="result-description">${d.description.map(p=>`<p>${p}</p>`).join('')}</div>
-      <button onclick="startSubQuiz()" style="margin-top:28px;background:${d.badge_color};border:none;color:#fff;padding:14px 32px;border-radius:100px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;letter-spacing:0.5px;transition:all .2s;box-shadow:0 4px 16px rgba(0,0,0,0.15);" onmouseover="this.style.opacity='0.85';this.style.transform='translateY(-2px)'" onmouseout="this.style.opacity='1';this.style.transform='translateY(0)'">
+      <button onclick="startSubQuiz()" style="margin-top:18px;background:${d.badge_color};border:none;color:#fff;padding:12px 28px;border-radius:100px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;letter-spacing:0.5px;transition:all .2s;box-shadow:0 4px 16px rgba(0,0,0,0.15);" onmouseover="this.style.opacity='0.85';this.style.transform='translateY(-2px)'" onmouseout="this.style.opacity='1';this.style.transform='translateY(0)'">
         Ora scopri il tuo sottogruppo!
       </button>
     </div>
@@ -794,8 +968,8 @@ function restartQuiz() {
   document.getElementById('subquiz-section').style.display='none';
   document.getElementById('subresult-section').style.display='none';
   document.getElementById('payment-section').style.display='none';
-  document.getElementById('user-name').value='';
-  document.getElementById('user-email').value='';
+  var emailEl = document.getElementById('user-email');
+  if (emailEl) emailEl.value='';
   document.getElementById('hero-section').style.display='flex';
   window.scrollTo(0,0);
 }
@@ -1127,6 +1301,7 @@ function showSubResult() {
   const subgroup = calculateSubgroup();
   lastSubgroup = subgroup;
   trackEvent('photo_view');
+  _scrolledToConfirm = false;
 
   document.getElementById('subquiz-section').style.display = 'none';
   const el = document.getElementById('subresult-section');
@@ -1134,28 +1309,47 @@ function showSubResult() {
   window.scrollTo(0,0);
 
   el.innerHTML = `
-    <div class="photo-upload-section">
+    <div class="photo-upload-section" id="photo-upload-section">
       <div class="sub-result-eyebrow">✦ Ultimo passo</div>
-      <h2 class="photo-upload-title">Carica un <em>selfie</em><br>per l'analisi dei tuoi colori</h2>
-      <p class="photo-upload-sub">Per determinare con precisione il tuo sottogruppo, abbiamo bisogno di analizzare i tuoi colori naturali. Carica 1 o 2 foto del viso in luce naturale, senza filtri.</p>
+      <h2 class="photo-upload-title">Un <em>selfie</em> per l'analisi</h2>
 
-      <div class="photo-dropzone" id="photo-dropzone" onclick="document.getElementById('photo-input').click()">
-        <div class="photo-dropzone-icon">📸</div>
-        <div class="photo-dropzone-text">Tocca per caricare le tue foto</div>
-        <div class="photo-dropzone-hint">oppure trascina qui • max 2 foto • JPG o PNG</div>
+      <div class="photo-meta-row">
+        <span class="photo-counter" id="photo-counter"><strong>0</strong>/2 foto</span>
+        <span class="photo-tip-chip">📷 Luce naturale</span>
+        <span class="photo-tip-chip">🚫 No filtri</span>
+        <span class="photo-tip-chip">🙂 Viso visibile</span>
       </div>
-      <input type="file" id="photo-input" accept="image/jpeg,image/png" multiple style="display:none" onchange="handlePhotoSelect(event)">
+
+      <div class="photo-privacy-badge-compact">
+        🔒 <u>Le tue foto sono al sicuro</u>: vengono usate solo per identificare il sottogruppo e cancellate dopo l'invio dell'analisi.
+      </div>
+
+      <div class="photo-action-row">
+        <button type="button" class="photo-action-btn primary" onclick="document.getElementById('photo-input-camera').click()">
+          <span class="icon">📸</span> Fai selfie
+        </button>
+        <button type="button" class="photo-action-btn" onclick="document.getElementById('photo-input-gallery').click()">
+          <span class="icon">🖼</span> Dalla galleria
+        </button>
+      </div>
+      <input type="file" id="photo-input-camera" accept="image/*" capture="user" style="display:none" onchange="handlePhotoSelect(event)">
+      <input type="file" id="photo-input-gallery" accept="image/*" multiple style="display:none" onchange="handlePhotoSelect(event)">
+
+      <div class="photo-dropzone" id="photo-dropzone" style="display:none;cursor:default;padding:12px;" aria-hidden="true">
+        <div class="photo-dropzone-hint">oppure trascina qui</div>
+      </div>
+
       <div class="photo-previews" id="photo-previews"></div>
 
-      <ul class="photo-tips">
-        <li>📷 Scatta in luce naturale (vicino a una finestra)</li>
-        <li>🚫 Senza filtri, senza trucco pesante</li>
-        <li>🙂 Viso ben visibile, capelli sciolti se possibile</li>
-      </ul>
-
-      <button class="btn-confirm-photos" id="btn-confirm-photos" onclick="confirmPhotos()" disabled>
-        Conferma e prosegui ✦
-      </button>
+      <div class="photo-confirm-block" id="photo-confirm-block">
+        <div class="photo-name-group" id="photo-name-wrap">
+          <label>Come ti chiami?</label>
+          <input type="text" id="photo-user-name" placeholder="Es. Sofia" autocomplete="given-name">
+        </div>
+        <button class="btn-confirm-photos" id="btn-confirm-photos" onclick="confirmPhotos()" style="display:none" disabled>
+          Conferma e prosegui ✦
+        </button>
+      </div>
     </div>`;
 
   // Setup drag & drop
@@ -1171,71 +1365,265 @@ function showSubResult() {
 
 function handlePhotoSelect(e) {
   handleFiles(e.target.files);
+  e.target.value = ''; // permette di ri-caricare lo stesso file
 }
 
-function handleFiles(files) {
+// Comprime un File lato client: max 1600px lato lungo, JPEG quality 0.85.
+// Ritorna una Promise<Blob>. Su errore (es. HEIC non decodificabile) ritorna il file originale.
+function compressImage(file) {
+  const MAX = 1600;
+  const QUALITY = 0.85;
+  return new Promise(function(resolve) {
+    try {
+      const reader = new FileReader();
+      reader.onerror = function() { resolve(file); };
+      reader.onload = function() {
+        const img = new Image();
+        img.onerror = function() { resolve(file); };
+        img.onload = function() {
+          let w = img.width, h = img.height;
+          if (w > MAX || h > MAX) {
+            if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+            else { w = Math.round(w * MAX / h); h = MAX; }
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = w; canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, w, h);
+          canvas.toBlob(function(blob) {
+            if (blob) resolve(blob); else resolve(file);
+          }, 'image/jpeg', QUALITY);
+        };
+        img.src = reader.result;
+      };
+      reader.readAsDataURL(file);
+    } catch(e) { resolve(file); }
+  });
+}
+
+// Carica una singola foto in background verso /api/subquiz-photo.
+// Aggiorna lo state della photo (progress, path, error) e il rendering.
+function startBackgroundUpload(photo) {
+  return new Promise(function(resolve) {
+    const xhr = new XMLHttpRequest();
+    const fd = new FormData();
+    const filename = (photo.originalName || 'photo.jpg').replace(/\.[^.]+$/, '') + '.jpg';
+    fd.append('photo', photo.blob, filename);
+
+    photo.xhr = xhr;
+    xhr.open('POST', '/api/subquiz-photo', true);
+    xhr.upload.onprogress = function(e) {
+      if (e.lengthComputable) {
+        photo.progress = Math.round((e.loaded / e.total) * 100);
+        updateThumbState(photo);
+      }
+    };
+    xhr.onload = function() {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        try {
+          const res = JSON.parse(xhr.responseText);
+          photo.serverPath = res.path;
+          photo.state = 'uploaded';
+          photo.progress = 100;
+        } catch(e) { photo.state = 'error'; }
+      } else {
+        photo.state = 'error';
+      }
+      updateThumbState(photo);
+      updateControlsState();
+      scrollToConfirmIfReady(photo);
+      resolve();
+    };
+    xhr.onerror = function() {
+      photo.state = 'error';
+      updateThumbState(photo);
+      updateControlsState();
+      resolve();
+    };
+    xhr.send(fd);
+  });
+}
+
+async function handleFiles(files) {
   const maxPhotos = 2;
   for (let i = 0; i < files.length && uploadedPhotos.length < maxPhotos; i++) {
     const file = files[i];
-    if (!file.type.match('image/(jpeg|png)')) continue;
-    if (file.size > 10 * 1024 * 1024) continue;
-    uploadedPhotos.push(file);
+    if (!file.type || !file.type.startsWith('image/')) continue;
+
+    const photo = {
+      id: Math.random().toString(36).slice(2),
+      originalName: file.name,
+      state: 'compressing',
+      progress: 0,
+      previewUrl: URL.createObjectURL(file),
+      blob: null,
+      serverPath: null,
+      xhr: null,
+    };
+    uploadedPhotos.push(photo);
+    renderPhotoPreviews();
+    updateControlsState();
+
+    // Compressione poi upload in background
+    compressImage(file).then(function(blob) {
+      photo.blob = blob;
+      photo.state = 'uploading';
+      photo.progress = 0;
+      updateThumbState(photo);
+      startBackgroundUpload(photo);
+    });
   }
-  renderPhotoPreviews();
+}
+
+function updateThumbState(photo) {
+  const el = document.querySelector('.photo-preview-item[data-id="' + photo.id + '"]');
+  if (!el) return;
+  el.classList.remove('state-compressing', 'state-uploading', 'state-uploaded', 'state-error');
+  el.classList.add('state-' + photo.state);
+  const label = el.querySelector('.upload-progress-label');
+  if (label) {
+    if (photo.state === 'compressing') label.textContent = 'Ottimizzo...';
+    else if (photo.state === 'uploading') label.textContent = photo.progress + '%';
+    else if (photo.state === 'error') label.textContent = '';
+  }
+  const ring = el.querySelector('.upload-progress-ring .fg');
+  if (ring) {
+    const offset = 100 - (photo.progress || 0);
+    ring.setAttribute('stroke-dashoffset', String(offset));
+  }
+}
+
+// Quando la prima foto diventa "uploaded" porta in vista il blocco conferma.
+// Evita di farlo piu' volte nella stessa sessione foto.
+let _scrolledToConfirm = false;
+function scrollToConfirmIfReady(photo) {
+  if (!photo || photo.state !== 'uploaded') return;
+  if (_scrolledToConfirm) return;
+  _scrolledToConfirm = true;
+  const block = document.getElementById('photo-confirm-block');
+  if (block) {
+    setTimeout(function() {
+      block.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      const nameInput = document.getElementById('photo-user-name');
+      if (nameInput) setTimeout(function() { nameInput.focus({ preventScroll: true }); }, 400);
+    }, 200);
+  }
+}
+
+function updateControlsState() {
+  // Contatore
+  const counter = document.getElementById('photo-counter');
+  if (counter) counter.innerHTML = '<strong>' + uploadedPhotos.length + '</strong>/2 foto';
+
+  // Progressive disclosure: campo nome appare dopo prima foto
+  const nameWrap = document.getElementById('photo-name-wrap');
+  if (nameWrap) {
+    if (uploadedPhotos.length > 0) nameWrap.classList.add('visible');
+    else nameWrap.classList.remove('visible');
+  }
+
+  // Bottone: sticky su mobile se ha almeno una foto, abilitato solo se tutte uploaded
+  const btn = document.getElementById('btn-confirm-photos');
+  if (!btn) return;
+  const hasPhotos = uploadedPhotos.length > 0;
+  const allUploaded = hasPhotos && uploadedPhotos.every(function(p) { return p.state === 'uploaded'; });
+
+  // Bottone nascosto finche' non c'e' almeno una foto. Poi appare.
+  if (!hasPhotos) {
+    btn.style.display = 'none';
+    btn.disabled = true;
+  } else if (!allUploaded) {
+    btn.style.display = 'inline-block';
+    btn.disabled = true;
+    btn.textContent = 'Carico le foto...';
+  } else {
+    btn.style.display = 'inline-block';
+    btn.disabled = false;
+    btn.textContent = 'Conferma e prosegui ✦';
+  }
+
+  // Azioni camera/galleria: hide se hai raggiunto il max
+  const actionRow = document.querySelector('.photo-action-row');
+  if (actionRow) actionRow.style.display = uploadedPhotos.length >= 2 ? 'none' : 'flex';
 }
 
 function renderPhotoPreviews() {
   const container = document.getElementById('photo-previews');
-  container.innerHTML = uploadedPhotos.map((file, i) => {
-    const url = URL.createObjectURL(file);
-    return `
-      <div class="photo-preview-item">
-        <img src="${url}" alt="Foto ${i+1}">
-        <button class="photo-preview-remove" onclick="removePhoto(${i})">✕</button>
-      </div>`;
+  container.innerHTML = uploadedPhotos.map(function(photo) {
+    return '<div class="photo-preview-item state-' + photo.state + '" data-id="' + photo.id + '">'
+      + '<img src="' + photo.previewUrl + '" alt="Foto">'
+      + '<button class="photo-preview-remove" onclick="removePhoto(\'' + photo.id + '\')" aria-label="Rimuovi">✕</button>'
+      + '<div class="upload-overlay">'
+        + '<div class="upload-progress-ring">'
+          + '<svg viewBox="0 0 36 36"><circle class="bg" cx="18" cy="18" r="15.9"/><circle class="fg" cx="18" cy="18" r="15.9" stroke-dashoffset="100"/></svg>'
+        + '</div>'
+        + '<div class="upload-progress-label">Ottimizzo...</div>'
+        + (photo.state === 'error' ? '<button class="photo-preview-retry" onclick="retryPhoto(\'' + photo.id + '\')">Riprova</button>' : '')
+      + '</div>'
+    + '</div>';
   }).join('');
-
-  const dropzone = document.getElementById('photo-dropzone');
-  if (uploadedPhotos.length >= 2) {
-    dropzone.style.display = 'none';
-  } else {
-    dropzone.style.display = 'block';
-    dropzone.querySelector('.photo-dropzone-text').textContent =
-      uploadedPhotos.length === 0 ? 'Tocca per caricare le tue foto' : 'Aggiungi un\'altra foto';
-  }
-
-  // Mostra/abilita bottone conferma
-  const btn = document.getElementById('btn-confirm-photos');
-  if (uploadedPhotos.length > 0) {
-    btn.style.display = 'inline-block';
-    btn.disabled = false;
-  } else {
-    btn.style.display = 'none';
-    btn.disabled = true;
-  }
+  // aggiorna lo state di ciascun thumb (overlay/ring)
+  uploadedPhotos.forEach(updateThumbState);
 }
 
-function removePhoto(idx) {
+function removePhoto(id) {
+  const idx = uploadedPhotos.findIndex(function(p) { return p.id === id; });
+  if (idx < 0) return;
+  const photo = uploadedPhotos[idx];
+  if (photo.xhr) { try { photo.xhr.abort(); } catch(e){} }
+  if (photo.previewUrl) { try { URL.revokeObjectURL(photo.previewUrl); } catch(e){} }
   uploadedPhotos.splice(idx, 1);
   renderPhotoPreviews();
+  updateControlsState();
+}
+
+function retryPhoto(id) {
+  const photo = uploadedPhotos.find(function(p) { return p.id === id; });
+  if (!photo || !photo.blob) return;
+  photo.state = 'uploading';
+  photo.progress = 0;
+  updateThumbState(photo);
+  updateControlsState();
+  startBackgroundUpload(photo);
 }
 
 async function confirmPhotos() {
+  // Valida il nome (richiesto qui perche' non chiesto nella lead capture)
+  const nameEl = document.getElementById('photo-user-name');
+  const name = (nameEl?.value || '').trim();
+  if (!name) {
+    if (nameEl) {
+      nameEl.classList.add('input-error');
+      nameEl.focus();
+      nameEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    return;
+  }
+  if (nameEl) nameEl.classList.remove('input-error');
+  lastName = name;
+
+  // Le foto dovrebbero gia' essere tutte caricate in background (vedi updateControlsState)
+  const allUploaded = uploadedPhotos.length > 0 && uploadedPhotos.every(function(p) { return p.state === 'uploaded'; });
+  if (!allUploaded) return;
+
   trackEvent('photo_confirm');
   const btn = document.getElementById('btn-confirm-photos');
   btn.disabled = true;
-  btn.textContent = 'Caricamento in corso...';
+  btn.textContent = 'Quasi fatto...';
 
   try {
-    // Salva foto e dati subquiz sul server (pre-pagamento, per analytics)
-    const formData = new FormData();
-    formData.append('name', lastName);
-    formData.append('email', lastEmail);
-    formData.append('season', lastSeason);
-    formData.append('subgroup', lastSubgroup);
-    uploadedPhotos.forEach(f => formData.append('photos', f));
-
-    await fetch('/api/subquiz-upload', { method: 'POST', body: formData });
+    // Finalize: chiama subquiz-upload in JSON con i path gia' ottenuti (payload piccolissimo)
+    await fetch('/api/subquiz-upload', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: lastName,
+        email: lastEmail,
+        season: lastSeason,
+        subgroup: lastSubgroup,
+        photoPaths: uploadedPhotos.map(function(p) { return p.serverPath; }),
+      }),
+    });
   } catch(e) { /* silenzioso — non bloccare il flusso */ }
 
   // Mostra pagina pagamento
@@ -1250,16 +1638,26 @@ function showPaymentPage() {
   window.scrollTo(0,0);
 
   el.innerHTML = `
-    <div style="text-align:center;margin-bottom:48px;animation:fadeUp .5s ease;">
-      <div class="sub-result-eyebrow">✦ Le tue foto sono state caricate</div>
-      <h2 class="photo-upload-title" style="margin-bottom:12px;">Ci siamo quasi!</h2>
-      <p class="photo-upload-sub">Abbiamo ricevuto le tue foto. Ora manca solo un passo per ricevere la tua analisi completa con il sottogruppo preciso.</p>
+    <div style="text-align:center;">
+      <div class="payment-done-toast">Foto ricevute</div>
     </div>
 
     <div class="subquiz-cta-section">
-      <div class="upsell-badge" style="margin-bottom:24px;">✦ Il tuo PDF personalizzato</div>
-      <h2 class="subquiz-cta-title">Scopri il tuo <em>sottogruppo</em><br>e ricevi la guida completa</h2>
-      <p style="font-size:15px;color:rgba(250,247,242,0.75);line-height:1.7;margin-bottom:28px;max-width:480px;margin-left:auto;margin-right:auto;position:relative;">Analizzeremo le tue foto e le tue risposte per identificare il tuo sottogruppo preciso. Riceverai via email un <strong style="color:var(--cream);">PDF personalizzato</strong> con tutto quello che ti serve.</p>
+      <div class="upsell-badge">La tua analisi personalizzata</div>
+      <h2 class="subquiz-cta-title">È tutto <em>pronto</em></h2>
+
+      <div class="subquiz-cta-price">
+        <span class="price-big">9,90€</span>
+        <span class="price-note">Pagamento unico<br>Analisi via email in 24h</span>
+      </div>
+
+      <button class="btn-upsell" onclick="startCheckout()" id="btn-sub-upsell" style="max-width:420px;margin:0 auto;display:block;">
+        Voglio la mia analisi personalizzata
+      </button>
+
+      <p class="payment-trust-note">🔒 Pagamento sicuro Stripe</p>
+
+      <div class="subquiz-cta-divider">Riceverai una guida in PDF con:</div>
       <ul class="subquiz-cta-list">
         <li><span class="icon">🔍</span> Il tuo sottogruppo preciso tra i 16 possibili</li>
         <li><span class="icon">🎨</span> Palette completa con 30+ colori perfetti per te</li>
@@ -1268,19 +1666,6 @@ function showPaymentPage() {
         <li><span class="icon">🚫</span> I colori da evitare assolutamente</li>
         <li><span class="icon">💎</span> Colori "prestito" dalle stagioni vicine</li>
       </ul>
-      <div class="subquiz-cta-price">
-        <span class="price-big">9,90€</span>
-        <span class="price-note">una tantum • PDF via email<br>consegna in 24 ore</span>
-      </div>
-      <button class="btn-upsell" onclick="startCheckout()" id="btn-sub-upsell" style="max-width:400px;margin:0 auto;display:block;">
-        Paga e ricevi il PDF ✦
-      </button>
-      <p style="font-size:12px;color:rgba(250,247,242,0.45);margin-top:16px;">🔒 Pagamento sicuro con Stripe</p>
-    </div>
-
-    <div class="restart-wrap">
-      <p style="font-size:14px;color:var(--muted);margin-bottom:20px;">Vuoi rifare il test o condividerlo con un'amica?</p>
-      <button class="btn-restart" onclick="restartQuiz()">↺ Rifai il Test</button>
     </div>`;
 }
 </script>
