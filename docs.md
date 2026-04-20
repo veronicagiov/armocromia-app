@@ -64,6 +64,7 @@ Richiede selezione stagione. Tre viste:
 ### Tab: Subquiz foto
 - Tabella con submission pre-pagamento: nome, email, stagione, sottogruppo stimato, foto, data
 - Utile per analytics: chi ha fatto il subquiz ma non ha pagato
+- Export CSV (nuovi dall'ultimo export / tutti) — colonne: email, name, season, subgroup_guess, created_at. Usa chiave localStorage separata dai lead.
 - Eliminazione singola e bulk
 
 ### Tab: Lead quiz

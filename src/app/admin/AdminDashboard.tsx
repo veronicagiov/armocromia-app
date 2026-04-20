@@ -400,6 +400,63 @@ export default function AdminDashboard() {
         {/* ── TAB SUBQUIZ ── */}
         {tab === 'subquiz' && (
           <>
+            {subquizSubs.length > 0 && (() => {
+              const STORAGE_KEY = 'yg_last_export_subquiz'
+              const lastExportTs = typeof window !== 'undefined' ? localStorage.getItem(STORAGE_KEY) : null
+              const lastExportDate = lastExportTs ? new Date(parseInt(lastExportTs)) : null
+              const newSubs = lastExportDate
+                ? subquizSubs.filter(s => new Date(s.created_at) > lastExportDate)
+                : subquizSubs
+
+              function downloadCsv(list: SubquizSubmission[], filename: string) {
+                const rows = [
+                  ['email', 'name', 'season', 'subgroup_guess', 'created_at'],
+                  ...list.map(s => [s.email, s.name, s.season, s.subgroup_guess || '', s.created_at]),
+                ]
+                const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n')
+                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+                const url = URL.createObjectURL(blob)
+                const a = document.createElement('a')
+                a.href = url; a.download = filename; a.click()
+                URL.revokeObjectURL(url)
+                localStorage.setItem(STORAGE_KEY, Date.now().toString())
+              }
+
+              return (
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, flexWrap: 'wrap', gap: 10 }}>
+                  <div style={{ fontSize: 12, color: '#999' }}>
+                    {lastExportDate
+                      ? <>Ultimo export: <strong style={{ color: '#555' }}>{lastExportDate.toLocaleDateString('it-IT', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</strong> · <strong style={{ color: newSubs.length > 0 ? '#c9a96e' : '#999' }}>{newSubs.length} nuovi</strong></>
+                      : <span>Nessun export precedente</span>
+                    }
+                  </div>
+                  <div style={{ display: 'flex', gap: 10 }}>
+                    <button
+                      onClick={() => downloadCsv(newSubs, `subquiz-nuovi-${new Date().toISOString().slice(0,10)}.csv`)}
+                      disabled={newSubs.length === 0}
+                      style={{
+                        padding: '10px 20px', borderRadius: 8, border: '1.5px solid #c9a96e',
+                        background: newSubs.length === 0 ? '#f5f3f0' : '#c9a96e',
+                        color: newSubs.length === 0 ? '#bbb' : '#fff',
+                        fontSize: 13, fontWeight: 600, cursor: newSubs.length === 0 ? 'default' : 'pointer',
+                      }}
+                    >
+                      ↓ Nuovi dall'ultimo export ({newSubs.length})
+                    </button>
+                    <button
+                      onClick={() => downloadCsv(subquizSubs, `subquiz-tutti-${new Date().toISOString().slice(0,10)}.csv`)}
+                      style={{
+                        padding: '10px 20px', borderRadius: 8, border: '1.5px solid #1a1614',
+                        background: '#1a1614', color: '#fff', fontSize: 13, fontWeight: 600, cursor: 'pointer',
+                      }}
+                    >
+                      ↓ Tutti ({subquizSubs.length})
+                    </button>
+                  </div>
+                </div>
+              )
+            })()}
+
             {subquizSubs.length > 0 && (
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
                 <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: '#666', cursor: 'pointer' }}>
