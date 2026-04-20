@@ -404,7 +404,7 @@
   <span class="hero-badge">✦ Scopri la tua bellezza naturale</span>
   <h1>Qual è la tua <em>stagione</em><br>armocromatica?</h1>
   <p>Un test di 6 domande per scoprire la palette di colori che ti valorizza davvero — e cambiare per sempre il tuo modo di vestirti.</p>
-  <button class="btn-start" onclick="startQuiz()">Inizia il Test Gratuito</button>
+  <button class="btn-start" onclick="window.open('/quiz.html?start=1', '_blank')">Inizia il Test Gratuito</button>
   <div class="seasons-strip">
     <span class="season-chip spring">🌸 Primavera</span>
     <span class="season-chip summer">🌿 Estate</span>
@@ -1677,6 +1677,16 @@ function showPaymentPage() {
       </ul>
     </div>`;
 }
+
+// Auto-start: se la pagina e' aperta con ?start=1 (da "Inizia il Test Gratuito" in nuova scheda), vai direttamente al quiz
+(function() {
+  try {
+    var params = new URLSearchParams(window.location.search);
+    if (params.get('start') === '1') {
+      startQuiz();
+    }
+  } catch(e) { /* silenzioso */ }
+})();
 </script>
 </body>
 </html>

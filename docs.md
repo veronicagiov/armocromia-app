@@ -15,7 +15,7 @@ Carica `quiz.html` in iframe. Punto di ingresso principale.
 
 ### `/quiz.html` — Quiz stagione + sottogruppo
 Flusso completo:
-1. **Hero** — "Qual e' la tua stagione armocromatica?"
+1. **Hero** — "Qual e' la tua stagione armocromatica?". Il bottone "Inizia il Test Gratuito" apre il quiz in una **nuova scheda** tramite `quiz.html?start=1` (saltando l'iframe della home), dove l'hero viene bypassata e si parte subito dalla domanda 1
 2. **Quiz stagione** — 6 domande (carnagione, occhi, capelli, rossetto, sole, palette)
 3. **Lead capture** — solo email (preview offuscato del risultato "Sei una ▓▓▓▓▓" + palette blurrata, counter social proof dinamico, trust signals). Il nome non viene chiesto qui per ridurre friction
 4. **Risultato stagione** — nome stagione, descrizione, palette colori, libro Amazon
@@ -28,6 +28,7 @@ Flusso completo:
 ### `/analisi.html` — Quiz sottogruppo standalone
 Versione per utenti che arrivano dalle newsletter. Stessa logica del subquiz ma:
 - Ha la propria hero e lead capture (solo email, counter social proof, trust signals — nome chiesto poi nella pagina foto)
+- Il bottone "Inizia il Test" della hero apre il flusso (lead capture + quiz) in una **nuova scheda** — `analisi.html?start=1` fa saltare direttamente al lead capture
 - Il quiz parte dalla domanda 1 "Che stagione sei?" (5 domande totali)
 - Stesso flusso upload foto (con **campo nome**) + pagamento
 - **URL:** `https://armocromia-app-production.up.railway.app/analisi.html`

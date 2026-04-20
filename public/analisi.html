@@ -299,7 +299,7 @@
   <span class="hero-badge">&#10022; Scopri il tuo sottogruppo</span>
   <h1>Qual è il tuo <em>sottogruppo</em><br>armocromatico?</h1>
   <p>Conosci già la tua stagione? Rispondi a 5 domande e scopri il tuo sottogruppo — poi ricevi un PDF personalizzato con palette, make-up e outfit.</p>
-  <button class="btn-start" onclick="showLeadCapture()">Inizia il Test</button>
+  <button class="btn-start" onclick="window.open('analisi.html?start=1', '_blank')">Inizia il Test</button>
   <div class="seasons-strip">
     <span class="season-chip spring">&#127800; Primavera</span>
     <span class="season-chip summer">&#127807; Estate</span>
@@ -1209,6 +1209,16 @@ function restartQuiz() {
   document.getElementById('hero-section').style.display = 'flex';
   window.scrollTo(0,0);
 }
+
+// Auto-start: se la pagina e' aperta con ?start=1 (da "Inizia il Test" in nuova scheda), vai direttamente al lead capture
+(function() {
+  try {
+    var params = new URLSearchParams(window.location.search);
+    if (params.get('start') === '1') {
+      showLeadCapture();
+    }
+  } catch(e) { /* silenzioso */ }
+})();
 </script>
 </body>
 </html>
