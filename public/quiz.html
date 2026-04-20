@@ -158,28 +158,28 @@
   .books-intro p { font-size: 15px; color: var(--muted); line-height: 1.6; max-width: 520px; margin: 10px auto 0; }
 
   .book-card {
-    display: flex; gap: 32px; align-items: flex-start;
+    display: flex; flex-direction: column; align-items: center; text-align: center;
     background: var(--warm-white); border: 1px solid var(--border);
-    border-radius: 20px; padding: 32px; transition: all .25s;
+    border-radius: 20px; padding: 48px 32px; transition: all .25s;
     text-decoration: none; color: inherit;
   }
   .book-card:hover { border-color: var(--gold); box-shadow: var(--shadow-hover); transform: translateY(-3px); }
 
   /* Copertina libro: immagine reale con <img> visibile */
   .book-cover-img {
-    width: 110px;
-    flex-shrink: 0;
+    width: 140px;
+    margin-top: 18px;
+    margin-bottom: 22px;
     border-radius: 8px;
     box-shadow: 6px 6px 20px rgba(0,0,0,.2);
     display: block;
     object-fit: cover;
   }
 
-  .book-info { flex: 1; }
-  .book-tag { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); font-weight: 500; margin-bottom: 8px; }
-  .book-title { font-family: 'Cormorant Garamond', serif; font-size: 24px; font-weight: 400; line-height: 1.2; margin-bottom: 4px; }
-  .book-author { font-size: 13px; color: var(--muted); margin-bottom: 12px; }
-  .book-desc { font-size: 14px; color: var(--muted); line-height: 1.7; margin-bottom: 20px; }
+  .book-info { width: 100%; max-width: 580px; }
+  .book-tag { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); font-weight: 500; }
+  .book-title { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 400; line-height: 1.3; margin-bottom: 16px; }
+  .book-desc { font-size: 15px; color: var(--muted); line-height: 1.7; margin-bottom: 24px; }
   .book-cta {
     display: inline-flex; align-items: center; gap: 8px;
     background: var(--charcoal); color: var(--cream);
@@ -188,7 +188,6 @@
     transition: background .2s, transform .2s;
   }
   .book-cta:hover { background: var(--gold); transform: translateY(-1px); }
-  .book-note { font-size: 12px; color: var(--muted); margin-top: 10px; }
 
   .restart-wrap { text-align: center; margin-top: 64px; padding-top: 40px; border-top: 1px solid var(--border); }
   .btn-restart { background: transparent; border: 1.5px solid var(--charcoal); color: var(--charcoal); padding: 14px 40px; border-radius: 100px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; transition: all .2s; }
@@ -196,7 +195,7 @@
 
   /* ── UPSELL ── */
   .upsell-section {
-    margin: 72px 0 0;
+    margin: 36px 0 0;
     padding: 0;
     text-align: center;
     position: relative;
@@ -457,12 +456,8 @@
 
     <button class="btn-reveal" onclick="showResult()">Rivelami la mia stagione →</button>
     <div class="trust-reward">✨ Risultato immediato · gratuito</div>
-    <div class="trust-row">
-      <span>📬 Newsletter settimanale</span>
-      <span>👆 1 click per disiscriverti</span>
-    </div>
     <p class="privacy-micro">
-      Cliccando accetti di ricevere la newsletter settimanale YouGlamour sull'armocromia. <a href="https://www.youglamour.it/privacy" target="_blank">Privacy policy</a>.
+      Cliccando accetti di ricevere la newsletter YouGlamour sull'armocromia. <a href="https://www.youglamour.it/privacy" target="_blank">Privacy policy</a>.
     </p>
   </div>
 </section>
@@ -933,14 +928,12 @@ function showResult() {
       </div>
 
       <a class="book-card" href="${b.link}" target="_blank" rel="noopener" onclick="trackEvent('amazon_book_click', { season: '${d.name}' })">
+        <div class="book-tag">✦ Il libro della tua stagione</div>
         <img class="book-cover-img" src="${makeBookSVG(d)}" alt="Copertina ${b.title}">
         <div class="book-info">
-          <div class="book-tag">✦ Il libro della tua stagione</div>
           <div class="book-title">${b.title}</div>
-          <div class="book-author">${b.subtitle}</div>
           <div class="book-desc">${b.desc}</div>
-          <span class="book-cta">Scopri su Amazon →</span>
-          <div class="book-note">📦 Disponibile in versione cartacea e Kindle</div>
+          <span class="book-cta">Vedi su Amazon →</span>
         </div>
       </a>
     </div>
@@ -949,16 +942,13 @@ function showResult() {
     <div class="upsell-section" id="upsell-box">
       <div class="upsell-badge">✦ C'è di più da scoprire</div>
       <h2 class="upsell-title">Sai che la tua stagione ha<br><em>4 sottogruppi</em>?</h2>
-      <p class="upsell-sub">Essere ${d.name} è solo l'inizio. Ogni stagione nasconde <strong>4 anime diverse</strong> — con palette, colori e consigli completamente diversi tra loro. Scopri quale sei davvero con 5 domande veloci.</p>
-      <button class="btn-upsell" onclick="startSubQuiz()" style="max-width:400px;">
+      <p class="upsell-sub">Essere ${d.name} è solo l'inizio. Ogni stagione nasconde <strong>4 anime diverse</strong> — con palette, colori e consigli completamente diversi tra loro. Bastano <strong>30 secondi</strong> per scoprire il tuo sottogruppo di appartenenza.</p>
+      <button class="btn-upsell" onclick="startSubQuiz()" style="max-width:400px;background:${d.badge_color};color:#fff;box-shadow:0 4px 16px rgba(0,0,0,0.15);" onmouseover="this.style.opacity='0.85';this.style.transform='translateY(-2px)'" onmouseout="this.style.opacity='1';this.style.transform='translateY(0)'">
         Ora scopri il tuo sottogruppo!
       </button>
     </div>
 
-    <div class="restart-wrap">
-      <p style="font-size:14px;color:var(--muted);margin-bottom:20px;">Vuoi rifare il test o condividerlo con un'amica?</p>
-      <button class="btn-restart" onclick="restartQuiz()">↺ Rifai il Test</button>
-    </div>`;
+    `;
 }
 
 function restartQuiz() {
