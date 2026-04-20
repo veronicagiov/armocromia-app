@@ -329,6 +329,23 @@ export function updateLeadSeason(email: string, season: string): void {
   db.prepare('UPDATE leads SET season = ? WHERE email = ? AND season = ?').run(season, email, 'sottogruppo-quiz')
 }
 
+/**
+ * Aggiorna il nome del lead piu' recente per questa email, solo se il nome
+ * corrente e' vuoto. Chiamato dalla pagina upload foto quando l'utente
+ * inserisce il nome (che non viene piu' chiesto nella lead capture).
+ */
+export function updateLeadName(email: string, name: string): void {
+  if (!email || !name) return
+  db.prepare(`
+    UPDATE leads SET name = ?
+    WHERE id = (
+      SELECT id FROM leads
+      WHERE email = ? AND (name IS NULL OR name = '')
+      ORDER BY id DESC LIMIT 1
+    )
+  `).run(name, email)
+}
+
 export function getAllLeads(): Lead[] {
   return db.prepare(`
     SELECT l.id, l.name, l.email,

@@ -1602,6 +1602,15 @@ async function confirmPhotos() {
   if (nameEl) nameEl.classList.remove('input-error');
   lastName = name;
 
+  // Aggiorna il lead con il nome (raccolto qui, non piu' nella lead capture)
+  if (lastEmail) {
+    fetch('/api/leads', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: lastEmail, name: name }),
+    }).catch(function(){});
+  }
+
   // Le foto dovrebbero gia' essere tutte caricate in background (vedi updateControlsState)
   const allUploaded = uploadedPhotos.length > 0 && uploadedPhotos.every(function(p) { return p.state === 'uploaded'; });
   if (!allUploaded) return;

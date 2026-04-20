@@ -182,9 +182,14 @@ export default function AdminDashboard() {
           <span style={{ color: '#555', fontSize: 12 }}>|</span>
           <span style={{ color: '#ccc', fontSize: 13 }}>Admin Panel</span>
         </div>
-        <button onClick={handleLogout} style={{ background: 'none', border: '1px solid #333', color: '#999', padding: '6px 14px', borderRadius: 8, cursor: 'pointer', fontSize: 12 }}>
-          Esci
-        </button>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <a href="/api/admin/download-db" style={{ background: 'none', border: '1px solid #333', color: '#999', padding: '6px 14px', borderRadius: 8, cursor: 'pointer', fontSize: 12, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 6 }} title="Scarica una copia del DB SQLite">
+            ⬇ DB
+          </a>
+          <button onClick={handleLogout} style={{ background: 'none', border: '1px solid #333', color: '#999', padding: '6px 14px', borderRadius: 8, cursor: 'pointer', fontSize: 12 }}>
+            Esci
+          </button>
+        </div>
       </div>
 
       <div style={{ maxWidth: 1100, margin: '0 auto', padding: '32px 24px' }}>
