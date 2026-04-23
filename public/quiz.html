@@ -128,12 +128,6 @@
   .progress-cue .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--gold); animation: pulse 1.5s infinite; }
   @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .4; } }
 
-  /* Campo nome nella photo upload */
-  .photo-name-group { text-align: left; margin: 20px auto 24px; max-width: 420px; }
-  .photo-name-group label { display: block; font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; font-weight: 500; }
-  .photo-name-group input { width: 100%; padding: 14px 18px; border: 1.5px solid var(--border); border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 15px; background: var(--cream); color: var(--charcoal); outline: none; transition: border-color .2s; box-sizing: border-box; }
-  .photo-name-group input:focus { border-color: var(--gold); }
-
   /* ── RESULT ── */
   #result-section { display: none; padding: 40px 24px 80px; max-width: 860px; margin: 0 auto; animation: fadeUp .6s ease forwards; }
   .result-header { text-align: center; margin-bottom: 36px; }
@@ -382,11 +376,6 @@
 
   #payment-section { display: none; padding: 28px 24px 80px; max-width: 860px; margin: 0 auto; animation: fadeUp .6s ease forwards; }
 
-  /* Fade-in progressivo per campo nome (progressive disclosure) */
-  .photo-name-group { opacity: 0; max-height: 0; overflow: hidden; transition: opacity .35s ease, max-height .35s ease, margin .35s ease; margin: 0 auto; }
-  .photo-name-group.visible { opacity: 1; max-height: 140px; margin: 20px auto 24px; }
-  .photo-name-group input.input-error { border-color: #cc4444 !important; }
-
   @media (max-width: 600px) {
     .subquiz-cta-section { padding: 32px 24px; }
     .photo-upload-sub { font-size: 14px; margin-bottom: 22px; padding: 0 8px; }
@@ -431,22 +420,12 @@
 <section id="lead-section">
   <div class="lead-card">
     <div class="progress-cue"><span class="dot"></span> Quiz completato · Ultimo passo</div>
-    <h2>La tua stagione ti aspetta</h2>
+    <h2>Il tuo risultato è pronto</h2>
+    <p>Inserisci la tua email per scoprire la tua stagione armocromatica.</p>
 
-    <!-- Preview offuscato del risultato -->
-    <div class="result-preview">
-      <div class="preview-eyebrow">✦ Stagione identificata</div>
-      <div class="preview-season-line">Sei una<span class="blur-label">Primavera</span></div>
-      <div class="preview-palette">
-        <span></span><span></span><span></span><span></span><span></span>
-      </div>
-      <div class="preview-unlock-hint">🔓 Inserisci l'email per scoprire la tua stagione</div>
-    </div>
-
-    <!-- Social proof -->
-    <div class="sp-wrap">
-      <div class="sp-avatars" id="sp-avatars"></div>
-      <div class="sp-text"><strong id="sp-count">70+</strong> <span id="sp-label">donne hanno scoperto la loro stagione oggi</span></div>
+    <div class="form-group">
+      <label>Il tuo nome <span style="text-transform:none; letter-spacing:0; color:var(--muted); font-weight:400;">(facoltativo)</span></label>
+      <input type="text" id="user-name" placeholder="Es. Sofia" autocomplete="given-name">
     </div>
 
     <div class="form-group">
@@ -454,10 +433,11 @@
       <input type="email" id="user-email" placeholder="Es. sofia@email.com">
     </div>
 
-    <button class="btn-reveal" onclick="showResult()">Rivelami la mia stagione →</button>
+    <button class="btn-reveal" onclick="showResult()">Scopri la tua stagione ✦</button>
     <div class="trust-reward">✨ Risultato immediato · gratuito</div>
+    <p class="privacy-note">🔒 I tuoi dati sono al sicuro.</p>
     <p class="privacy-micro">
-      Cliccando accetti di ricevere la newsletter YouGlamour sull'armocromia. <a href="https://www.youglamour.it/privacy" target="_blank">Privacy policy</a>.
+      Cliccando ricevi il risultato e consigli sull'armocromia da YouGlamour. Disiscriviti in 1 click. <a href="https://www.youglamour.it/privacy" target="_blank">Privacy policy</a>.
     </p>
   </div>
 </section>
@@ -744,7 +724,6 @@ function showLead() {
   trackEvent('lead_view');
   document.getElementById('quiz-section').style.display = 'none';
   document.getElementById('lead-section').style.display = 'flex';
-  updateSocialProof();
   window.scrollTo(0,0);
 }
 
@@ -880,9 +859,10 @@ function showResult() {
     emailEl.classList.add('input-error'); emailEl.focus(); return;
   }
 
-  // Nome viene chiesto piu' avanti (pagina upload foto). Per il lead iniziale
-  // salviamo email-only; il nome verra' raccolto e aggiornato nel subquiz-upload.
-  const name = '';
+  // Nome opzionale qui; se non viene dato, verra' raccolto poi nella pagina foto
+  // e aggiornato via PATCH /api/leads.
+  const nameEl = document.getElementById('user-name');
+  const name = nameEl ? nameEl.value.trim() : '';
   const season = calculateSeason();
   lastSeason = seasonData[season].name;
   lastName = name;
@@ -960,6 +940,8 @@ function restartQuiz() {
   document.getElementById('payment-section').style.display='none';
   var emailEl = document.getElementById('user-email');
   if (emailEl) emailEl.value='';
+  var nameEl = document.getElementById('user-name');
+  if (nameEl) nameEl.value='';
   document.getElementById('hero-section').style.display='flex';
   window.scrollTo(0,0);
 }
@@ -1332,10 +1314,6 @@ function showSubResult() {
       <div class="photo-previews" id="photo-previews"></div>
 
       <div class="photo-confirm-block" id="photo-confirm-block">
-        <div class="photo-name-group" id="photo-name-wrap">
-          <label>Come ti chiami?</label>
-          <input type="text" id="photo-user-name" placeholder="Es. Sofia" autocomplete="given-name">
-        </div>
         <button class="btn-confirm-photos" id="btn-confirm-photos" onclick="confirmPhotos()" style="display:none" disabled>
           Conferma e prosegui ✦
         </button>
@@ -1494,8 +1472,6 @@ function scrollToConfirmIfReady(photo) {
   if (block) {
     setTimeout(function() {
       block.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      const nameInput = document.getElementById('photo-user-name');
-      if (nameInput) setTimeout(function() { nameInput.focus({ preventScroll: true }); }, 400);
     }, 200);
   }
 }
@@ -1504,13 +1480,6 @@ function updateControlsState() {
   // Contatore
   const counter = document.getElementById('photo-counter');
   if (counter) counter.innerHTML = '<strong>' + uploadedPhotos.length + '</strong>/2 foto';
-
-  // Progressive disclosure: campo nome appare dopo prima foto
-  const nameWrap = document.getElementById('photo-name-wrap');
-  if (nameWrap) {
-    if (uploadedPhotos.length > 0) nameWrap.classList.add('visible');
-    else nameWrap.classList.remove('visible');
-  }
 
   // Bottone: sticky su mobile se ha almeno una foto, abilitato solo se tutte uploaded
   const btn = document.getElementById('btn-confirm-photos');
@@ -1578,29 +1547,7 @@ function retryPhoto(id) {
 }
 
 async function confirmPhotos() {
-  // Valida il nome (richiesto qui perche' non chiesto nella lead capture)
-  const nameEl = document.getElementById('photo-user-name');
-  const name = (nameEl?.value || '').trim();
-  if (!name) {
-    if (nameEl) {
-      nameEl.classList.add('input-error');
-      nameEl.focus();
-      nameEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-    return;
-  }
-  if (nameEl) nameEl.classList.remove('input-error');
-  lastName = name;
-
-  // Aggiorna il lead con il nome (raccolto qui, non piu' nella lead capture)
-  if (lastEmail) {
-    fetch('/api/leads', {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: lastEmail, name: name }),
-    }).catch(function(){});
-  }
-
+  // Il nome e' gia' stato raccolto (facoltativo) nella lead capture — nessuna validazione qui.
   // Le foto dovrebbero gia' essere tutte caricate in background (vedi updateControlsState)
   const allUploaded = uploadedPhotos.length > 0 && uploadedPhotos.every(function(p) { return p.state === 'uploaded'; });
   if (!allUploaded) return;

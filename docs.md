@@ -17,20 +17,20 @@ Carica `quiz.html` in iframe. Punto di ingresso principale.
 Flusso completo:
 1. **Hero** — "Qual e' la tua stagione armocromatica?". Il bottone "Inizia il Test Gratuito" apre il quiz in una **nuova scheda** tramite `quiz.html?start=1` (saltando l'iframe della home), dove l'hero viene bypassata e si parte subito dalla domanda 1
 2. **Quiz stagione** — 6 domande (carnagione, occhi, capelli, rossetto, sole, palette)
-3. **Lead capture** — solo email (preview offuscato del risultato "Sei una ▓▓▓▓▓" + palette blurrata, counter social proof dinamico, trust signals). Il nome non viene chiesto qui per ridurre friction
+3. **Lead capture** — nome (facoltativo) + email, titolo "Il tuo risultato è pronto", bottone "Scopri la tua stagione ✦", reassurance "🔒 I tuoi dati sono al sicuro". Il nome è opzionale qui (unico punto in cui viene chiesto: non viene più richiesto nella pagina foto). Microcopy privacy senza la parola "newsletter" (si parla di "risultato e consigli sull'armocromia")
 4. **Risultato stagione** — nome stagione, descrizione, palette colori, libro Amazon
 5. **CTA sottogruppo** — "Ora scopri il tuo sottogruppo!"
 6. **Quiz sottogruppo** — 4 domande (contrasto, vivacita', chiaro/scuro, accessori). La stagione e' gia' nota, quindi viene saltata la prima domanda
-7. **Upload foto** — 1-2 selfie in luce naturale + **campo nome** (chiesto qui invece che nella lead capture). La pagina offre due bottoni "📸 Fai selfie" (apre fotocamera frontale via `capture="user"`) e "🖼 Dalla galleria". Le foto vengono **compresse client-side** (max 1600px, JPEG 0.85) e **caricate in background** su `/api/subquiz-photo` appena selezionate — il click "Conferma" diventa istantaneo perche' le foto sono gia' sul server. Ogni thumb mostra un progress ring in tempo reale, con retry in caso di errore. Il campo nome appare solo dopo la prima foto (progressive disclosure). Su mobile il bottone "Conferma" e' sticky in fondo allo schermo. **Badge privacy** ("Le tue foto sono al sicuro: usate solo per il sottogruppo e cancellate dopo l'invio") — vedi sezione Privacy foto piu' sotto
+7. **Upload foto** — 1-2 selfie in luce naturale. La pagina offre due bottoni "📸 Fai selfie" (apre fotocamera frontale via `capture="user"`) e "🖼 Dalla galleria". Le foto vengono **compresse client-side** (max 1600px, JPEG 0.85) e **caricate in background** su `/api/subquiz-photo` appena selezionate — il click "Conferma" diventa istantaneo perche' le foto sono gia' sul server. Ogni thumb mostra un progress ring in tempo reale, con retry in caso di errore. Su mobile il bottone "Conferma" e' sticky in fondo allo schermo. **Badge privacy** ("Le tue foto sono al sicuro: usate solo per il sottogruppo e cancellate dopo l'invio") — vedi sezione Privacy foto piu' sotto. Il nome **non viene piu' chiesto qui** (solo in lead capture, facoltativo)
 8. **Pagamento** — upsell PDF 7 EUR, checkout Stripe
 9. **Redirect** → `/upload` → `/grazie`
 
 ### `/analisi.html` — Quiz sottogruppo standalone
 Versione per utenti che arrivano dalle newsletter. Stessa logica del subquiz ma:
-- Ha la propria hero e lead capture (solo email, counter social proof, trust signals — nome chiesto poi nella pagina foto)
+- Ha la propria hero e lead capture (solo email, counter social proof, trust signals). Microcopy privacy allineata al quiz.html (senza "newsletter"). **Il nome non viene mai richiesto in questo flusso** (ne' in lead capture ne' in pagina foto): `lastName` resta vuoto quando arriva a `/api/subquiz-upload` e all'email/PDF
 - Il bottone "Inizia il Test" della hero apre il flusso (lead capture + quiz) in una **nuova scheda** — `analisi.html?start=1` fa saltare direttamente al lead capture
 - Il quiz parte dalla domanda 1 "Che stagione sei?" (5 domande totali)
-- Stesso flusso upload foto (con **campo nome**) + pagamento
+- Stesso flusso upload foto (senza campo nome) + pagamento
 - **URL:** `https://armocromia-app-production.up.railway.app/analisi.html`
 
 ### `/upload` — Conferma pagamento

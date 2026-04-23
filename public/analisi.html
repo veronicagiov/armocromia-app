@@ -102,12 +102,6 @@
   .privacy-micro a { color: var(--gold); text-decoration: underline; }
 
   /* Campo nome nella photo upload */
-  .photo-name-group { text-align: left; max-width: 420px; opacity: 0; max-height: 0; overflow: hidden; transition: opacity .35s ease, max-height .35s ease, margin .35s ease; margin: 0 auto; }
-  .photo-name-group.visible { opacity: 1; max-height: 140px; margin: 20px auto 24px; }
-  .photo-name-group label { display: block; font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; font-weight: 500; }
-  .photo-name-group input { width: 100%; padding: 14px 18px; border: 1.5px solid var(--border); border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 15px; background: var(--cream); color: var(--charcoal); outline: none; transition: border-color .2s; box-sizing: border-box; }
-  .photo-name-group input:focus { border-color: var(--gold); }
-  .photo-name-group input.input-error { border-color: #cc4444 !important; }
 
   /* ── SUBQUIZ RESULT / PHOTO UPLOAD ── */
   #subresult-section { display: none; padding: 60px 24px 100px; max-width: 860px; margin: 0 auto; animation: fadeUp .6s ease forwards; }
@@ -328,7 +322,7 @@
     <button class="btn-reveal" onclick="submitLead()">Inizia il test &#10022;</button>
     <div class="trust-reward">&#10024; Risultato immediato &middot; gratuito</div>
     <p class="privacy-micro">
-      Cliccando accetti di ricevere la newsletter YouGlamour sull'armocromia. <a href="https://www.youglamour.it/privacy" target="_blank">Privacy policy</a>.
+      Cliccando ricevi il risultato e consigli sull'armocromia da YouGlamour. Disiscriviti in 1 click. <a href="https://www.youglamour.it/privacy" target="_blank">Privacy policy</a>.
     </p>
   </div>
 </section>
@@ -784,10 +778,6 @@ function showSubResult() {
       '<input type="file" id="photo-input-gallery" accept="image/*" multiple style="display:none" onchange="handlePhotoSelect(event)">' +
       '<div class="photo-previews" id="photo-previews"></div>' +
       '<div class="photo-confirm-block" id="photo-confirm-block">' +
-        '<div class="photo-name-group" id="photo-name-wrap">' +
-          '<label>Come ti chiami?</label>' +
-          '<input type="text" id="photo-user-name" placeholder="Es. Sofia" autocomplete="given-name">' +
-        '</div>' +
         '<button class="btn-confirm-photos" id="btn-confirm-photos" onclick="confirmPhotos()" style="display:none" disabled>' +
           'Conferma e prosegui \u2726' +
         '</button>' +
@@ -923,8 +913,6 @@ function scrollToConfirmIfReady(photo) {
   if (block) {
     setTimeout(function() {
       block.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      var nameInput = document.getElementById('photo-user-name');
-      if (nameInput) setTimeout(function() { nameInput.focus({ preventScroll: true }); }, 400);
     }, 200);
   }
 }
@@ -932,12 +920,6 @@ function scrollToConfirmIfReady(photo) {
 function updateControlsState() {
   var counter = document.getElementById('photo-counter');
   if (counter) counter.innerHTML = '<strong>' + uploadedPhotos.length + '</strong>/2 foto';
-
-  var nameWrap = document.getElementById('photo-name-wrap');
-  if (nameWrap) {
-    if (uploadedPhotos.length > 0) nameWrap.classList.add('visible');
-    else nameWrap.classList.remove('visible');
-  }
 
   var btn = document.getElementById('btn-confirm-photos');
   if (!btn) return;
@@ -1002,28 +984,7 @@ function retryPhoto(id) {
 }
 
 function confirmPhotos() {
-  var nameEl = document.getElementById('photo-user-name');
-  var name = (nameEl && nameEl.value || '').trim();
-  if (!name) {
-    if (nameEl) {
-      nameEl.classList.add('input-error');
-      nameEl.focus();
-      nameEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-    return;
-  }
-  if (nameEl) nameEl.classList.remove('input-error');
-  lastName = name;
-
-  // Aggiorna il lead col nome (raccolto qui, non piu' nella lead capture)
-  if (lastEmail) {
-    fetch('/api/leads', {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: lastEmail, name: name }),
-    }).catch(function(){});
-  }
-
+  // Il nome non viene piu' richiesto — lastName resta vuoto (flusso analisi standalone)
   var allUploaded = uploadedPhotos.length > 0 && uploadedPhotos.every(function(p) { return p.state === 'uploaded'; });
   if (!allUploaded) return;
 
