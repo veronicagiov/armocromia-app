@@ -17,20 +17,20 @@ Carica `quiz.html` in iframe. Punto di ingresso principale.
 Flusso completo:
 1. **Hero** — "Qual e' la tua stagione armocromatica?". Il bottone "Inizia il Test Gratuito" apre il quiz in una **nuova scheda** tramite `quiz.html?start=1` (saltando l'iframe della home), dove l'hero viene bypassata e si parte subito dalla domanda 1
 2. **Quiz stagione** — 6 domande (carnagione, occhi, capelli, rossetto, sole, palette)
-3. **Lead capture** — solo email (preview offuscato del risultato "Sei una ▓▓▓▓▓" + palette blurrata, counter social proof dinamico, trust signals). Il nome non viene chiesto qui per ridurre friction
+3. **Lead capture** — nome + email obbligatori (preview offuscato del risultato "Sei una ▓▓▓▓▓" + palette blurrata, counter social proof dinamico, trust signals)
 4. **Risultato stagione** — nome stagione, descrizione, palette colori, libro Amazon
 5. **CTA sottogruppo** — "Ora scopri il tuo sottogruppo!"
 6. **Quiz sottogruppo** — 4 domande (contrasto, vivacita', chiaro/scuro, accessori). La stagione e' gia' nota, quindi viene saltata la prima domanda
-7. **Upload foto** — 1-2 selfie in luce naturale + **campo nome** (chiesto qui invece che nella lead capture). La pagina offre due bottoni "📸 Fai selfie" (apre fotocamera frontale via `capture="user"`) e "🖼 Dalla galleria". Le foto vengono **compresse client-side** (max 1600px, JPEG 0.85) e **caricate in background** su `/api/subquiz-photo` appena selezionate — il click "Conferma" diventa istantaneo perche' le foto sono gia' sul server. Ogni thumb mostra un progress ring in tempo reale, con retry in caso di errore. Il campo nome appare solo dopo la prima foto (progressive disclosure). Su mobile il bottone "Conferma" e' sticky in fondo allo schermo. **Badge privacy** ("Le tue foto sono al sicuro: usate solo per il sottogruppo e cancellate dopo l'invio") — vedi sezione Privacy foto piu' sotto
+7. **Upload foto** — 1-2 selfie in luce naturale (il nome e' gia' stato raccolto nella lead capture). La pagina mostra un blocco **"Perche' serve la foto?"** che spiega il valore (sottotoni reali, contrasto viso, iride — dettagli non catturati dal quiz). Offre tre bottoni: "📸 Fai selfie" (apre fotocamera frontale via `capture="user"`), "🖼 Dalla galleria" e **"📝 Senza foto"** (opt-out). Cliccando "Senza foto" si apre un modale di conferma ("L'analisi potrebbe essere meno precisa — vuoi continuare cosi'?"): se confermato, la submission viene salvata con `photoPaths: []` e si salta alla pagina pagamento — in admin l'analisi arriva senza foto, il `subgroup_guess` dal quiz resta disponibile per la scelta manuale del sottogruppo. **Recupero foto sulla payment page:** se l'utente ha saltato le foto, sopra il banner prezzo appare un box tratteggiato ("Hai saltato il selfie. Vuoi caricarlo per un'analisi piu' precisa? → Carica le foto ora") che lo riporta alla photo-upload section. Se carica e conferma, parte una **seconda** POST `/api/subquiz-upload` con le foto (la prima submission vuota resta nel DB — admin la elimina manualmente quando necessario). Le foto selezionate vengono **compresse client-side** (max 1600px, JPEG 0.85) e **caricate in background** su `/api/subquiz-photo` appena selezionate — il click "Conferma" diventa istantaneo perche' le foto sono gia' sul server. Ogni thumb mostra un progress ring in tempo reale, con retry in caso di errore. Su mobile il bottone "Conferma" e' sticky in fondo allo schermo. **Badge privacy** ("Le tue foto sono al sicuro: usate solo per il sottogruppo e cancellate dopo l'invio") — vedi sezione Privacy foto piu' sotto. Il toast della pagina pagamento cambia testo in base al flusso ("Le tue foto sono state caricate" vs generico "Ci siamo quasi!")
 8. **Pagamento** — upsell PDF 7 EUR, checkout Stripe
 9. **Redirect** → `/upload` → `/grazie`
 
 ### `/analisi.html` — Quiz sottogruppo standalone
 Versione per utenti che arrivano dalle newsletter. Stessa logica del subquiz ma:
-- Ha la propria hero e lead capture (solo email, counter social proof, trust signals — nome chiesto poi nella pagina foto)
+- Ha la propria hero e lead capture (nome + email obbligatori, counter social proof, trust signals)
 - Il bottone "Inizia il Test" della hero apre il flusso (lead capture + quiz) in una **nuova scheda** — `analisi.html?start=1` fa saltare direttamente al lead capture
 - Il quiz parte dalla domanda 1 "Che stagione sei?" (5 domande totali)
-- Stesso flusso upload foto (con **campo nome**) + pagamento
+- Stesso flusso upload foto + pagamento
 - **URL:** `https://armocromia-app-production.up.railway.app/analisi.html`
 
 ### `/upload` — Conferma pagamento
@@ -74,7 +74,7 @@ Richiede selezione stagione. Tre viste:
 - Eliminazione singola e bulk
 
 ### Tab: Analytics (KPI)
-- **Funnel di conversione** — barre orizzontali con % drop-off: quiz start → email inserita → risultato stagione visto → subquiz start → pagina foto → foto caricate → banner prezzo → click paga → **pagamento completato**
+- **Funnel di conversione** — barre orizzontali con % drop-off: quiz start → email inserita → risultato stagione visto → subquiz start → pagina foto → foto caricate o skippate → banner prezzo → click paga → **pagamento completato**
 - **Tempo medio per domanda** — barre che evidenziano domande con esitazione (>8s in rosso). Contiene anche due metriche non-domanda:
   - Tra le domande quiz e il subquiz: **"✉️ Inserisci email"** = tempo medio tra `lead_view` e `lead_submit` (rosso se >20s)
   - In coda alla sezione subquiz: **"📸 Carica foto"** = tempo medio tra `photo_view` e `photo_confirm` (rosso se >30s). Utile per capire se l'upload foto e' un collo di bottiglia.

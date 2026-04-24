@@ -696,7 +696,7 @@ const FUNNEL_STEPS: { event: string; label: string }[] = [
   { event: 'quiz_complete', label: 'Risultato stagione visto' },
   { event: 'subquiz_start', label: 'Subquiz iniziato' },
   { event: 'photo_view', label: 'Pagina foto vista' },
-  { event: 'photo_confirm', label: 'Foto caricate' },
+  { event: 'photo_confirm', label: 'Foto caricate o skippate' },
   { event: 'payment_view', label: 'Banner prezzo analisi' },
   { event: 'payment_click', label: 'Click paga' },
   { event: 'payment_success', label: 'Pagamento completato' },
