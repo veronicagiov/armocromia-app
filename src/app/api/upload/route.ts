@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { Resend } from 'resend'
 import Stripe from 'stripe'
-import { insertAnalysis, getLatestSubquizByEmail, markSubquizPaid } from '@/lib/db'
+import { insertAnalysis, getLatestSubquizByEmail, markSubquizPaidByEmail } from '@/lib/db'
 import fs from 'fs'
 import path from 'path'
 
@@ -51,8 +51,12 @@ export async function POST(req: NextRequest) {
       const subquizSub = getLatestSubquizByEmail(emailForLookup)
       if (subquizSub) {
         photoPaths = JSON.parse(subquizSub.photos || '[]')
-        markSubquizPaid(subquizSub.id)
       }
+      // Marca TUTTE le submission per questa email come pagate (non solo la
+      // piu' recente). Cosi' eventuali duplicati residui — caso raro di
+      // "cambio idea" oltre la finestra di 30 min dell'UPSERT — non
+      // mandano reminder dopo che l'utente ha gia' pagato.
+      markSubquizPaidByEmail(emailForLookup)
     }
 
     // 3. Salva analisi nel database

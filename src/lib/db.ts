@@ -258,18 +258,41 @@ export interface SubquizSubmission {
   created_at: string
 }
 
+// UPSERT: se esiste una submission per la stessa email negli ultimi 30 minuti
+// e non e' ancora pagata, la aggiorniamo invece di crearne una nuova. Cosi' chi
+// salta le foto e poi cambia idea non genera duplicati ne' reminder doppi.
+// `isNew` distingue il caso INSERT (schedula reminder) dal caso UPDATE
+// (riusa il setTimeout gia' attivo dal primo INSERT).
 export function insertSubquizSubmission(data: {
   name: string
   email: string
   season: string
   subgroup_guess: string
   photos: string[]
-}): number {
+}): { id: number; isNew: boolean } {
+  const recent = db.prepare(`
+    SELECT id FROM subquiz_submissions
+    WHERE email = ?
+      AND paid = 0
+      AND created_at >= datetime('now', '-30 minutes')
+    ORDER BY created_at DESC
+    LIMIT 1
+  `).get(data.email) as { id: number } | undefined
+
+  if (recent) {
+    db.prepare(`
+      UPDATE subquiz_submissions
+      SET name = ?, season = ?, subgroup_guess = ?, photos = ?
+      WHERE id = ?
+    `).run(data.name, data.season, data.subgroup_guess, JSON.stringify(data.photos), recent.id)
+    return { id: recent.id, isNew: false }
+  }
+
   const result = db.prepare(`
     INSERT INTO subquiz_submissions (name, email, season, subgroup_guess, photos)
     VALUES (?, ?, ?, ?, ?)
   `).run(data.name, data.email, data.season, data.subgroup_guess, JSON.stringify(data.photos))
-  return result.lastInsertRowid as number
+  return { id: result.lastInsertRowid as number, isNew: true }
 }
 
 export function getAllSubquizSubmissions(): SubquizSubmission[] {
@@ -282,6 +305,14 @@ export function getLatestSubquizByEmail(email: string): SubquizSubmission | unde
 
 export function markSubquizPaid(id: number): void {
   db.prepare('UPDATE subquiz_submissions SET paid = 1 WHERE id = ?').run(id)
+}
+
+// Marca tutte le submission non pagate per una email come pagate. Safety net
+// per casi rari in cui l'UPSERT non ha deduplicato (es. cambio idea oltre i
+// 30 minuti): cosi' nessun reminder pendente parte verso un cliente che ha
+// gia' completato il pagamento.
+export function markSubquizPaidByEmail(email: string): void {
+  db.prepare('UPDATE subquiz_submissions SET paid = 1 WHERE email = ? AND paid = 0').run(email)
 }
 
 export function markReminderSent(id: number): void {

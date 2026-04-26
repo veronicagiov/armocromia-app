@@ -46,8 +46,13 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Salva nel database (pre-pagamento)
-    const submissionId = insertSubquizSubmission({
+    // Salva nel database (pre-pagamento). insertSubquizSubmission fa UPSERT:
+    // se esiste gia' una submission recente non pagata per la stessa email,
+    // la aggiorna invece di crearne una nuova (caso "cambio idea" tra skip
+    // foto e poi carica foto). isNew=false significa che il setTimeout del
+    // reminder e' gia' stato schedulato dal primo insert e leggera' i dati
+    // aggiornati al momento dello scatto — non bisogna schedularne un altro.
+    const { id: submissionId, isNew } = insertSubquizSubmission({
       name,
       email,
       season,
@@ -55,8 +60,9 @@ export async function POST(req: NextRequest) {
       photos: photoPaths,
     })
 
-    // Schedula reminder email dopo 15 minuti se non paga
-    scheduleAbandonedCartReminder(submissionId)
+    if (isNew) {
+      scheduleAbandonedCartReminder(submissionId)
+    }
 
     return NextResponse.json({ success: true })
   } catch (err: any) {

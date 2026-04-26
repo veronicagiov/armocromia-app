@@ -17,6 +17,27 @@ export function scheduleAbandonedCartReminder(submissionId: number) {
 
       const scontoUrl = `${baseUrl}/sconto?email=${encodeURIComponent(sub.email)}&name=${encodeURIComponent(sub.name)}&season=${encodeURIComponent(sub.season)}`
 
+      // Check se l'utente ha caricato foto o ha skippato
+      let hasPhotos = false
+      try {
+        const parsed = JSON.parse(sub.photos || '[]')
+        hasPhotos = Array.isArray(parsed) && parsed.length > 0
+      } catch { /* photos malformato = consideralo skippato */ }
+
+      const openingParagraph = hasPhotos
+        ? `sono Veronica, la fondatrice di YouGlamour. Ho visto che hai completato il test dell'armocromia
+              e hai anche caricato le tue foto &mdash; ottimo!`
+        : `sono Veronica, la fondatrice di YouGlamour. Ho visto che hai completato il test dell'armocromia
+              ma non hai caricato il selfie &mdash; nessun problema, far&ograve; del mio meglio basandomi sulle tue risposte.`
+
+      const valuePropParagraph = hasPhotos
+        ? `L'analisi che riceverai non &egrave; generata da un algoritmo: <strong>studio personalmente ogni foto</strong>,
+              una per una, per determinare il tuo sottogruppo preciso tra i 16 possibili.
+              Poi creo a mano il tuo PDF personalizzato con:`
+        : `L'analisi che riceverai non &egrave; generata da un algoritmo: <strong>studio personalmente le tue risposte al quiz</strong>,
+              una per una, per identificare il sottogruppo che meglio ti rappresenta tra i 16 possibili.
+              Poi creo a mano il tuo PDF personalizzato con:`
+
       await resend.emails.send({
         from: 'Veronica di YouGlamour <veronica@youglamour.it>',
         to: sub.email,
@@ -29,8 +50,7 @@ export function scheduleAbandonedCartReminder(submissionId: number) {
             </p>
 
             <p style="font-size: 15px; line-height: 1.8; color: #3a3430; margin-bottom: 20px;">
-              sono Veronica, la fondatrice di YouGlamour. Ho visto che hai completato il test dell'armocromia
-              e hai anche caricato le tue foto &mdash; ottimo!
+              ${openingParagraph}
             </p>
 
             <p style="font-size: 15px; line-height: 1.8; color: #3a3430; margin-bottom: 20px;">
@@ -41,9 +61,7 @@ export function scheduleAbandonedCartReminder(submissionId: number) {
             </p>
 
             <p style="font-size: 15px; line-height: 1.8; color: #3a3430; margin-bottom: 20px;">
-              L'analisi che riceverai non &egrave; generata da un algoritmo: <strong>studio personalmente ogni foto</strong>,
-              una per una, per determinare il tuo sottogruppo preciso tra i 16 possibili.
-              Poi creo a mano il tuo PDF personalizzato con:
+              ${valuePropParagraph}
             </p>
 
             <ul style="font-size: 15px; line-height: 2; color: #3a3430; padding-left: 20px; margin-bottom: 24px;">
