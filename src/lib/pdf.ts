@@ -143,7 +143,7 @@ const SEASON_DATA: Record<string, SeasonInfo> = {
       'La donna Primavera irradia una luce calda, fresca e luminosa. La sua colorazione è caratterizzata da sottotoni dorati e aranciati: capelli con riflessi ramati o dorati, occhi chiari o medi con pagliuzze dorate, pelle luminosa con sottotono pesca-avorio.',
     characteristics: [
       'Sottotono: caldo e dorato',
-      'Contrasto: basso-medio tra pelle, occhi e capelli',
+      'Contrasto: alto tra pelle, occhi e capelli',
       'Luminosità: chiara, fresca, luminosa',
       'Parola chiave: vivace e delicata insieme',
     ],
@@ -272,10 +272,10 @@ const SEASON_DATA: Record<string, SeasonInfo> = {
     accent: '#A0522D',
     light: '#FFF8F0',
     description:
-      "La donna Autunno esprime una bellezza ricca, profonda e terrosa. La sua colorazione è caratterizzata da sottotoni caldi e dorati-arancio: capelli ramati, castani caldi o rossi, occhi marroni, verdi o ambra, pelle dorata o beige caldo con sottotono giallo.",
+      "La donna Autunno esprime una bellezza ricca, profonda e terrosa. La sua colorazione è caratterizzata da sottotoni caldi e dorati-arancio: capelli ramati, castani caldi o rossi, occhi marroni, verdi o ambra, pelle con sottotono caldo, sul beige/giallino.",
     characteristics: [
       'Sottotono: caldo, dorato-arancio',
-      'Contrasto: medio-alto, tutto in calore',
+      'Contrasto: medio-basso',
       'Luminosità: media e profonda, mai fredda',
       'Parola chiave: ricca, opulenta, naturale',
     ],
@@ -338,7 +338,7 @@ const SEASON_DATA: Record<string, SeasonInfo> = {
     accent: '#1A3A6E',
     light: '#F0F0FF',
     description:
-      "La donna Inverno irradia un'eleganza drammatica e sofisticata. La sua colorazione è caratterizzata da sottotoni freddi e neutri: capelli scuri o biondo cenere freddo, occhi intensi, pelle chiara o scura con sottotono rosato-freddo. Il contrasto è il suo punto di forza.",
+      "La donna Inverno irradia un'eleganza drammatica e sofisticata. La sua colorazione è caratterizzata da sottotoni freddi e neutri: i capelli vanno dal nero corvino al castano fondente, fino al castano cenere; gli occhi possono essere neri, castani o olivastri, oppure intensi e brillanti come blu, azzurro o verde; pelle chiara o scura con sottotono rosato-freddo. Il contrasto è il suo punto di forza.",
     characteristics: [
       'Sottotono: freddo, neutro-rosato o olivastro',
       'Contrasto: alto tra pelle, occhi e capelli',
@@ -383,6 +383,7 @@ const SEASON_DATA: Record<string, SeasonInfo> = {
       'I tessuti pregiati — seta, raso, crepe, cashmere — esaltano la tua eleganza naturale.',
       'Accessori in argento, cristallo, platino e pietre preziose fredde. Evita oro giallo.',
       "L'abbinamento nero + rosso intenso è il tuo signature look per le serate.",
+      'Osa anche con nero + fucsia, nero + verde smeraldo o bianco + rosa shocking: i toni accesi ti valorizzano senza sopraffarti.',
       'Puoi gestire pattern geometrici netti e stampe grafiche bold senza sembrare eccessiva.',
       'Il blu navy è il tuo neutral alternativo al nero: elegante e sempre perfetto.',
     ],
@@ -390,11 +391,11 @@ const SEASON_DATA: Record<string, SeasonInfo> = {
       'Inverno Assoluto':
         "L'Inverno Assoluto è il più classico e drammatico. Bianco puro e nero sono i tuoi colori assoluti, insieme a rosso intenso, blu royal e verde smeraldo. Sei la definizione di eleganza senza compromessi.",
       'Winter Cool':
-        "Il Winter Cool tende verso l'Estate. I tuoi colori migliori sono freddi e delicati: azzurro ghiaccio, malva freddo, grigio perla, prugna chiara. Hai più morbidezza rispetto all'Inverno Assoluto.",
+        "Il Winter Cool tende verso l'Estate. I tuoi colori migliori sono freddi e delicati: azzurro ghiaccio, malva freddo, grigio perla, prugna chiara, rosso carminio. La tua è una bellezza fredda ma sfumata, con contrasti più armoniosi e meno netti.",
       'Winter Bright':
-        "Il Winter Bright tende verso la Primavera. I tuoi colori sono vividi, brillanti e intensi: fucsia, ciclamino, verde lime brillante, turchese elettrico. Hai una qualità cristallina e luminosa.",
+        "Il Winter Bright tende verso la Primavera. I tuoi colori sono vividi, brillanti e intensi: fucsia, ciclamino, verde lime brillante, turchese elettrico. Hai una luminosità nitida e pulita che esalta i toni più accesi.",
       'Winter Deep':
-        "Il Winter Deep è l'Inverno più profondo e scuro. I tuoi colori migliori sono intensi e ricchi: nero, bordeaux profondo, blu notte, verde smeraldo scuro. La tua colorazione ha una profondità rara.",
+        "Il Winter Deep è l'Inverno più profondo e scuro. I tuoi colori migliori sono intensi e ricchi: nero, bordeaux scuro, blu notte, verde smeraldo scuro. È uno dei sottogruppi più diffusi in Italia, soprattutto al Sud, dove la bellezza mediterranea — capelli corvini e occhi intensi — trova la sua espressione più autentica.",
     },
     bookLink: 'https://www.amazon.it/Armocromia-Palette-Winter-Larmadio-perfetto/dp/B0B4K1BXVF/',
     bookTitle: "Armocromia Palette Winter — L'armadio perfetto",
@@ -482,11 +483,12 @@ export function generatePDF(input: PDFInput): Promise<Buffer> {
 
     // Descrizione stagione
     doc.fontSize(20).font('Times-Bold').fillColor(data.accent).text(seasonKey, MARGIN, 112, { lineBreak: false })
-    const descH = 60
     doc.fontSize(10).font('Helvetica').fillColor('#555555')
-      .text(data.description, MARGIN, 140, { width: CONTENT_W, lineGap: 2, height: descH })
+    const descOpts = { width: CONTENT_W, lineGap: 2 }
+    const descH = doc.heightOfString(data.description, descOpts)
+    doc.text(data.description, MARGIN, 140, descOpts)
 
-    let y2 = 140 + descH
+    let y2 = 140 + descH + 8
 
     doc.rect(MARGIN, y2, CONTENT_W, 0.8).fill('#E0D8D0')
     y2 += 12
@@ -494,18 +496,23 @@ export function generatePDF(input: PDFInput): Promise<Buffer> {
     y2 += 15
     doc.fontSize(14).font('Times-Bold').fillColor(data.accent).text(normalizedSubgroup, MARGIN, y2, { lineBreak: false })
     y2 += 22
-    const subH = 50
-    doc.fontSize(10).font('Helvetica').fillColor('#555555').text(subgroupDesc, MARGIN, y2, { width: CONTENT_W, lineGap: 2, height: subH })
-    y2 += subH
+    doc.fontSize(10).font('Helvetica').fillColor('#555555')
+    const subOpts = { width: CONTENT_W, lineGap: 2 }
+    const subH = doc.heightOfString(subgroupDesc, subOpts)
+    doc.text(subgroupDesc, MARGIN, y2, subOpts)
+    y2 += subH + 8
 
     doc.rect(MARGIN, y2, CONTENT_W, 0.8).fill('#E0D8D0')
     y2 += 12
     doc.fontSize(8).font('Helvetica').fillColor('#AAAAAA').text('CARATTERISTICHE', MARGIN, y2, { characterSpacing: 1.5, lineBreak: false })
     y2 += 15
+    doc.fontSize(10).font('Helvetica').fillColor('#333333')
+    const charOpts = { width: CONTENT_W - 18, lineGap: 2 }
     for (const c of data.characteristics) {
       drawBullet(doc, MARGIN + 7, y2, data.accent)
-      doc.fontSize(10).font('Helvetica').fillColor('#333333').text(c, MARGIN + 18, y2, { width: CONTENT_W - 18, lineBreak: false })
-      y2 += 19
+      doc.text(c, MARGIN + 18, y2, charOpts)
+      const charH = doc.heightOfString(c, charOpts)
+      y2 += Math.max(19, charH + 4)
     }
 
     drawPageFooter(doc, data)
@@ -580,12 +587,15 @@ export function generatePDF(input: PDFInput): Promise<Buffer> {
     doc.fontSize(8).font('Helvetica').fillColor('#AAAAAA').text('CONSIGLI MAKE-UP', MARGIN, y4, { characterSpacing: 1.5, lineBreak: false })
     y4 += 14
 
-    const mkRowH = 40
+    const valueOpts = { width: CONTENT_W - 11, lineGap: 1 }
     for (const item of data.makeup) {
-      doc.rect(MARGIN, y4, 3, mkRowH - 4).fill(data.accent)
+      doc.fontSize(9).font('Helvetica')
+      const valH = doc.heightOfString(item.value, valueOpts)
+      const rowH = Math.max(40, valH + 22)
+      doc.rect(MARGIN, y4, 3, rowH - 4).fill(data.accent)
       doc.fontSize(7.5).font('Helvetica').fillColor('#AAAAAA').text(item.label.toUpperCase(), MARGIN + 11, y4 + 2, { characterSpacing: 0.8, lineBreak: false })
-      doc.fontSize(9).font('Helvetica').fillColor('#333333').text(item.value, MARGIN + 11, y4 + 14, { width: CONTENT_W - 11, lineBreak: false })
-      y4 += mkRowH
+      doc.fontSize(9).font('Helvetica').fillColor('#333333').text(item.value, MARGIN + 11, y4 + 14, valueOpts)
+      y4 += rowH
     }
 
     y4 += 8
@@ -595,12 +605,15 @@ export function generatePDF(input: PDFInput): Promise<Buffer> {
     doc.fontSize(8).font('Helvetica').fillColor('#AAAAAA').text('CONSIGLI DI STILE', MARGIN, y4, { characterSpacing: 1.5, lineBreak: false })
     y4 += 14
 
-    const stRowH = 32
+    const tipOpts = { width: CONTENT_W - 35, lineGap: 2 }
     for (const tip of data.styleAdvice) {
-      doc.roundedRect(MARGIN, y4, CONTENT_W, stRowH - 4, 4).fill(lightenHex(data.accent, 0.9))
+      doc.fontSize(9).font('Helvetica')
+      const tipH = doc.heightOfString(tip, tipOpts)
+      const rowH = Math.max(32, tipH + 18)
+      doc.roundedRect(MARGIN, y4, CONTENT_W, rowH - 4, 4).fill(lightenHex(data.accent, 0.9))
       drawBullet(doc, MARGIN + 13, y4 + 10, data.accent)
-      doc.fontSize(9).font('Helvetica').fillColor('#333333').text(tip, MARGIN + 25, y4 + 10, { width: CONTENT_W - 35, lineBreak: false })
-      y4 += stRowH
+      doc.fontSize(9).font('Helvetica').fillColor('#333333').text(tip, MARGIN + 25, y4 + 10, tipOpts)
+      y4 += rowH
     }
 
     drawPageFooter(doc, data)
