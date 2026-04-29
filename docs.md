@@ -81,6 +81,7 @@ Richiede selezione stagione. Tre viste:
 - **Distribuzione stagioni** — donut chart con percentuali per stagione
 - **Trend giornaliero** — barre impilate (lead/subquiz/pagamenti) ultimi 30 giorni
 - **Filtro periodo** — input data "da/a" + preset rapidi: oggi, ieri, ultima settimana (lun-dom precedente), mese corrente, mese precedente, ultimi 30/60/90 giorni. Il preset attivo viene evidenziato; modificare le date manualmente deseleziona il preset.
+- **Confronta col periodo precedente** — toggle nella filter bar. Quando attivo, calcola il periodo immediatamente precedente di stessa durata e mostra delta % accanto a: ogni step del funnel, totale lead nel donut stagioni, ogni tempo medio (quiz, subquiz, email, upload foto). Sul trend giornaliero sovrappone una linea tratteggiata col periodo precedente (riferito al selettore 30gg/3m/6m/12m del chart, non al filtro). Per le metriche dei tempi i colori sono invertiti (più veloce = verde). Le delta su funnel/tempi/stagioni richiedono un filtro periodo attivo.
 - Dati raccolti tramite tracking eventi anonimo (`quiz_events` table, session UUID). Il count **"Pagamento completato"** e il conteggio pagamenti del trend giornaliero vengono dalla tabella `analyses` (fonte di verita' Stripe-verificata) — include anche le vendite via link sconto `/sconto` che bypassano il tracking browser
 
 ### Statistiche (barra in alto)

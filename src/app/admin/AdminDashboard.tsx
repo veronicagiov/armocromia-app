@@ -713,12 +713,67 @@ function AnalyticsTab({ initialAnalytics }: { initialAnalytics: AnalyticsData | 
   const [trendData, setTrendData] = useState(initialAnalytics?.dailyActivity || [])
   const [trendLoading, setTrendLoading] = useState(false)
   const [activePreset, setActivePreset] = useState<Preset | null>(null)
+  // Confronto col periodo precedente
+  const [compareEnabled, setCompareEnabled] = useState(false)
+  const [previousAnalytics, setPreviousAnalytics] = useState<AnalyticsData | null>(null)
+  const [previousTrendData, setPreviousTrendData] = useState<AnalyticsData['dailyActivity']>([])
+  const [previousRange, setPreviousRange] = useState<{ from: string; to: string } | null>(null)
+  const [compareLoading, setCompareLoading] = useState(false)
 
   // Aggiorna quando initialAnalytics cambia
   useEffect(() => {
     setAnalytics(initialAnalytics)
     setTrendData(initialAnalytics?.dailyActivity || [])
   }, [initialAnalytics])
+
+  // Helper formattazione data YYYY-MM-DD (locale)
+  function fmtDate(d: Date) {
+    const y = d.getFullYear()
+    const m = String(d.getMonth() + 1).padStart(2, '0')
+    const day = String(d.getDate()).padStart(2, '0')
+    return `${y}-${m}-${day}`
+  }
+
+  // Parse YYYY-MM-DD come data locale
+  function parseLocalDate(s: string): Date {
+    const [y, m, d] = s.split('-').map(Number)
+    return new Date(y, m - 1, d)
+  }
+
+  // Periodo precedente di stessa durata che termina il giorno prima di `from`
+  function computePreviousFromTo(from: string, to: string): { from: string; to: string } {
+    const fromDate = parseLocalDate(from)
+    const toDate = parseLocalDate(to)
+    const days = Math.floor((toDate.getTime() - fromDate.getTime()) / 86400000) + 1
+    const prevTo = new Date(fromDate); prevTo.setDate(fromDate.getDate() - 1)
+    const prevFrom = new Date(prevTo); prevFrom.setDate(prevTo.getDate() - days + 1)
+    return { from: fmtDate(prevFrom), to: fmtDate(prevTo) }
+  }
+
+  // Periodo precedente per il selettore del trend chart
+  function computePreviousTrend(period: '30d' | '3m' | '6m' | '12m'): { from: string; to: string } {
+    const now = new Date()
+    const currentFrom = new Date()
+    if (period === '30d') currentFrom.setDate(now.getDate() - 30)
+    else if (period === '3m') currentFrom.setMonth(now.getMonth() - 3)
+    else if (period === '6m') currentFrom.setMonth(now.getMonth() - 6)
+    else currentFrom.setFullYear(now.getFullYear() - 1)
+    const days = Math.floor((now.getTime() - currentFrom.getTime()) / 86400000)
+    const prevTo = new Date(currentFrom); prevTo.setDate(currentFrom.getDate() - 1)
+    const prevFrom = new Date(prevTo); prevFrom.setDate(prevTo.getDate() - days + 1)
+    return { from: fmtDate(prevFrom), to: fmtDate(prevTo) }
+  }
+
+  async function fetchAnalyticsRange(from: string, to: string): Promise<AnalyticsData | null> {
+    const params = new URLSearchParams()
+    params.set('from', from)
+    params.set('to', to)
+    try {
+      const res = await fetch(`/api/admin/analytics?${params}`)
+      if (res.ok) return await res.json()
+    } catch (e) { console.error('previous analytics error:', e) }
+    return null
+  }
 
   async function loadTrend(period: '30d' | '3m' | '6m' | '12m') {
     setTrendPeriod(period)
@@ -738,6 +793,11 @@ function AnalyticsTab({ initialAnalytics }: { initialAnalytics: AnalyticsData | 
         const data = await res.json()
         setTrendData(data.dailyActivity || [])
       }
+      if (compareEnabled) {
+        const prev = computePreviousTrend(period)
+        const prevData = await fetchAnalyticsRange(prev.from, prev.to)
+        setPreviousTrendData(prevData?.dailyActivity || [])
+      }
     } catch (e) { console.error('trend load error:', e) }
     setTrendLoading(false)
   }
@@ -752,6 +812,15 @@ function AnalyticsTab({ initialAnalytics }: { initialAnalytics: AnalyticsData | 
       if (to) params.set('to', to)
       const res = await fetch(`/api/admin/analytics?${params}`)
       if (res.ok) setAnalytics(await res.json())
+      if (compareEnabled && from && to) {
+        const prev = computePreviousFromTo(from, to)
+        const prevData = await fetchAnalyticsRange(prev.from, prev.to)
+        setPreviousAnalytics(prevData)
+        setPreviousRange(prev)
+      } else {
+        setPreviousAnalytics(null)
+        setPreviousRange(null)
+      }
     } catch (e) { console.error('analytics filter error:', e) }
     setLoading(false)
   }
@@ -761,14 +830,51 @@ function AnalyticsTab({ initialAnalytics }: { initialAnalytics: AnalyticsData | 
     setDateTo('')
     setActivePreset(null)
     setAnalytics(initialAnalytics)
+    setPreviousAnalytics(null)
+    setPreviousRange(null)
   }
 
-  // Preset di periodo rapido
-  function fmtDate(d: Date) {
-    const y = d.getFullYear()
-    const m = String(d.getMonth() + 1).padStart(2, '0')
-    const day = String(d.getDate()).padStart(2, '0')
-    return `${y}-${m}-${day}`
+  async function toggleCompare() {
+    const next = !compareEnabled
+    setCompareEnabled(next)
+    if (next) {
+      setCompareLoading(true)
+      try {
+        const tasks: Promise<void>[] = []
+        if (dateFrom && dateTo) {
+          const prev = computePreviousFromTo(dateFrom, dateTo)
+          tasks.push(fetchAnalyticsRange(prev.from, prev.to).then(d => {
+            setPreviousAnalytics(d)
+            setPreviousRange(prev)
+          }))
+        }
+        const prevTrend = computePreviousTrend(trendPeriod)
+        tasks.push(fetchAnalyticsRange(prevTrend.from, prevTrend.to).then(d => {
+          setPreviousTrendData(d?.dailyActivity || [])
+        }))
+        await Promise.all(tasks)
+      } finally { setCompareLoading(false) }
+    } else {
+      setPreviousAnalytics(null)
+      setPreviousTrendData([])
+      setPreviousRange(null)
+    }
+  }
+
+  // Calcola variazione percentuale current vs previous
+  // inverseColors: per metriche dove "più alto = peggio" (es. tempi)
+  function deltaInfo(current: number, previous: number, inverseColors = false): { text: string; color: string } | null {
+    if (previous === 0 && current === 0) return null
+    if (previous === 0) {
+      return { text: 'nuovo', color: inverseColors ? '#cc4444' : '#2A7A2A' }
+    }
+    const diff = ((current - previous) / previous) * 100
+    const pct = Math.round(Math.abs(diff))
+    if (pct === 0) return { text: '=', color: '#999' }
+    const sign = diff > 0 ? '+' : '−'
+    const isUp = diff > 0
+    const isGood = inverseColors ? !isUp : isUp
+    return { text: `${sign}${pct}%`, color: isGood ? '#2A7A2A' : '#cc4444' }
   }
 
   function computePreset(p: Preset): { from: string; to: string } {
@@ -896,6 +1002,28 @@ function AnalyticsTab({ initialAnalytics }: { initialAnalytics: AnalyticsData | 
             {dateFrom && dateTo ? `${dateFrom} — ${dateTo}` : dateFrom ? `Dal ${dateFrom}` : `Fino al ${dateTo}`}
           </span>
         )}
+        <button onClick={toggleCompare} disabled={loading || compareLoading}
+          title={hasFilter ? 'Confronta col periodo precedente di stessa durata' : 'Attiva un periodo per vedere il confronto su funnel, tempi e stagioni'}
+          style={{
+            marginLeft: 'auto',
+            padding: '8px 16px',
+            background: compareEnabled ? '#1a1614' : '#fff',
+            color: compareEnabled ? '#fff' : '#1a1614',
+            border: '1.5px solid #1a1614',
+            borderRadius: 8,
+            fontSize: 12,
+            fontWeight: 600,
+            cursor: loading || compareLoading ? 'default' : 'pointer',
+            opacity: loading || compareLoading ? 0.6 : 1,
+            transition: 'all .15s',
+          }}>
+          {compareLoading ? 'Carico…' : compareEnabled ? '✓ Confronto attivo' : 'Confronta col periodo precedente'}
+        </button>
+        {compareEnabled && previousRange && (
+          <span style={{ fontSize: 11, color: '#999', flexBasis: '100%' }}>
+            Periodo precedente: {previousRange.from} — {previousRange.to}
+          </span>
+        )}
       </div>
     </div>
   )
@@ -931,6 +1059,8 @@ function AnalyticsTab({ initialAnalytics }: { initialAnalytics: AnalyticsData | 
             const pct = funnelMax > 0 ? (val / funnelMax) * 100 : 0
             const prevVal = i > 0 ? (funnel[FUNNEL_STEPS[i - 1].event] || 0) : val
             const dropPct = prevVal > 0 ? Math.round(((prevVal - val) / prevVal) * 100) : 0
+            const compPrevVal = compareEnabled && previousAnalytics ? (previousAnalytics.funnel[step.event] || 0) : null
+            const compDelta = compPrevVal !== null ? deltaInfo(val, compPrevVal) : null
             return (
               <div key={step.event} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                 <div style={{ width: 140, fontSize: 12, color: '#666', textAlign: 'right', flexShrink: 0 }}>{step.label}</div>
@@ -948,6 +1078,12 @@ function AnalyticsTab({ initialAnalytics }: { initialAnalytics: AnalyticsData | 
                 <div style={{ width: 60, fontSize: 11, color: dropPct > 30 ? '#cc4444' : dropPct > 15 ? '#D4845A' : '#2A7A2A', fontWeight: 600, flexShrink: 0 }}>
                   {i > 0 && val < prevVal ? `−${dropPct}%` : ''}
                 </div>
+                {compareEnabled && (
+                  <div style={{ width: 90, fontSize: 11, fontWeight: 600, flexShrink: 0, color: compDelta?.color || '#ccc' }}
+                    title={compPrevVal !== null ? `Periodo precedente: ${compPrevVal}` : ''}>
+                    {compDelta ? `${compDelta.text} vs prec.` : ''}
+                  </div>
+                )}
               </div>
             )
           })}
@@ -968,6 +1104,10 @@ function AnalyticsTab({ initialAnalytics }: { initialAnalytics: AnalyticsData | 
                 const secs = (t.avg_ms / 1000).toFixed(1)
                 const pct = (t.avg_ms / maxTime) * 100
                 const isHigh = t.avg_ms > 8000
+                const prevT = compareEnabled && previousAnalytics
+                  ? previousAnalytics.quizAnswerTimes.find(p => p.question === t.question)
+                  : undefined
+                const d = prevT ? deltaInfo(t.avg_ms, prevT.avg_ms, true) : null
                 return (
                   <div key={`q${t.question}`} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                     <div style={{ width: 120, fontSize: 11, color: '#888', textAlign: 'right', flexShrink: 0 }}>
@@ -983,6 +1123,12 @@ function AnalyticsTab({ initialAnalytics }: { initialAnalytics: AnalyticsData | 
                     <div style={{ width: 60, fontSize: 12, fontWeight: 600, color: isHigh ? '#cc4444' : '#555', flexShrink: 0 }}>
                       {secs}s
                     </div>
+                    {compareEnabled && (
+                      <div style={{ width: 60, fontSize: 10, fontWeight: 600, flexShrink: 0, color: d?.color || '#ccc' }}
+                        title={prevT ? `Periodo precedente: ${(prevT.avg_ms / 1000).toFixed(1)}s` : ''}>
+                        {d?.text || ''}
+                      </div>
+                    )}
                   </div>
                 )
               })}
@@ -996,6 +1142,10 @@ function AnalyticsTab({ initialAnalytics }: { initialAnalytics: AnalyticsData | 
                     const pct = (leadFormTime.avg_ms / maxTime) * 100
                     const isHigh = leadFormTime.avg_ms > 20000
                     const display = secs < 60 ? `${secs.toFixed(1)}s` : `${Math.floor(secs / 60)}m ${Math.round(secs % 60)}s`
+                    const prev = compareEnabled && previousAnalytics ? previousAnalytics.leadFormTime : null
+                    const d = prev ? deltaInfo(leadFormTime.avg_ms, prev.avg_ms, true) : null
+                    const prevSecs = prev ? prev.avg_ms / 1000 : 0
+                    const prevDisplay = prev ? (prevSecs < 60 ? `${prevSecs.toFixed(1)}s` : `${Math.floor(prevSecs / 60)}m ${Math.round(prevSecs % 60)}s`) : ''
                     return (
                       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                         <div style={{ width: 120, fontSize: 11, color: '#888', textAlign: 'right', flexShrink: 0 }}>
@@ -1011,6 +1161,12 @@ function AnalyticsTab({ initialAnalytics }: { initialAnalytics: AnalyticsData | 
                         <div style={{ width: 60, fontSize: 12, fontWeight: 600, color: isHigh ? '#cc4444' : '#555', flexShrink: 0 }}>
                           {display}
                         </div>
+                        {compareEnabled && (
+                          <div style={{ width: 60, fontSize: 10, fontWeight: 600, flexShrink: 0, color: d?.color || '#ccc' }}
+                            title={prev ? `Periodo precedente: ${prevDisplay}` : ''}>
+                            {d?.text || ''}
+                          </div>
+                        )}
                       </div>
                     )
                   })()}
@@ -1028,6 +1184,10 @@ function AnalyticsTab({ initialAnalytics }: { initialAnalytics: AnalyticsData | 
                 const secs = (t.avg_ms / 1000).toFixed(1)
                 const pct = (t.avg_ms / maxTime) * 100
                 const isHigh = t.avg_ms > 8000
+                const prevT = compareEnabled && previousAnalytics
+                  ? previousAnalytics.subquizAnswerTimes.find(p => p.question === t.question)
+                  : undefined
+                const d = prevT ? deltaInfo(t.avg_ms, prevT.avg_ms, true) : null
                 return (
                   <div key={`sq${t.question}`} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                     <div style={{ width: 120, fontSize: 11, color: '#888', textAlign: 'right', flexShrink: 0 }}>
@@ -1043,6 +1203,12 @@ function AnalyticsTab({ initialAnalytics }: { initialAnalytics: AnalyticsData | 
                     <div style={{ width: 60, fontSize: 12, fontWeight: 600, color: isHigh ? '#cc4444' : '#555', flexShrink: 0 }}>
                       {secs}s
                     </div>
+                    {compareEnabled && (
+                      <div style={{ width: 60, fontSize: 10, fontWeight: 600, flexShrink: 0, color: d?.color || '#ccc' }}
+                        title={prevT ? `Periodo precedente: ${(prevT.avg_ms / 1000).toFixed(1)}s` : ''}>
+                        {d?.text || ''}
+                      </div>
+                    )}
                   </div>
                 )
               })}
@@ -1056,6 +1222,10 @@ function AnalyticsTab({ initialAnalytics }: { initialAnalytics: AnalyticsData | 
                     const pct = (photoUploadTime.avg_ms / maxTime) * 100
                     const isHigh = photoUploadTime.avg_ms > 30000
                     const display = secs < 60 ? `${secs.toFixed(1)}s` : `${Math.floor(secs / 60)}m ${Math.round(secs % 60)}s`
+                    const prev = compareEnabled && previousAnalytics ? previousAnalytics.photoUploadTime : null
+                    const d = prev ? deltaInfo(photoUploadTime.avg_ms, prev.avg_ms, true) : null
+                    const prevSecs = prev ? prev.avg_ms / 1000 : 0
+                    const prevDisplay = prev ? (prevSecs < 60 ? `${prevSecs.toFixed(1)}s` : `${Math.floor(prevSecs / 60)}m ${Math.round(prevSecs % 60)}s`) : ''
                     return (
                       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                         <div style={{ width: 120, fontSize: 11, color: '#888', textAlign: 'right', flexShrink: 0 }}>
@@ -1071,6 +1241,12 @@ function AnalyticsTab({ initialAnalytics }: { initialAnalytics: AnalyticsData | 
                         <div style={{ width: 60, fontSize: 12, fontWeight: 600, color: isHigh ? '#cc4444' : '#555', flexShrink: 0 }}>
                           {display}
                         </div>
+                        {compareEnabled && (
+                          <div style={{ width: 60, fontSize: 10, fontWeight: 600, flexShrink: 0, color: d?.color || '#ccc' }}
+                            title={prev ? `Periodo precedente: ${prevDisplay}` : ''}>
+                            {d?.text || ''}
+                          </div>
+                        )}
                       </div>
                     )
                   })()}
@@ -1117,6 +1293,15 @@ function AnalyticsTab({ initialAnalytics }: { initialAnalytics: AnalyticsData | 
                 <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column' }}>
                   <div style={{ fontSize: 22, fontWeight: 700, color: '#1a1614' }}>{totalSeasons}</div>
                   <div style={{ fontSize: 10, color: '#999' }}>lead totali</div>
+                  {compareEnabled && previousAnalytics && (() => {
+                    const prevTotal = previousAnalytics.seasonDistribution.reduce((s, r) => s + r.count, 0)
+                    const d = deltaInfo(totalSeasons, prevTotal)
+                    return d ? (
+                      <div style={{ fontSize: 10, fontWeight: 600, marginTop: 2, color: d.color }} title={`Periodo precedente: ${prevTotal}`}>
+                        {d.text} vs prec.
+                      </div>
+                    ) : null
+                  })()}
                 </div>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -1168,12 +1353,27 @@ function AnalyticsTab({ initialAnalytics }: { initialAnalytics: AnalyticsData | 
           const CHART_W = 700, CHART_H = 180, PAD_L = 36, PAD_R = 12, PAD_T = 16, PAD_B = 32
           const w = CHART_W - PAD_L - PAD_R
           const h = CHART_H - PAD_T - PAD_B
-          const maxVal = Math.max(...trendData.map(d => Math.max(d.leads, d.subquiz, d.payments)), 1)
+          const showCompare = compareEnabled && previousTrendData.length > 0
+          const maxVal = Math.max(
+            ...trendData.map(d => Math.max(d.leads, d.subquiz, d.payments)),
+            ...(showCompare ? previousTrendData.map(d => Math.max(d.leads, d.subquiz, d.payments)) : []),
+            1,
+          )
           const n = trendData.length
+          const pn = previousTrendData.length
 
           function makePath(key: 'leads' | 'subquiz' | 'payments') {
             return trendData.map((d, i) => {
               const x = PAD_L + (n > 1 ? (i / (n - 1)) * w : w / 2)
+              const y = PAD_T + h - (d[key] / maxVal) * h
+              return `${i === 0 ? 'M' : 'L'}${x.toFixed(1)},${y.toFixed(1)}`
+            }).join(' ')
+          }
+
+          function makePrevPath(key: 'leads' | 'subquiz' | 'payments') {
+            if (pn === 0) return ''
+            return previousTrendData.map((d, i) => {
+              const x = PAD_L + (pn > 1 ? (i / (pn - 1)) * w : w / 2)
               const y = PAD_T + h - (d[key] / maxVal) * h
               return `${i === 0 ? 'M' : 'L'}${x.toFixed(1)},${y.toFixed(1)}`
             }).join(' ')
@@ -1207,13 +1407,25 @@ function AnalyticsTab({ initialAnalytics }: { initialAnalytics: AnalyticsData | 
 
           return (
             <>
-              <div style={{ display: 'flex', gap: 16, marginBottom: 16 }}>
+              <div style={{ display: 'flex', gap: 16, marginBottom: 16, alignItems: 'center', flexWrap: 'wrap' }}>
                 {series.map(s => (
                   <div key={s.key} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#666' }}>
                     <div style={{ width: 16, height: 3, borderRadius: 2, background: s.color }} />
                     {s.label}
                   </div>
                 ))}
+                {showCompare && (
+                  <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 12, fontSize: 11, color: '#999' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <svg width={20} height={4}><line x1={0} y1={2} x2={20} y2={2} stroke="#666" strokeWidth={2} /></svg>
+                      corrente
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <svg width={20} height={4}><line x1={0} y1={2} x2={20} y2={2} stroke="#666" strokeWidth={2} strokeDasharray="3 2" /></svg>
+                      precedente
+                    </div>
+                  </div>
+                )}
               </div>
               <div style={{ width: '100%', overflowX: 'auto' }}>
                 <svg viewBox={`0 0 ${CHART_W} ${CHART_H}`} style={{ width: '100%', height: 'auto', minWidth: 400 }}>
@@ -1230,6 +1442,10 @@ function AnalyticsTab({ initialAnalytics }: { initialAnalytics: AnalyticsData | 
                   {/* Area fills */}
                   {series.map(s => (
                     <path key={`area-${s.key}`} d={makeArea(s.key)} fill={s.color} opacity={0.08} />
+                  ))}
+                  {/* Previous period (dashed overlay) */}
+                  {showCompare && series.map(s => (
+                    <path key={`prev-line-${s.key}`} d={makePrevPath(s.key)} fill="none" stroke={s.color} strokeWidth={1.5} strokeDasharray="4 3" strokeLinecap="round" strokeLinejoin="round" opacity={0.55} />
                   ))}
                   {/* Lines */}
                   {series.map(s => (
