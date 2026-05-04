@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { insertLead, updateLeadSeason, updateLeadName } from '@/lib/db'
+import { sendSeasonResultEmail } from '@/lib/season-result-email'
 
 export const dynamic = 'force-dynamic'
+
+// Stagioni reali (non placeholder come 'sottogruppo-quiz'): per queste mandiamo
+// la mail di recap col risultato + CTA al subquiz.
+const REAL_SEASONS = new Set(['Primavera', 'Estate', 'Autunno', 'Inverno'])
 
 export async function POST(req: NextRequest) {
   try {
@@ -12,6 +17,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Dati mancanti' }, { status: 400 })
     }
     insertLead({ name: name || '', email, season })
+
+    // Mail di recap col risultato (solo per stagioni reali, non per il subquiz)
+    if (REAL_SEASONS.has(season)) {
+      sendSeasonResultEmail({ name: name || '', email, season }).catch(() => {})
+    }
+
     return NextResponse.json({ ok: true })
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 })
