@@ -1002,11 +1002,11 @@ async function startCheckout() {
       window.open(data.url, '_top');
     } else {
       alert('Errore nel pagamento. Riprova.');
-      if (btn) { btn.disabled = false; btn.textContent = 'Paga e ricevi il PDF ✦'; }
+      if (btn) { btn.disabled = false; btn.textContent = 'Richiedila ✦'; }
     }
   } catch(e) {
     alert('Errore di connessione. Riprova.');
-    if (btn) { btn.disabled = false; btn.textContent = 'Paga e ricevi il PDF ✦'; }
+    if (btn) { btn.disabled = false; btn.textContent = 'Richiedila ✦'; }
   }
 }
 
@@ -1685,26 +1685,26 @@ function showPaymentPage() {
     ${recoverBlock}
 
     <div class="subquiz-cta-section">
-      <div class="upsell-badge">Il tuo PDF personalizzato</div>
-      <h2 class="subquiz-cta-title">Scopri il tuo <em>sottogruppo</em><br>e ricevi la guida completa</h2>
+      <div class="upsell-badge">✦ Manca pochissimo</div>
+      <h2 class="subquiz-cta-title">Scopri il tuo <em>sottogruppo</em><br>e ricevi la consulenza personalizzata</h2>
 
       <div class="subquiz-cta-price">
         <span class="price-big">9,90€</span>
-        <span class="price-note">una tantum • PDF via email<br>consegna in 24 ore</span>
+        <span class="price-note">pagamento unico • PDF via email,<br>consegna entro 24 ore</span>
       </div>
 
-      <div class="subquiz-cta-divider">Riceverai una guida in PDF con:</div>
+      <div class="subquiz-cta-divider">Cosa c'è nel tuo PDF:</div>
       <ul class="subquiz-cta-list">
         <li><span class="icon">🔍</span> Il tuo sottogruppo preciso tra i 16 possibili</li>
-        <li><span class="icon">🎨</span> Palette completa con 30+ colori perfetti per te</li>
+        <li><span class="icon">🎨</span> Palette di 30+ colori scelti su misura per te</li>
         <li><span class="icon">💄</span> Consigli make-up: fondotinta, blush, rossetto, ombretti</li>
-        <li><span class="icon">👗</span> Guida outfit: abbinamenti e colori da indossare</li>
-        <li><span class="icon">🚫</span> I colori da evitare assolutamente</li>
+        <li><span class="icon">👗</span> Guida outfit: abbinamenti e colori ideali</li>
+        <li><span class="icon">🚫</span> I colori da evitare</li>
         <li><span class="icon">💎</span> Colori "prestito" dalle stagioni vicine</li>
       </ul>
 
       <button class="btn-upsell" onclick="startCheckout()" id="btn-sub-upsell" style="max-width:420px;margin:0 auto;display:block;">
-        Paga e ricevi il PDF ✦
+        Richiedila ✦
       </button>
 
       <p class="payment-trust-note">🔒 Pagamento sicuro con Stripe</p>
