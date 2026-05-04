@@ -29,12 +29,25 @@
   .hero p { font-size: 16px; font-weight: 300; color: var(--muted); max-width: 440px; line-height: 1.7; margin-bottom: 48px; position: relative; }
   .btn-start { background: var(--charcoal); color: var(--cream); border: none; padding: 18px 52px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; letter-spacing: 1.5px; text-transform: uppercase; border-radius: 100px; cursor: pointer; transition: all .3s; box-shadow: 0 4px 20px rgba(26,22,20,0.2); position: relative; }
   .btn-start:hover { background: var(--gold); transform: translateY(-2px); }
+  .hero-secondary-cta { margin-top: 20px; font-size: 14px; color: var(--muted); line-height: 1.5; max-width: 380px; }
+  .hero-secondary-cta a { color: var(--gold); font-weight: 500; text-decoration: underline; text-underline-offset: 3px; }
+  .hero-secondary-cta a:hover { color: var(--charcoal); }
   .seasons-strip { display: flex; gap: 12px; margin-top: 64px; flex-wrap: wrap; justify-content: center; position: relative; }
   .season-chip { padding: 8px 20px; border-radius: 100px; font-size: 13px; font-weight: 500; border: 1px solid var(--border); }
   .season-chip.spring { background: rgba(232,168,124,0.12); color: #b86d3e; border-color: rgba(232,168,124,0.4); }
   .season-chip.summer { background: rgba(184,169,201,0.12); color: #7a5e9a; border-color: rgba(184,169,201,0.4); }
   .season-chip.autumn { background: rgba(196,128,74,0.12); color: #9a5822; border-color: rgba(196,128,74,0.4); }
   .season-chip.winter { background: rgba(107,140,186,0.12); color: #3d6096; border-color: rgba(107,140,186,0.4); }
+
+  /* ── SEASON SELECT ── */
+  #season-section { display: none; min-height: 100vh; padding: 60px 24px 80px; max-width: 860px; margin: 0 auto; animation: fadeUp .5s ease forwards; }
+  .season-select-header { text-align: center; margin-bottom: 36px; }
+  .season-select-eyebrow { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); font-weight: 500; margin-bottom: 14px; }
+  .season-select-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(28px,5vw,44px); font-weight: 300; line-height: 1.2; margin-bottom: 12px; color: var(--charcoal); }
+  .season-select-title em { font-style: italic; color: var(--gold); }
+  .season-select-subtitle { font-size: 14px; color: var(--muted); line-height: 1.6; max-width: 480px; margin: 0 auto; }
+  .season-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; max-width: 600px; margin: 0 auto; }
+  @media (max-width: 540px) { .season-grid { grid-template-columns: 1fr; } }
 
   /* ── QUIZ ── */
   #quiz-section { display: none; min-height: 100vh; padding: 0 24px 80px; max-width: 780px; margin: 0 auto; }
@@ -325,8 +338,11 @@
 <section class="hero" id="hero-section">
   <span class="hero-badge">&#10022; Scopri il tuo sottogruppo</span>
   <h1>Qual è il tuo <em>sottogruppo</em><br>armocromatico?</h1>
-  <p>Conosci già la tua stagione? Rispondi a 5 domande e scopri il tuo sottogruppo — poi ricevi un PDF personalizzato con palette, make-up e outfit.</p>
+  <p>Conosci già la tua stagione? Rispondi a 4 domande e scopri il tuo sottogruppo — poi ricevi un PDF personalizzato con palette, make-up e outfit.</p>
   <button class="btn-start" onclick="window.open('analisi.html?start=1', '_blank')">Inizia il Test</button>
+  <p class="hero-secondary-cta">
+    Non conosci ancora la tua stagione? <a href="https://www.youglamour.it/test-armocromia/" target="_blank" rel="noopener">Scoprila ora &rarr;</a>
+  </p>
   <div class="seasons-strip">
     <span class="season-chip spring">&#127800; Primavera</span>
     <span class="season-chip summer">&#127807; Estate</span>
@@ -335,11 +351,67 @@
   </div>
 </section>
 
+<!-- SEASON SELECT (prima del lead capture) -->
+<section id="season-section">
+  <div class="season-select-header">
+    <div class="season-select-eyebrow">&#10022; Passo 1 di 2</div>
+    <h2 class="season-select-title">Qual &egrave; la tua <em>stagione</em>?</h2>
+    <p class="season-select-subtitle">Seleziona la stagione armocromatica a cui appartieni. Se hai gi&agrave; fatto il test base, scegli il risultato che hai ottenuto.</p>
+  </div>
+  <div class="season-grid">
+    <div class="option-card" onclick="selectSeasonAndContinue('spring', 0)">
+      <div class="check-badge">&#10003;</div>
+      <div style="padding:22px 16px 12px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
+        <div style="width:36px;height:36px;border-radius:50%;background:#f0b080;box-shadow:0 2px 8px rgba(0,0,0,.15);"></div>
+        <div style="width:36px;height:36px;border-radius:50%;background:#e88060;box-shadow:0 2px 8px rgba(0,0,0,.15);"></div>
+        <div style="width:36px;height:36px;border-radius:50%;background:#80b858;box-shadow:0 2px 8px rgba(0,0,0,.15);"></div>
+        <div style="width:36px;height:36px;border-radius:50%;background:#f0d060;box-shadow:0 2px 8px rgba(0,0,0,.15);"></div>
+        <div style="width:36px;height:36px;border-radius:50%;background:#e8a048;box-shadow:0 2px 8px rgba(0,0,0,.15);"></div>
+      </div>
+      <div class="option-label"><strong>Primavera</strong> &mdash; calda, luminosa e fresca</div>
+    </div>
+    <div class="option-card" onclick="selectSeasonAndContinue('summer', 1)">
+      <div class="check-badge">&#10003;</div>
+      <div style="padding:22px 16px 12px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
+        <div style="width:36px;height:36px;border-radius:50%;background:#c0b0d8;box-shadow:0 2px 8px rgba(0,0,0,.15);"></div>
+        <div style="width:36px;height:36px;border-radius:50%;background:#e8c8cc;box-shadow:0 2px 8px rgba(0,0,0,.15);"></div>
+        <div style="width:36px;height:36px;border-radius:50%;background:#a8c0d8;box-shadow:0 2px 8px rgba(0,0,0,.15);"></div>
+        <div style="width:36px;height:36px;border-radius:50%;background:#d0d0d8;box-shadow:0 2px 8px rgba(0,0,0,.15);"></div>
+        <div style="width:36px;height:36px;border-radius:50%;background:#e0c8d0;box-shadow:0 2px 8px rgba(0,0,0,.15);"></div>
+      </div>
+      <div class="option-label"><strong>Estate</strong> &mdash; fredda, delicata e sofisticata</div>
+    </div>
+    <div class="option-card" onclick="selectSeasonAndContinue('autumn', 2)">
+      <div class="check-badge">&#10003;</div>
+      <div style="padding:22px 16px 12px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
+        <div style="width:36px;height:36px;border-radius:50%;background:#a04820;box-shadow:0 2px 8px rgba(0,0,0,.15);"></div>
+        <div style="width:36px;height:36px;border-radius:50%;background:#c89040;box-shadow:0 2px 8px rgba(0,0,0,.15);"></div>
+        <div style="width:36px;height:36px;border-radius:50%;background:#507840;box-shadow:0 2px 8px rgba(0,0,0,.15);"></div>
+        <div style="width:36px;height:36px;border-radius:50%;background:#9a6028;box-shadow:0 2px 8px rgba(0,0,0,.15);"></div>
+        <div style="width:36px;height:36px;border-radius:50%;background:#804030;box-shadow:0 2px 8px rgba(0,0,0,.15);"></div>
+      </div>
+      <div class="option-label"><strong>Autunno</strong> &mdash; calda, profonda e avvolgente</div>
+    </div>
+    <div class="option-card" onclick="selectSeasonAndContinue('winter', 3)">
+      <div class="check-badge">&#10003;</div>
+      <div style="padding:22px 16px 12px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
+        <div style="width:36px;height:36px;border-radius:50%;background:#2040a0;box-shadow:0 2px 8px rgba(0,0,0,.15);"></div>
+        <div style="width:36px;height:36px;border-radius:50%;background:#cc1020;box-shadow:0 2px 8px rgba(0,0,0,.15);"></div>
+        <div style="width:36px;height:36px;border-radius:50%;background:#f0f0f8;box-shadow:0 2px 8px rgba(0,0,0,.15);"></div>
+        <div style="width:36px;height:36px;border-radius:50%;background:#101018;box-shadow:0 2px 8px rgba(0,0,0,.15);"></div>
+        <div style="width:36px;height:36px;border-radius:50%;background:#8030a0;box-shadow:0 2px 8px rgba(0,0,0,.15);"></div>
+      </div>
+      <div class="option-label"><strong>Inverno</strong> &mdash; fredda, contrastata e potente</div>
+    </div>
+  </div>
+</section>
+
 <!-- LEAD CAPTURE -->
 <section id="lead-section">
   <div class="lead-card">
-    <h2>Scopri il tuo sottogruppo</h2>
-    <p>Inserisci nome ed email per iniziare il test: 5 domande in 2 minuti.</p>
+    <div class="season-select-eyebrow" style="margin-bottom:14px;">&#10022; Passo 2 di 2</div>
+    <h2>Dove ti mandiamo il risultato?</h2>
+    <p>Lasciaci nome ed email: ti invieremo via mail il tuo sottogruppo armocromatico preciso con la guida personalizzata.</p>
 
     <!-- Social proof -->
     <div class="social-proof" id="sp-lead-wrap" style="margin: 8px 0 22px;">
@@ -357,8 +429,7 @@
       <input type="email" id="user-email" placeholder="Es. sofia@email.com">
     </div>
 
-    <button class="btn-reveal" onclick="submitLead()">Inizia il test &#10022;</button>
-    <div class="trust-reward">&#10024; Risultato immediato &middot; gratuito</div>
+    <button class="btn-reveal" onclick="submitLead()">Scopri il sottogruppo &rarr;</button>
     <p class="privacy-micro">
       Cliccando accetti di ricevere la newsletter YouGlamour sull'armocromia. <a href="https://www.youglamour.it/privacy" target="_blank">Privacy policy</a>.
     </p>
@@ -580,9 +651,28 @@ let lastSeason = '';
 let lastSubgroup = '';
 
 // ─── FLOW ───────────────────────────────────────────────────────────────────
+function showSeasonSelect() {
+  trackEvent('season_select_view');
+  document.getElementById('hero-section').style.display = 'none';
+  document.getElementById('lead-section').style.display = 'none';
+  document.getElementById('season-section').style.display = 'block';
+  window.scrollTo(0,0);
+}
+
+function selectSeasonAndContinue(value, optIdx) {
+  selectedSeason = value;
+  answers[0] = optIdx;
+  trackEvent('season_select', { season: value });
+  // feedback visivo prima della transizione
+  var cards = document.querySelectorAll('#season-section .option-card');
+  cards.forEach(function(el, i) { el.classList.toggle('selected', i === optIdx); });
+  setTimeout(showLeadCapture, 350);
+}
+
 function showLeadCapture() {
   trackEvent('lead_view');
   document.getElementById('hero-section').style.display = 'none';
+  document.getElementById('season-section').style.display = 'none';
   document.getElementById('lead-section').style.display = 'flex';
   updateSocialProof();
   window.scrollTo(0,0);
@@ -652,25 +742,26 @@ function submitLead() {
     body: JSON.stringify({ name, email, season: 'sottogruppo-quiz' }),
   }).catch(() => {});
 
-  // Start the quiz
+  // Start the quiz dalla Q2 (la stagione e' gia' stata scelta in season-section)
   document.getElementById('lead-section').style.display = 'none';
   document.getElementById('quiz-section').style.display = 'block';
-  current = 0;
-  answers = [];
-  selectedSeason = null;
+  current = 1;
   trackEvent('subquiz_start');
   _qtime = Date.now();
-  renderQuestion(0);
+  renderQuestion(current);
   window.scrollTo(0,0);
 }
 
 // ─── QUIZ RENDERING ─────────────────────────────────────────────────────────
 function renderQuestion(idx) {
   const q = questions[idx];
-  const total = 5;
-  document.getElementById('q-counter').textContent = (idx + 1) + ' / ' + total;
-  document.getElementById('progress-fill').style.width = ((idx / total) * 100) + '%';
-  document.getElementById('btn-back').style.display = idx > 0 ? 'block' : 'none';
+  // La Q1 (stagione) e' gestita in season-section: nel quiz visibile contano solo le 4 domande successive (idx 1-4)
+  const total = 4;
+  const visibleIdx = idx; // idx 1 -> 1/4, idx 4 -> 4/4
+  const displayNumber = String(visibleIdx).padStart(2, '0');
+  document.getElementById('q-counter').textContent = visibleIdx + ' / ' + total;
+  document.getElementById('progress-fill').style.width = (((visibleIdx - 1) / total) * 100) + '%';
+  document.getElementById('btn-back').style.display = idx > 1 ? 'block' : 'none';
 
   let html = '';
   if (q.type === 'palette') {
@@ -702,7 +793,7 @@ function renderQuestion(idx) {
 
   document.getElementById('question-container').innerHTML =
     '<div class="question-card">' +
-      '<div class="q-number">Domanda ' + q.number + '</div>' +
+      '<div class="q-number">Domanda ' + displayNumber + '</div>' +
       '<h2 class="q-title">' + q.title + '</h2>' +
       '<p class="q-subtitle">' + q.subtitle + '</p>' +
       '<div class="options-grid ' + q.layout + '">' + html + '</div>' +
@@ -733,7 +824,8 @@ function nextQuestion() {
 }
 
 function prevQuestion() {
-  if (current > 0) {
+  // La Q1 (stagione) e' fuori dal quiz visibile: il "back" si ferma alla Q2 (idx 1)
+  if (current > 1) {
     current--;
     renderQuestion(current);
     window.scrollTo(0,0);
@@ -1265,18 +1357,21 @@ function restartQuiz() {
   document.getElementById('subresult-section').style.display = 'none';
   document.getElementById('payment-section').style.display = 'none';
   document.getElementById('lead-section').style.display = 'none';
+  document.getElementById('season-section').style.display = 'none';
+  // resetta selezione visiva delle card stagione
+  document.querySelectorAll('#season-section .option-card').forEach(function(el) { el.classList.remove('selected'); });
   var emailEl = document.getElementById('user-email');
   if (emailEl) emailEl.value = '';
   document.getElementById('hero-section').style.display = 'flex';
   window.scrollTo(0,0);
 }
 
-// Auto-start: se la pagina e' aperta con ?start=1 (da "Inizia il Test" in nuova scheda), vai direttamente al lead capture
+// Auto-start: se la pagina e' aperta con ?start=1 (da "Inizia il Test" in nuova scheda), vai direttamente alla selezione stagione
 (function() {
   try {
     var params = new URLSearchParams(window.location.search);
     if (params.get('start') === '1') {
-      showLeadCapture();
+      showSeasonSelect();
     }
   } catch(e) { /* silenzioso */ }
 })();

@@ -27,9 +27,11 @@ Flusso completo:
 
 ### `/analisi.html` — Quiz sottogruppo standalone
 Versione per utenti che arrivano dalle newsletter. Stessa logica del subquiz ma:
-- Ha la propria hero e lead capture (nome + email obbligatori, counter social proof, trust signals)
-- Il bottone "Inizia il Test" della hero apre il flusso (lead capture + quiz) in una **nuova scheda** — `analisi.html?start=1` fa saltare direttamente al lead capture
-- Il quiz parte dalla domanda 1 "Che stagione sei?" (5 domande totali)
+- Ha la propria hero, **selezione stagione**, e lead capture
+- **Hero**: il bottone primario "Inizia il Test" apre il flusso in una **nuova scheda** (`analisi.html?start=1`). Sotto al bottone c'e' un link secondario "Non conosci ancora la tua stagione? Scoprila ora" che rimanda a `https://www.youglamour.it/test-armocromia/` (utenti che non sanno la stagione vanno a fare prima il test base)
+- **Step 1 — Selezione stagione** (`#season-section`): card visuali con palette colori per Primavera/Estate/Autunno/Inverno. La scelta viene salvata in `selectedSeason` + `answers[0]` (saltando cosi' la prima domanda del quiz). `analisi.html?start=1` apre direttamente questo step
+- **Step 2 — Lead capture**: nome + email con motivazione esplicita ("Lasciaci nome ed email: ti invieremo via mail il tuo sottogruppo armocromatico preciso con la guida personalizzata"). CTA "Scopri il mio sottogruppo →". Niente trust line "risultato immediato e gratuito" (non e' ne' immediato ne' gratuito — il PDF e' a pagamento e arriva entro 24h)
+- **Quiz**: 4 domande visibili (contrasto, vivacita', chiaro/scuro, accessori). Counter "X / 4", numerazione "Domanda 01-04". Il "back" si ferma alla Q1 visibile (non si torna alla selezione stagione)
 - Stesso flusso upload foto + pagamento
 - **URL:** `https://armocromia-app-production.up.railway.app/analisi.html`
 
