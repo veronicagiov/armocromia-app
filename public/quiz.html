@@ -1002,11 +1002,11 @@ async function startCheckout() {
       window.open(data.url, '_top');
     } else {
       alert('Errore nel pagamento. Riprova.');
-      if (btn) { btn.disabled = false; btn.textContent = 'Richiedila ✦'; }
+      if (btn) { btn.disabled = false; btn.textContent = "Ricevi l'analisi · 9,90€"; }
     }
   } catch(e) {
     alert('Errore di connessione. Riprova.');
-    if (btn) { btn.disabled = false; btn.textContent = 'Richiedila ✦'; }
+    if (btn) { btn.disabled = false; btn.textContent = "Ricevi l'analisi · 9,90€"; }
   }
 }
 
@@ -1686,7 +1686,7 @@ function showPaymentPage() {
 
     <div class="subquiz-cta-section">
       <div class="upsell-badge">✦ Manca pochissimo</div>
-      <h2 class="subquiz-cta-title">Scopri il tuo <em>sottogruppo</em><br>e ricevi la consulenza personalizzata</h2>
+      <h2 class="subquiz-cta-title">Scopri il tuo <em>sottogruppo</em><br>e ricevi l'analisi personalizzata</h2>
 
       <div class="subquiz-cta-price">
         <span class="price-big">9,90€</span>
@@ -1697,14 +1697,14 @@ function showPaymentPage() {
       <ul class="subquiz-cta-list">
         <li><span class="icon">🔍</span> Il tuo sottogruppo preciso tra i 16 possibili</li>
         <li><span class="icon">🎨</span> Palette di 30+ colori scelti su misura per te</li>
-        <li><span class="icon">💄</span> Consigli make-up: fondotinta, blush, rossetto, ombretti</li>
-        <li><span class="icon">👗</span> Guida outfit: abbinamenti e colori ideali</li>
-        <li><span class="icon">🚫</span> I colori da evitare</li>
         <li><span class="icon">💎</span> Colori "prestito" dalle stagioni vicine</li>
+        <li><span class="icon">🚫</span> I colori da evitare</li>
+        <li><span class="icon">👗</span> Guida outfit: abbinamenti e colori ideali</li>
+        <li><span class="icon">✨</span> <strong>BONUS:</strong> 💄 Consigli make-up: fondotinta, blush, rossetto, ombretti</li>
       </ul>
 
       <button class="btn-upsell" onclick="startCheckout()" id="btn-sub-upsell" style="max-width:420px;margin:0 auto;display:block;">
-        Richiedila ✦
+        Ricevi l'analisi · 9,90€
       </button>
 
       <p class="payment-trust-note">🔒 Pagamento sicuro con Stripe</p>

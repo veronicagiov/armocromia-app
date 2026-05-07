@@ -1218,7 +1218,7 @@ function showPaymentPage() {
     recoverBlock +
     '<div class="subquiz-cta-section">' +
       '<div class="upsell-badge">✦ Manca pochissimo</div>' +
-      '<h2 class="subquiz-cta-title">Scopri il tuo <em>sottogruppo</em><br>e ricevi la consulenza personalizzata</h2>' +
+      '<h2 class="subquiz-cta-title">Scopri il tuo <em>sottogruppo</em><br>e ricevi l\'analisi personalizzata</h2>' +
 
       '<div class="subquiz-cta-price-bar">' +
         '<div class="price-tag"><span class="price-label">a soli</span>9,90\u20AC</div>' +
@@ -1235,14 +1235,14 @@ function showPaymentPage() {
       '<ul class="subquiz-cta-list">' +
         '<li><span class="icon">\uD83D\uDD0D</span> Il tuo sottogruppo preciso tra i 16 possibili</li>' +
         '<li><span class="icon">\uD83C\uDFA8</span> Palette di 30+ colori scelti su misura per te</li>' +
-        '<li><span class="icon">\uD83D\uDC84</span> Consigli make-up: fondotinta, blush, rossetto, ombretti</li>' +
-        '<li><span class="icon">\uD83D\uDC57</span> Guida outfit: abbinamenti e colori ideali</li>' +
-        '<li><span class="icon">\uD83D\uDEAB</span> I colori da evitare</li>' +
         '<li><span class="icon">\uD83D\uDC8E</span> Colori "prestito" dalle stagioni vicine</li>' +
+        '<li><span class="icon">\uD83D\uDEAB</span> I colori da evitare</li>' +
+        '<li><span class="icon">\uD83D\uDC57</span> Guida outfit: abbinamenti e colori ideali</li>' +
+        '<li><span class="icon">\u2728</span> <strong>BONUS:</strong> \uD83D\uDC84 Consigli make-up: fondotinta, blush, rossetto, ombretti</li>' +
       '</ul>' +
 
       '<button class="btn-upsell" onclick="startCheckout()" id="btn-sub-upsell" style="max-width:400px;margin:0 auto;display:block;">' +
-        'Richiedila \u2726' +
+        "Ricevi l'analisi \u00b7 9,90\u20ac" +
       '</button>' +
 
       '<p class="payment-trust-note">\uD83D\uDD12 Pagamento sicuro con Stripe</p>' +
@@ -1334,12 +1334,12 @@ function startCheckout() {
       window.open(data.url, '_top');
     } else {
       alert('Errore nel pagamento. Riprova.');
-      if (btn) { btn.disabled = false; btn.textContent = 'Richiedila \u2726'; }
+      if (btn) { btn.disabled = false; btn.textContent = "Ricevi l'analisi \u00b7 9,90\u20ac"; }
     }
   })
   .catch(function() {
     alert('Errore di connessione. Riprova.');
-    if (btn) { btn.disabled = false; btn.textContent = 'Richiedila \u2726'; }
+    if (btn) { btn.disabled = false; btn.textContent = "Ricevi l'analisi \u00b7 9,90\u20ac"; }
   });
 }
 
