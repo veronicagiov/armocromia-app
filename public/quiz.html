@@ -268,6 +268,9 @@
   .subquiz-cta-list li { padding: 9px 0; font-size: 14px; color: var(--charcoal); border-bottom: 1px solid rgba(26,22,20,0.08); display: flex; align-items: center; gap: 12px; line-height: 1.4; }
   .subquiz-cta-list li:last-child { border-bottom: none; }
   .subquiz-cta-list li span.icon { font-size: 18px; flex-shrink: 0; }
+  .subquiz-cta-list li.bonus-row { flex-direction: column; align-items: flex-start; gap: 4px; padding-top: 12px; }
+  .subquiz-cta-list .bonus-tag { font-size: 10px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: var(--gold); }
+  .subquiz-cta-list .bonus-content { display: flex; align-items: center; gap: 12px; }
   .subquiz-cta-price { position: relative; display: flex; align-items: center; justify-content: center; gap: 24px; flex-wrap: wrap; margin-bottom: 14px; }
   .subquiz-cta-price .price-big { font-family: 'Cormorant Garamond', serif; font-size: 52px; font-weight: 300; color: var(--charcoal); line-height: 1; }
   .subquiz-cta-price .price-note { font-size: 13px; color: var(--muted); text-align: left; }
@@ -1700,7 +1703,7 @@ function showPaymentPage() {
         <li><span class="icon">💎</span> Colori "prestito" dalle stagioni vicine</li>
         <li><span class="icon">🚫</span> I colori da evitare</li>
         <li><span class="icon">👗</span> Guida outfit: abbinamenti e colori ideali</li>
-        <li><span class="icon">✨</span> <strong>BONUS:</strong> 💄 Consigli make-up: fondotinta, blush, rossetto, ombretti</li>
+        <li class="bonus-row"><span class="bonus-tag">✨ BONUS</span><span class="bonus-content"><span class="icon">💄</span> Consigli make-up: fondotinta, blush, rossetto, ombretti</span></li>
       </ul>
 
       <button class="btn-upsell" onclick="startCheckout()" id="btn-sub-upsell" style="max-width:420px;margin:0 auto;display:block;">
@@ -1711,12 +1714,16 @@ function showPaymentPage() {
     </div>`;
 }
 
-// Auto-start: se la pagina e' aperta con ?start=1 (da "Inizia il Test Gratuito" in nuova scheda), vai direttamente al quiz
+// Auto-start: ?start=1 vai direttamente al quiz, ?pay=1 (DEBUG) salta al banner pagamento per testarne la grafica
 (function() {
   try {
     var params = new URLSearchParams(window.location.search);
     if (params.get('start') === '1') {
       startQuiz();
+    } else if (params.get('pay') === '1') {
+      document.getElementById('hero-section').style.display = 'none';
+      window.skippedPhotos = false;
+      showPaymentPage();
     }
   } catch(e) { /* silenzioso */ }
 })();
