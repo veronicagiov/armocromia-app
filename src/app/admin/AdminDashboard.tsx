@@ -1079,9 +1079,15 @@ function AnalyticsTab({ initialAnalytics }: { initialAnalytics: AnalyticsData | 
                   {i > 0 && val < prevVal ? `−${dropPct}%` : ''}
                 </div>
                 {compareEnabled && (
-                  <div style={{ width: 90, fontSize: 11, fontWeight: 600, flexShrink: 0, color: compDelta?.color || '#ccc' }}
-                    title={compPrevVal !== null ? `Periodo precedente: ${compPrevVal}` : ''}>
-                    {compDelta ? `${compDelta.text} vs prec.` : ''}
+                  <div style={{ width: 100, flexShrink: 0 }}>
+                    <div style={{ fontSize: 11, fontWeight: 600, color: compDelta?.color || '#ccc' }}>
+                      {compDelta ? `${compDelta.text} vs prec.` : ''}
+                    </div>
+                    {compPrevVal !== null && (
+                      <div style={{ fontSize: 10, color: '#999', fontWeight: 400, marginTop: 1 }}>
+                        prec. {compPrevVal}
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -1124,9 +1130,15 @@ function AnalyticsTab({ initialAnalytics }: { initialAnalytics: AnalyticsData | 
                       {secs}s
                     </div>
                     {compareEnabled && (
-                      <div style={{ width: 60, fontSize: 10, fontWeight: 600, flexShrink: 0, color: d?.color || '#ccc' }}
-                        title={prevT ? `Periodo precedente: ${(prevT.avg_ms / 1000).toFixed(1)}s` : ''}>
-                        {d?.text || ''}
+                      <div style={{ width: 80, flexShrink: 0 }}>
+                        <div style={{ fontSize: 10, fontWeight: 600, color: d?.color || '#ccc' }}>
+                          {d?.text || ''}
+                        </div>
+                        {prevT && (
+                          <div style={{ fontSize: 9, color: '#999', fontWeight: 400, marginTop: 1 }}>
+                            prec. {(prevT.avg_ms / 1000).toFixed(1)}s
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
@@ -1162,9 +1174,15 @@ function AnalyticsTab({ initialAnalytics }: { initialAnalytics: AnalyticsData | 
                           {display}
                         </div>
                         {compareEnabled && (
-                          <div style={{ width: 60, fontSize: 10, fontWeight: 600, flexShrink: 0, color: d?.color || '#ccc' }}
-                            title={prev ? `Periodo precedente: ${prevDisplay}` : ''}>
-                            {d?.text || ''}
+                          <div style={{ width: 80, flexShrink: 0 }}>
+                            <div style={{ fontSize: 10, fontWeight: 600, color: d?.color || '#ccc' }}>
+                              {d?.text || ''}
+                            </div>
+                            {prev && (
+                              <div style={{ fontSize: 9, color: '#999', fontWeight: 400, marginTop: 1 }}>
+                                prec. {prevDisplay}
+                              </div>
+                            )}
                           </div>
                         )}
                       </div>
@@ -1204,9 +1222,15 @@ function AnalyticsTab({ initialAnalytics }: { initialAnalytics: AnalyticsData | 
                       {secs}s
                     </div>
                     {compareEnabled && (
-                      <div style={{ width: 60, fontSize: 10, fontWeight: 600, flexShrink: 0, color: d?.color || '#ccc' }}
-                        title={prevT ? `Periodo precedente: ${(prevT.avg_ms / 1000).toFixed(1)}s` : ''}>
-                        {d?.text || ''}
+                      <div style={{ width: 80, flexShrink: 0 }}>
+                        <div style={{ fontSize: 10, fontWeight: 600, color: d?.color || '#ccc' }}>
+                          {d?.text || ''}
+                        </div>
+                        {prevT && (
+                          <div style={{ fontSize: 9, color: '#999', fontWeight: 400, marginTop: 1 }}>
+                            prec. {(prevT.avg_ms / 1000).toFixed(1)}s
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
@@ -1242,9 +1266,15 @@ function AnalyticsTab({ initialAnalytics }: { initialAnalytics: AnalyticsData | 
                           {display}
                         </div>
                         {compareEnabled && (
-                          <div style={{ width: 60, fontSize: 10, fontWeight: 600, flexShrink: 0, color: d?.color || '#ccc' }}
-                            title={prev ? `Periodo precedente: ${prevDisplay}` : ''}>
-                            {d?.text || ''}
+                          <div style={{ width: 80, flexShrink: 0 }}>
+                            <div style={{ fontSize: 10, fontWeight: 600, color: d?.color || '#ccc' }}>
+                              {d?.text || ''}
+                            </div>
+                            {prev && (
+                              <div style={{ fontSize: 9, color: '#999', fontWeight: 400, marginTop: 1 }}>
+                                prec. {prevDisplay}
+                              </div>
+                            )}
                           </div>
                         )}
                       </div>
@@ -1297,9 +1327,14 @@ function AnalyticsTab({ initialAnalytics }: { initialAnalytics: AnalyticsData | 
                     const prevTotal = previousAnalytics.seasonDistribution.reduce((s, r) => s + r.count, 0)
                     const d = deltaInfo(totalSeasons, prevTotal)
                     return d ? (
-                      <div style={{ fontSize: 10, fontWeight: 600, marginTop: 2, color: d.color }} title={`Periodo precedente: ${prevTotal}`}>
-                        {d.text} vs prec.
-                      </div>
+                      <>
+                        <div style={{ fontSize: 10, fontWeight: 600, marginTop: 2, color: d.color }}>
+                          {d.text} vs prec.
+                        </div>
+                        <div style={{ fontSize: 9, color: '#999', fontWeight: 400, marginTop: 1 }}>
+                          prec. {prevTotal}
+                        </div>
+                      </>
                     ) : null
                   })()}
                 </div>
