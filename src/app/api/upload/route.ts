@@ -52,10 +52,16 @@ export async function POST(req: NextRequest) {
       if (subquizSub) {
         photoPaths = JSON.parse(subquizSub.photos || '[]')
       }
-      // Marca TUTTE le submission per questa email come pagate (non solo la
-      // piu' recente). Cosi' eventuali duplicati residui — caso raro di
-      // "cambio idea" oltre la finestra di 30 min dell'UPSERT — non
-      // mandano reminder dopo che l'utente ha gia' pagato.
+    }
+
+    // Marca TUTTE le submission per questa email come pagate (non solo la
+    // piu' recente). Cosi' eventuali duplicati residui — caso raro di
+    // "cambio idea" oltre la finestra di 30 min dell'UPSERT — non
+    // mandano reminder dopo che l'utente ha gia' pagato.
+    // IMPORTANTE: deve avvenire sempre se c'è email, NON solo nel ramo
+    // "nessuna foto al checkout" — altrimenti chi paga caricando foto
+    // direttamente continua a ricevere mail di reminder.
+    if (emailForLookup) {
       markSubquizPaidByEmail(emailForLookup)
     }
 

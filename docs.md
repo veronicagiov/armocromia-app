@@ -103,7 +103,7 @@ Richiede selezione stagione. Tre viste:
 | `/api/leads` | POST | Salva lead dal quiz. Body: `{name, email, season}` |
 | `/api/subquiz-photo` | POST | Upload di una singola foto (FormData, campo `photo`). Scrive in cartella temp, ritorna `{ path }`. Usato dal client per l'upload in background mentre l'utente compila la pagina |
 | `/api/subquiz-upload` | POST | Finalizza la submission subquiz pre-pagamento. Due modalita': JSON `{name, email, season, subgroup, photoPaths}` con path gia' caricati via `/api/subquiz-photo` (nuovo flusso), oppure FormData con foto binary (legacy, retrocompatibile). **UPSERT:** se esiste gia' una submission per la stessa email negli ultimi 30 minuti e non pagata, la aggiorna invece di crearne una nuova (caso "cambio idea" tra skip foto e poi caricamento foto) — il reminder abbandoned-cart viene schedulato **solo** sul primo INSERT, e a 15 min legge i dati piu' aggiornati. |
-| `/sconto` | GET | Pagina redirect a Stripe con sconto 20% (7 EUR). Params: `?email=...&name=...&season=...` |
+| `/sconto` | GET | Pagina sconto reminder. Params: `?email=...&name=...&season=...`. **Scadenza:** lo sconto e' valido per `DISCOUNT_EXPIRY_DAYS` giorni (default: 4) dall'invio della mail di reminder (timestamp in `subquiz_submissions.reminder_sent_at`). Se ancora valido → redirect immediato a Stripe checkout a 7€ (metadata `discount: abandoned_cart_20`). Se scaduto → mostra pagina "Lo sconto e' scaduto" con bottone per checkout a prezzo pieno 9,90€ (metadata `discount: expired_discount_full_price`, per distinguere queste vendite in analytics da quelle organiche). Se l'email non risulta mai aver ricevuto un reminder (fallback / link "vecchio stile"), comportamento attuale: sconto attivo. |
 | `/api/analyze-color` | POST | Analisi AI colore dominante foto (Claude Haiku). Ritorna hex, nome, in_palette, confidence |
 | `/api/wardrobe` | GET/POST/DELETE | CRUD capi armadio |
 | `/api/wardrobe/photo` | GET | Serve foto capi armadio |
@@ -166,6 +166,12 @@ File: `armocromia.db` in `STORAGE_PATH` o `/storage` o `./data`
 | subgroup_guess | TEXT | Sottogruppo stimato dal quiz |
 | photos | TEXT (JSON) | Array path foto |
 | paid | INTEGER | 0 = non pagato, 1 = pagato |
+| reminder_sent | INTEGER | 0 = mai inviato, 1 = mail reminder abbandoned cart inviata |
+| reminder_sent_at | TEXT | Timestamp invio reminder 1 (NULL se mai inviato). Usato per calcolare la scadenza dello sconto su `/sconto` e per triggerare il follow-up 2 dopo 24h |
+| reminder2_sent | INTEGER | 0 = mai inviato, 1 = mail follow-up 2 (+24h) inviata |
+| reminder2_sent_at | TEXT | Timestamp invio reminder 2 (NULL se mai inviato). Usato per triggerare il follow-up 3 dopo 48h |
+| reminder3_sent | INTEGER | 0 = mai inviato, 1 = mail follow-up 3 (+48h dopo mail 2, urgenza scadenza) inviata |
+| reminder3_sent_at | TEXT | Timestamp invio reminder 3 (NULL se mai inviato) |
 | created_at | TEXT | Timestamp |
 
 ### Tabella `quiz_events`
@@ -231,7 +237,16 @@ Generato con pdfkit (A4). Contenuto per ogni sottogruppo:
 - Email notifica admin (nuova analisi ricevuta)
 - Email conferma cliente (foto ricevute)
 - Email invio PDF (attachment base64)
-- Email abandoned cart reminder (15 min dopo subquiz senza pagamento, link sconto 20%). Il template ha **due varianti condizionali** sui paragrafi che parlano delle foto (apertura + value prop "studio personalmente"): se la submission ha foto, copy invariato; se l'utente ha skippato (`photos = []`), copy adattato a "non hai caricato il selfie — nessun problema" e "studio personalmente le tue risposte al quiz". Logica in [src/lib/abandoned-cart.ts](src/lib/abandoned-cart.ts).
+- Email abandoned cart reminder — **sequenza a 3 mail** (logica in [src/lib/abandoned-cart.ts](src/lib/abandoned-cart.ts)). Timeline rispetto al momento del subquiz abbandonato:
+  - T+15min → **Mail 1**
+  - T+24h15min → **Mail 2** (+24h dopo mail 1)
+  - T+72h15min → **Mail 3** (+48h dopo mail 2 = +72h dopo mail 1)
+  - T+96h15min → **Sconto scaduto** (`DISCOUNT_EXPIRY_DAYS = 4` giorni dalla mail 1)
+  - **Mail 1** — Template lunga e personale (presentazione di Veronica, value prop, sconto a 7€). Ha **due varianti condizionali** sui paragrafi che parlano delle foto (apertura + value prop "studio personalmente"): se la submission ha foto, copy invariato; se l'utente ha skippato (`photos = []`), copy adattato a "non hai caricato il selfie — nessun problema" e "studio personalmente le tue risposte al quiz". Schedulata in memoria con `setTimeout` 15min (rischio basso di perdita per riavvio server in 15min).
+  - **Mail 2** — Costante `REMINDER2_DELAY_HOURS = 24`. Template breve "lo sconto è ancora valido", richiamo discreto, link diretto a `/sconto`.
+  - **Mail 3** — Costante `REMINDER3_DELAY_HOURS = 48`. Template breve a tono umano-empatico (NON vendita-forte): subject "una nota veloce sulla tua analisi", corpo che comunica la scadenza imminente ma disarmando la pressione ("non voglio essere insistente", "lo sconto è pensato come ringraziamento", "se preferisci aspettare va benissimo"). Ultimo richiamo prima che `/sconto` mostri il prezzo pieno. Il tono empatico è una scelta esplicita per restare coerenti con la voce della mail 1 (personale, non aggressiva).
+  - **Lazy polling** ([abandoned-cart.ts:processPendingFollowups](src/lib/abandoned-cart.ts)) — Mail 2 e Mail 3 sono triggerate da polling lazy: ogni volta che arriva una nuova submission abbandonata, prima del `setTimeout` per la mail 1 viene chiamato `processPendingFollowups()` che cerca nel DB le submission eligible per mail 2 (`reminder_sent_at <= now - 24h AND reminder2_sent = 0 AND paid = 0`) e per mail 3 (`reminder2_sent_at <= now - 48h AND reminder3_sent = 0 AND paid = 0`), e le invia. Per ogni invio fa un **double-check** rifaccendo `getSubquizById(id)` per evitare race condition con un pagamento appena completato. Approccio robusto ai riavvii del server (non dipende da timer in memoria), funziona finchè c'è traffico costante. Limite: se non arriva traffico per >24h, le mail di follow-up partono in ritardo (degradazione graceful, non bloccante).
+  - **Paid tracking** — quando l'utente paga (sia via `/sconto` a 7€ sia via flusso normale a 9,90€), [src/app/api/upload/route.ts](src/app/api/upload/route.ts) chiama `markSubquizPaidByEmail(email)` che setta `paid = 1` su tutte le submission di quella email. Questo "spegne" tutti i reminder pending: il filtro `paid = 0` nelle query di polling li esclude immediatamente.
 - **Mail di recap stagione** — inviata immediatamente dopo il submit del lead di `quiz.html` (POST `/api/leads`) **solo per stagioni reali** (Primavera/Estate/Autunno/Inverno, non per il placeholder `sottogruppo-quiz` di analisi.html). Recap brevissimo: nome stagione + paragrafo descrittivo + palette inline (6 cerchi) + CTA "Scopri il mio sottogruppo →" verso `/analisi.html?start=1&utm_source=mail-stagione`. Invio fire-and-forget (errori loggati, non bloccano la response). Logica in [src/lib/season-result-email.ts](src/lib/season-result-email.ts). La mail giustifica la richiesta dell'email nel lead-section ("Dove ti mandiamo il risultato?") e funziona da secondo punto d'ingresso al subquiz a pagamento.
 
 ---

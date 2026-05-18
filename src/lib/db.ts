@@ -246,6 +246,29 @@ try {
   // Colonna già esistente, ignora
 }
 
+// Aggiunge colonna reminder_sent_at (timestamp) per scadenza sconto
+try {
+  db.exec(`ALTER TABLE subquiz_submissions ADD COLUMN reminder_sent_at TEXT DEFAULT NULL`)
+} catch (e) {
+  // Colonna già esistente, ignora
+}
+
+// Aggiunge colonne per il secondo reminder (+24h dopo il primo)
+try {
+  db.exec(`ALTER TABLE subquiz_submissions ADD COLUMN reminder2_sent INTEGER DEFAULT 0`)
+} catch (e) { /* esiste già */ }
+try {
+  db.exec(`ALTER TABLE subquiz_submissions ADD COLUMN reminder2_sent_at TEXT DEFAULT NULL`)
+} catch (e) { /* esiste già */ }
+
+// Aggiunge colonne per il terzo reminder (+48h dopo il secondo = +72h dopo il primo)
+try {
+  db.exec(`ALTER TABLE subquiz_submissions ADD COLUMN reminder3_sent INTEGER DEFAULT 0`)
+} catch (e) { /* esiste già */ }
+try {
+  db.exec(`ALTER TABLE subquiz_submissions ADD COLUMN reminder3_sent_at TEXT DEFAULT NULL`)
+} catch (e) { /* esiste già */ }
+
 export interface SubquizSubmission {
   id: number
   name: string
@@ -255,8 +278,18 @@ export interface SubquizSubmission {
   photos: string
   paid: number
   reminder_sent: number
+  reminder_sent_at: string | null
+  reminder2_sent: number
+  reminder2_sent_at: string | null
+  reminder3_sent: number
+  reminder3_sent_at: string | null
   created_at: string
 }
+
+// Lo sconto del reminder (`/sconto`, 7€ anziché 9,90€) scade dopo questo
+// numero di giorni dall'invio della mail. Trascorso questo periodo,
+// chi clicca il link vede il prezzo pieno.
+export const DISCOUNT_EXPIRY_DAYS = 4
 
 // UPSERT: se esiste una submission per la stessa email negli ultimi 30 minuti
 // e non e' ancora pagata, la aggiorniamo invece di crearne una nuova. Cosi' chi
@@ -316,7 +349,69 @@ export function markSubquizPaidByEmail(email: string): void {
 }
 
 export function markReminderSent(id: number): void {
-  db.prepare('UPDATE subquiz_submissions SET reminder_sent = 1 WHERE id = ?').run(id)
+  db.prepare(`UPDATE subquiz_submissions SET reminder_sent = 1, reminder_sent_at = datetime('now', 'localtime') WHERE id = ?`).run(id)
+}
+
+export function markReminder2Sent(id: number): void {
+  db.prepare(`UPDATE subquiz_submissions SET reminder2_sent = 1, reminder2_sent_at = datetime('now', 'localtime') WHERE id = ?`).run(id)
+}
+
+export function markReminder3Sent(id: number): void {
+  db.prepare(`UPDATE subquiz_submissions SET reminder3_sent = 1, reminder3_sent_at = datetime('now', 'localtime') WHERE id = ?`).run(id)
+}
+
+// Submissions che hanno ricevuto la mail 1 da più di REMINDER2_DELAY_HOURS ore
+// e non hanno ancora ricevuto la mail 2, e non hanno pagato. Usato dal lazy
+// polling: ogni nuova submission triggera un check di follow-up pending.
+// Limitato per non sovraccaricare (cap di 50 per chiamata, molto generoso).
+export function getPendingFollowup2Submissions(delayHours: number): SubquizSubmission[] {
+  return db.prepare(`
+    SELECT * FROM subquiz_submissions
+    WHERE reminder_sent = 1
+      AND reminder_sent_at IS NOT NULL
+      AND reminder2_sent = 0
+      AND paid = 0
+      AND datetime(reminder_sent_at) <= datetime('now', 'localtime', '-${delayHours} hours')
+    ORDER BY reminder_sent_at ASC
+    LIMIT 50
+  `).all() as SubquizSubmission[]
+}
+
+// Submissions che hanno ricevuto la mail 2 da più di REMINDER3_DELAY_HOURS ore
+// e non hanno ancora ricevuto la mail 3, e non hanno pagato.
+export function getPendingFollowup3Submissions(delayHours: number): SubquizSubmission[] {
+  return db.prepare(`
+    SELECT * FROM subquiz_submissions
+    WHERE reminder2_sent = 1
+      AND reminder2_sent_at IS NOT NULL
+      AND reminder3_sent = 0
+      AND paid = 0
+      AND datetime(reminder2_sent_at) <= datetime('now', 'localtime', '-${delayHours} hours')
+    ORDER BY reminder2_sent_at ASC
+    LIMIT 50
+  `).all() as SubquizSubmission[]
+}
+
+// Verifica se lo sconto del reminder è scaduto per una certa email.
+// Cerca la submission più recente con reminder inviato e calcola se sono
+// passati più di DISCOUNT_EXPIRY_DAYS giorni dall'invio.
+// Ritorna false se non c'è nessun reminder inviato per quella email
+// (così chi clicca un link "vecchio stile" senza mai aver ricevuto reminder
+// non viene bloccato — fallback al comportamento attuale).
+export function isDiscountExpiredForEmail(email: string): boolean {
+  const row = db.prepare(`
+    SELECT
+      CASE
+        WHEN datetime(reminder_sent_at) < datetime('now', 'localtime', '-${DISCOUNT_EXPIRY_DAYS} days') THEN 1
+        ELSE 0
+      END as expired
+    FROM subquiz_submissions
+    WHERE email = ? AND reminder_sent = 1 AND reminder_sent_at IS NOT NULL
+    ORDER BY reminder_sent_at DESC LIMIT 1
+  `).get(email) as { expired: number } | undefined
+
+  if (!row) return false
+  return row.expired === 1
 }
 
 export function getSubquizById(id: number): SubquizSubmission | undefined {
