@@ -145,9 +145,10 @@
   .subquiz-cta-list li { padding: 6px 0; font-size: 14px; color: var(--charcoal); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
   .subquiz-cta-list li:last-child { border-bottom: none; }
   .subquiz-cta-list li span.icon { font-size: 16px; flex-shrink: 0; }
-  .subquiz-cta-list li.bonus-row { flex-direction: column; align-items: flex-start; gap: 4px; padding-top: 10px; }
+  .subquiz-cta-list li.bonus-row { flex-direction: column; align-items: flex-start; gap: 6px; padding-top: 10px; }
   .subquiz-cta-list .bonus-tag { font-size: 10px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: var(--gold); }
-  .subquiz-cta-list .bonus-content { display: flex; align-items: center; gap: 10px; }
+  .subquiz-cta-list .bonus-title { font-size: 14px; font-weight: 600; color: var(--charcoal); line-height: 1.3; }
+  .subquiz-cta-list .bonus-desc { font-size: 12px; color: var(--muted); line-height: 1.45; }
   .subquiz-cta-price-bar {
     display: flex; align-items: center; justify-content: center; gap: 14px;
     background: linear-gradient(135deg, rgba(201,169,110,0.12) 0%, rgba(201,169,110,0.05) 100%);
@@ -319,17 +320,33 @@
     .options-grid.cols-2 { grid-template-columns: 1fr; }
     .options-grid.cols-3 { grid-template-columns: 1fr; }
 
-    /* Sticky CTA su mobile: bottone principale ancorato in basso */
-    #btn-sub-upsell {
-      position: fixed;
-      left: 12px; right: 12px; bottom: 12px;
-      max-width: none !important;
-      width: auto !important;
-      margin: 0 !important;
+    /* Sticky CTA su mobile: bottone + trust-note ancorati insieme in basso
+       come blocco unico, cosi' la nota "Pagamento sicuro" resta sotto al bottone
+       anche quando il CTA esce dal flow. */
+    .payment-cta-stack {
+      position: fixed !important;
+      left: 12px !important;
+      right: 12px !important;
+      bottom: 12px !important;
       z-index: 100;
-      box-shadow: 0 8px 28px rgba(26,22,20,0.3);
-      padding: 18px 20px;
+      margin: 0;
+      background: var(--cream);
+      border-radius: 18px;
+      padding: 10px 12px 8px;
+      box-shadow: 0 8px 28px rgba(26,22,20,0.18);
+      border: 1px solid rgba(26,22,20,0.06);
+    }
+    .payment-cta-stack #btn-sub-upsell {
+      max-width: none !important;
+      width: 100% !important;
+      margin: 0 !important;
+      padding: 16px 20px;
       font-size: 16px;
+      box-shadow: 0 6px 22px rgba(201,169,110,0.35);
+    }
+    .payment-cta-stack .payment-trust-note {
+      margin: 6px 0 0 !important;
+      font-size: 11px;
     }
     #payment-section { padding-bottom: 140px; }
   }
@@ -1231,24 +1248,29 @@ function showPaymentPage() {
 
       '<div class="social-proof">' +
         '<div class="social-proof-avatars" id="sp-avatars"></div>' +
-        '<div class="social-proof-text"><strong id="sp-count">50+</strong> <span id="sp-label">persone hanno scoperto il<br>proprio sottogruppo oggi</span></div>' +
+        '<div class="social-proof-text">Unisciti a <strong id="sp-cumul-count">150</strong> donne che hanno scoperto<br>il loro sottogruppo</div>' +
       '</div>' +
 
-      '<div class="subquiz-cta-divider">Cosa c\'è nel tuo PDF:</div>' +
+      '<div class="subquiz-cta-divider">Cosa c\'è nella tua Analisi Personalizzata in PDF:</div>' +
       '<ul class="subquiz-cta-list">' +
-        '<li><span class="icon">\uD83D\uDD0D</span> Il tuo sottogruppo preciso tra i 16 possibili</li>' +
+        '<li><span class="icon">\uD83D\uDD0D</span> Il sottogruppo preciso tra i 16 possibili</li>' +
         '<li><span class="icon">\uD83C\uDFA8</span> Palette di 30+ colori scelti su misura per te</li>' +
-        '<li><span class="icon">\uD83D\uDC8E</span> Colori "prestito" dalle stagioni vicine</li>' +
-        '<li><span class="icon">\uD83D\uDEAB</span> I colori da evitare</li>' +
+        '<li><span class="icon">\uD83D\uDC8E</span> Colori in prestito dalle stagioni vicine</li>' +
+        '<li><span class="icon">\uD83D\uDEAB</span> Colori da evitare</li>' +
         '<li><span class="icon">\uD83D\uDC57</span> Guida outfit: abbinamenti e colori ideali</li>' +
-        '<li class="bonus-row"><span class="bonus-tag">\u2728 BONUS</span><span class="bonus-content"><span class="icon">\uD83D\uDC84</span> Consigli make-up: fondotinta, blush, rossetto, ombretti</span></li>' +
+        '<li class="bonus-row">' +
+          '<span class="bonus-tag">\uD83C\uDF81 BONUS INCLUSO</span>' +
+          '<span class="bonus-title">Guida make-up personalizzata</span>' +
+          '<span class="bonus-desc">Fondotinta, blush, rossetti e ombretti perfetti per il tuo sottogruppo</span>' +
+        '</li>' +
       '</ul>' +
 
-      '<button class="btn-upsell" onclick="startCheckout()" id="btn-sub-upsell" style="max-width:400px;margin:0 auto;display:block;">' +
-        "Ricevi l'analisi \u00b7 9,90\u20ac" +
-      '</button>' +
-
-      '<p class="payment-trust-note">\uD83D\uDD12 Pagamento sicuro con Stripe</p>' +
+      '<div class="payment-cta-stack">' +
+        '<button class="btn-upsell" onclick="startCheckout()" id="btn-sub-upsell" style="max-width:400px;margin:0 auto;display:block;">' +
+          "Ricevi l'analisi \u00b7 9,90\u20ac" +
+        '</button>' +
+        '<p class="payment-trust-note">\uD83D\uDD12 Pagamento sicuro con Stripe</p>' +
+      '</div>' +
     '</div>';
 
   updateSocialProof();
@@ -1306,11 +1328,28 @@ function updateSocialProof() {
     }
   }
 
-  // Payment section (sp-*) e lead-section (sp-lead-*)
+  // Avatars: payment section (sp-*) e lead-section (sp-lead-*)
   renderAvatars(document.getElementById('sp-avatars'));
   renderAvatars(document.getElementById('sp-lead-avatars'));
-  renderCount(document.getElementById('sp-count'), document.getElementById('sp-label'));
+  // Lead section: counter giornaliero dinamico (curva ora/giorno)
   renderCount(document.getElementById('sp-lead-count'), document.getElementById('sp-lead-label'));
+  // Payment section: counter cumulativo reale (lead totali + baseline) via API
+  fetchCumulativeCount();
+}
+
+// Counter cumulativo: numero reale di lead nel DB + baseline, fetchato lato server.
+// Cache 60s su Cache-Control per evitare hit DB ad ogni view.
+function fetchCumulativeCount() {
+  var el = document.getElementById('sp-cumul-count');
+  if (!el) return;
+  fetch('/api/social-proof', { cache: 'no-store' })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data && typeof data.count === 'number') {
+        el.textContent = data.count.toLocaleString('it-IT');
+      }
+    })
+    .catch(function() { /* mantieni placeholder */ });
 }
 
 // ─── CHECKOUT ───────────────────────────────────────────────────────────────

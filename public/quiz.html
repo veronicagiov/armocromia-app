@@ -213,19 +213,33 @@
     .upsell-cta-wrap { flex-direction: column; align-items: flex-start; gap: 16px; }
     .btn-upsell { width: 100%; }
 
-    /* Sticky CTA su mobile per la payment page: il bottone principale
-       rimane ancorato in basso mentre l'utente scorre i bullet.
-       #btn-sub-upsell e' il bottone PRIMARIO dentro la card pagamento. */
-    #btn-sub-upsell {
-      position: fixed;
-      left: 12px; right: 12px; bottom: 12px;
-      max-width: none !important;
-      width: auto !important;
-      margin: 0 !important;
+    /* Sticky CTA su mobile per la payment page: bottone + trust-note ancorati
+       insieme in basso come blocco unico, cosi' la nota "Pagamento sicuro" resta
+       sotto al bottone anche quando il CTA esce dal flow. */
+    .payment-cta-stack {
+      position: fixed !important;
+      left: 12px !important;
+      right: 12px !important;
+      bottom: 12px !important;
       z-index: 100;
-      box-shadow: 0 8px 28px rgba(26,22,20,0.3);
-      padding: 18px 20px;
+      margin: 0;
+      background: var(--cream);
+      border-radius: 18px;
+      padding: 10px 12px 8px;
+      box-shadow: 0 8px 28px rgba(26,22,20,0.18);
+      border: 1px solid rgba(26,22,20,0.06);
+    }
+    .payment-cta-stack #btn-sub-upsell {
+      max-width: none !important;
+      width: 100% !important;
+      margin: 0 !important;
+      padding: 16px 20px;
       font-size: 16px;
+      box-shadow: 0 6px 22px rgba(201,169,110,0.35);
+    }
+    .payment-cta-stack .payment-trust-note {
+      margin: 6px 0 0 !important;
+      font-size: 11px;
     }
     /* Spazio in fondo alla pagina pagamento per non nascondere contenuti */
     #payment-section { padding-bottom: 140px; }
@@ -268,12 +282,52 @@
   .subquiz-cta-list li { padding: 9px 0; font-size: 14px; color: var(--charcoal); border-bottom: 1px solid rgba(26,22,20,0.08); display: flex; align-items: center; gap: 12px; line-height: 1.4; }
   .subquiz-cta-list li:last-child { border-bottom: none; }
   .subquiz-cta-list li span.icon { font-size: 18px; flex-shrink: 0; }
-  .subquiz-cta-list li.bonus-row { flex-direction: column; align-items: flex-start; gap: 4px; padding-top: 12px; }
+  .subquiz-cta-list li.bonus-row { flex-direction: column; align-items: flex-start; gap: 6px; padding-top: 12px; }
   .subquiz-cta-list .bonus-tag { font-size: 10px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: var(--gold); }
-  .subquiz-cta-list .bonus-content { display: flex; align-items: center; gap: 12px; }
+  .subquiz-cta-list .bonus-title { font-size: 14px; font-weight: 600; color: var(--charcoal); line-height: 1.3; }
+  .subquiz-cta-list .bonus-desc { font-size: 12px; color: var(--muted); line-height: 1.45; }
   .subquiz-cta-price { position: relative; display: flex; align-items: center; justify-content: center; gap: 24px; flex-wrap: wrap; margin-bottom: 14px; }
   .subquiz-cta-price .price-big { font-family: 'Cormorant Garamond', serif; font-size: 52px; font-weight: 300; color: var(--charcoal); line-height: 1; }
   .subquiz-cta-price .price-note { font-size: 13px; color: var(--muted); text-align: left; }
+  .subquiz-cta-price-bar {
+    display: flex; align-items: center; justify-content: center; gap: 14px;
+    background: linear-gradient(135deg, rgba(201,169,110,0.12) 0%, rgba(201,169,110,0.05) 100%);
+    border: 1.5px solid rgba(201,169,110,0.35); border-radius: 14px;
+    padding: 14px 24px; margin-bottom: 16px;
+  }
+  .subquiz-cta-price-bar .price-tag {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 36px; font-weight: 600; color: var(--gold); line-height: 1;
+  }
+  .subquiz-cta-price-bar .price-label {
+    display: block; font-family: 'DM Sans', sans-serif;
+    font-size: 11px; font-weight: 500; letter-spacing: 1.5px;
+    text-transform: uppercase; color: var(--muted); margin-bottom: 2px;
+  }
+  .subquiz-cta-price-bar .price-sep {
+    width: 1px; height: 32px; background: rgba(201,169,110,0.3);
+  }
+  .subquiz-cta-price-bar .price-details {
+    font-size: 12px; color: var(--muted); text-align: left; line-height: 1.5;
+  }
+  .social-proof {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    margin-bottom: 16px; padding: 8px 16px;
+    border-radius: 100px;
+    background: rgba(201,169,110,0.06);
+    border: 1px solid rgba(201,169,110,0.15);
+    max-width: 380px; margin-left: auto; margin-right: auto;
+  }
+  .social-proof-avatars { display: flex; }
+  .social-proof-avatars span {
+    width: 26px; height: 26px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 600; color: var(--cream);
+    margin-left: -6px; border: 2px solid var(--warm-white);
+  }
+  .social-proof-avatars span:first-child { margin-left: 0; }
+  .social-proof-text { font-size: 12px; color: var(--muted); line-height: 1.3; }
+  .social-proof-text strong { color: var(--gold); font-weight: 700; }
 
   /* Toast conferma foto ricevute */
   .payment-done-toast { display: inline-flex; align-items: center; gap: 8px; padding: 8px 18px; background: rgba(42,122,42,0.12); border: 1px solid rgba(42,122,42,0.3); border-radius: 100px; font-size: 12px; color: #2a7a2a; font-weight: 600; letter-spacing: .5px; margin: 0 auto 10px; }
@@ -1691,27 +1745,72 @@ function showPaymentPage() {
       <div class="upsell-badge">✦ Manca pochissimo</div>
       <h2 class="subquiz-cta-title">Scopri il tuo <em>sottogruppo</em><br>e ricevi l'analisi personalizzata</h2>
 
-      <div class="subquiz-cta-price">
-        <span class="price-big">9,90€</span>
-        <span class="price-note">pagamento unico • PDF via email,<br>pronto in poche ore</span>
+      <div class="subquiz-cta-price-bar">
+        <div class="price-tag"><span class="price-label">a soli</span>9,90€</div>
+        <div class="price-sep"></div>
+        <div class="price-details">pagamento unico • PDF via email,<br>pronto in poche ore</div>
       </div>
 
-      <div class="subquiz-cta-divider">Cosa c'è nel tuo PDF:</div>
+      <div class="social-proof">
+        <div class="social-proof-avatars" id="sp-pay-avatars"></div>
+        <div class="social-proof-text">Unisciti a <strong id="sp-cumul-count">150</strong> donne che hanno scoperto<br>il loro sottogruppo</div>
+      </div>
+
+      <div class="subquiz-cta-divider">Cosa c'è nella tua Analisi Personalizzata in PDF:</div>
       <ul class="subquiz-cta-list">
-        <li><span class="icon">🔍</span> Il tuo sottogruppo preciso tra i 16 possibili</li>
+        <li><span class="icon">🔍</span> Il sottogruppo preciso tra i 16 possibili</li>
         <li><span class="icon">🎨</span> Palette di 30+ colori scelti su misura per te</li>
-        <li><span class="icon">💎</span> Colori "prestito" dalle stagioni vicine</li>
-        <li><span class="icon">🚫</span> I colori da evitare</li>
+        <li><span class="icon">💎</span> Colori in prestito dalle stagioni vicine</li>
+        <li><span class="icon">🚫</span> Colori da evitare</li>
         <li><span class="icon">👗</span> Guida outfit: abbinamenti e colori ideali</li>
-        <li class="bonus-row"><span class="bonus-tag">✨ BONUS</span><span class="bonus-content"><span class="icon">💄</span> Consigli make-up: fondotinta, blush, rossetto, ombretti</span></li>
+        <li class="bonus-row">
+          <span class="bonus-tag">🎁 BONUS INCLUSO</span>
+          <span class="bonus-title">Guida make-up personalizzata</span>
+          <span class="bonus-desc">Fondotinta, blush, rossetti e ombretti perfetti per il tuo sottogruppo</span>
+        </li>
       </ul>
 
-      <button class="btn-upsell" onclick="startCheckout()" id="btn-sub-upsell" style="max-width:420px;margin:0 auto;display:block;">
-        Ricevi l'analisi · 9,90€
-      </button>
-
-      <p class="payment-trust-note">🔒 Pagamento sicuro con Stripe</p>
+      <div class="payment-cta-stack">
+        <button class="btn-upsell" onclick="startCheckout()" id="btn-sub-upsell" style="max-width:420px;margin:0 auto;display:block;">
+          Ricevi l'analisi · 9,90€
+        </button>
+        <p class="payment-trust-note">🔒 Pagamento sicuro con Stripe</p>
+      </div>
     </div>`;
+
+  renderPaymentAvatars();
+  fetchCumulativeCount();
+}
+
+// Genera 4 avatar pseudo-casuali per il banner payment (basati su giorno + fascia oraria)
+function renderPaymentAvatars() {
+  var el = document.getElementById('sp-pay-avatars');
+  if (!el) return;
+  var letters = 'ABCDEFGHILMNOPRSTV';
+  var colors = ['#c9a96e','#b8860b','#a0785a','#8b7355','#9c7c5b','#b09060'];
+  var now = new Date();
+  var seed = now.getDay() * 100 + Math.floor((now.getHours() + now.getMinutes()/60) / 2);
+  var html = '';
+  for (var a = 0; a < 4; a++) {
+    var idx = (seed * 7 + a * 13 + a * a * 3) % letters.length;
+    var cIdx = (seed * 3 + a * 5) % colors.length;
+    html += '<span style="background:' + colors[cIdx] + ';">' + letters.charAt(idx) + '</span>';
+  }
+  el.innerHTML = html;
+}
+
+// Counter cumulativo: numero reale di lead nel DB + baseline, fetchato lato server.
+function fetchCumulativeCount() {
+  var el = document.getElementById('sp-cumul-count');
+  if (!el) return;
+  fetch('/api/social-proof', { cache: 'no-store' })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data && typeof data.count === 'number') {
+        el.textContent = data.count.toLocaleString('it-IT');
+      }
+    })
+    .catch(function() { /* mantieni placeholder */ });
 }
 
 // Auto-start: ?start=1 vai direttamente al quiz, ?pay=1 (DEBUG) salta al banner pagamento per testarne la grafica
