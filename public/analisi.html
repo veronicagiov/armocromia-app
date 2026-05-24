@@ -1256,8 +1256,8 @@ function showPaymentPage() {
 
 // ─── SOCIAL PROOF COUNTER (dinamico per giorno/ora) ────────────────────────
 function updateSocialProof() {
-  // Target giornalieri: lun=50, mar=40, mer=70, gio=100, ven=60, sab=50, dom=40
-  var dailyTargets = [40, 50, 40, 70, 100, 60, 50]; // dom(0)..sab(6)
+  // Target giornalieri: lun=65, mar=52, mer=91, gio=130, ven=78, sab=65, dom=52
+  var dailyTargets = [52, 65, 52, 91, 130, 78, 65]; // dom(0)..sab(6)
   var now = new Date();
   var target = dailyTargets[now.getDay()];
   var hour = now.getHours() + now.getMinutes() / 60;
