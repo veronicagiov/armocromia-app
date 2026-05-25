@@ -27,30 +27,10 @@ function getScontoUrl(sub: SubquizSubmission): string {
 async function sendFirstReminder(sub: SubquizSubmission): Promise<void> {
   const scontoUrl = getScontoUrl(sub)
 
-  let hasPhotos = false
-  try {
-    const parsed = JSON.parse(sub.photos || '[]')
-    hasPhotos = Array.isArray(parsed) && parsed.length > 0
-  } catch { /* photos malformato = consideralo skippato */ }
-
-  const openingParagraph = hasPhotos
-    ? `sono Veronica, la fondatrice di YouGlamour. Ho visto che hai completato il test dell'armocromia
-          e hai anche caricato le tue foto &mdash; ottimo!`
-    : `sono Veronica, la fondatrice di YouGlamour. Ho visto che hai completato il test dell'armocromia
-          ma non hai caricato il selfie &mdash; nessun problema, far&ograve; del mio meglio basandomi sulle tue risposte.`
-
-  const valuePropParagraph = hasPhotos
-    ? `L'analisi che riceverai non &egrave; generata da un algoritmo: <strong>studio personalmente ogni foto</strong>,
-          una per una, per determinare il tuo sottogruppo preciso tra i 16 possibili.
-          Poi creo a mano il tuo PDF personalizzato con:`
-    : `L'analisi che riceverai non &egrave; generata da un algoritmo: <strong>studio personalmente le tue risposte al quiz</strong>,
-          una per una, per identificare il sottogruppo che meglio ti rappresenta tra i 16 possibili.
-          Poi creo a mano il tuo PDF personalizzato con:`
-
   await getResend().emails.send({
     from: 'Veronica di YouGlamour <veronica@youglamour.it>',
     to: sub.email,
-    subject: `Ciao ${sub.name}, ti scrivo a proposito della tua analisi`,
+    subject: `${sub.name}, manca poco per scoprire il tuo sottogruppo`,
     html: `
       <div style="font-family: Georgia, serif; max-width: 560px; margin: 0 auto; padding: 32px; color: #1a1614; background: #ffffff;">
 
@@ -59,7 +39,8 @@ async function sendFirstReminder(sub: SubquizSubmission): Promise<void> {
         </p>
 
         <p style="font-size: 15px; line-height: 1.8; color: #3a3430; margin-bottom: 20px;">
-          ${openingParagraph}
+          sono Veronica, la fondatrice di YouGlamour. Ho visto che hai completato
+          il test dell'armocromia: sai gi&agrave; la tua stagione, ma non ancora il tuo sottogruppo.
         </p>
 
         <p style="font-size: 15px; line-height: 1.8; color: #3a3430; margin-bottom: 20px;">
@@ -70,7 +51,10 @@ async function sendFirstReminder(sub: SubquizSubmission): Promise<void> {
         </p>
 
         <p style="font-size: 15px; line-height: 1.8; color: #3a3430; margin-bottom: 20px;">
-          ${valuePropParagraph}
+          L'analisi che riceverai non la fa un algoritmo: <strong>studio personalmente
+          ogni caso</strong>, uno per uno, per identificare il <strong>tuo sottogruppo
+          preciso</strong> fra i 16 possibili. E con la scoperta del sottogruppo ricevi
+          anche un <strong>PDF completo, fatto a mano per te</strong>, con:
         </p>
 
         <ul style="font-size: 15px; line-height: 2; color: #3a3430; padding-left: 20px; margin-bottom: 24px;">
@@ -81,15 +65,13 @@ async function sendFirstReminder(sub: SubquizSubmission): Promise<void> {
           <li>i colori da evitare e quelli in "prestito" dalle stagioni vicine</li>
         </ul>
 
-        <p style="font-size: 15px; line-height: 1.8; color: #3a3430; margin-bottom: 20px;">
-          Il prezzo &egrave; davvero simbolico &mdash; chiedo solo un piccolo contributo
-          per il tempo che dedico a ogni singola analisi.
-        </p>
-
         <p style="font-size: 15px; line-height: 1.8; color: #3a3430; margin-bottom: 28px;">
           Per ringraziarti di aver completato il test, ho riservato per te
           uno <strong style="color: #c9a96e;">sconto speciale</strong>: invece di 9,90&euro;,
           la tua analisi ti costa solo <strong style="color: #c9a96e;">7&euro;</strong>.
+          Pi&ugrave; o meno una colazione al bar sotto casa mia a Milano &mdash;
+          cappuccino d'avena e brioche. Solo che la colazione la finisci in dieci minuti,
+          l'analisi ti resta.
         </p>
 
         <div style="text-align: center; margin-bottom: 28px;">
