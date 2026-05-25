@@ -109,7 +109,7 @@ async function sendSecondReminder(sub: SubquizSubmission): Promise<void> {
   await getResend().emails.send({
     from: 'Veronica di YouGlamour <veronica@youglamour.it>',
     to: sub.email,
-    subject: `${sub.name}, lo sconto sulla tua analisi &egrave; ancora valido`,
+    subject: `${sub.name}, il tuo sottogruppo ti aspetta ancora`,
     html: `
       <div style="font-family: Georgia, serif; max-width: 560px; margin: 0 auto; padding: 32px; color: #1a1614; background: #ffffff;">
 
@@ -118,32 +118,37 @@ async function sendSecondReminder(sub: SubquizSubmission): Promise<void> {
         </p>
 
         <p style="font-size: 15px; line-height: 1.8; color: #3a3430; margin-bottom: 20px;">
-          ieri ti ho scritto a proposito della tua <strong>analisi armocromatica personalizzata</strong>.
-          So che le mail a volte si perdono &mdash; non volevo farti perdere lo sconto
-          che ho riservato per te.
+          ieri ti ho scritto a proposito della tua analisi: <strong>il tuo sottogruppo
+          preciso fra i 16 possibili</strong>, pi&ugrave; il PDF personalizzato con palette,
+          make-up e outfit. Volevo solo ricordarti che lo sconto &egrave; ancora qui per te.
         </p>
 
         <p style="font-size: 15px; line-height: 1.8; color: #3a3430; margin-bottom: 28px;">
-          Hai ancora qualche giorno per ricevere il tuo <strong>PDF personalizzato</strong>
-          con palette, make-up e outfit, al prezzo speciale di <strong style="color: #c9a96e;">7&euro;</strong>
-          invece di 9,90&euro;.
+          Hai ancora qualche giorno per averla a
+          <strong style="color: #c9a96e;">7&euro;</strong> invece di 9,90&euro;
+          &mdash; lo sconto che ho riservato per chi ha completato il test.
         </p>
 
-        <div style="text-align: center; margin-bottom: 32px;">
+        <div style="text-align: center; margin-bottom: 28px;">
           <a href="${scontoUrl}"
              style="display: inline-block; background: #1a1614; color: #faf7f2; text-decoration: none;
                     padding: 16px 40px; border-radius: 100px; font-family: 'Helvetica Neue', Arial, sans-serif;
                     font-size: 15px; font-weight: 600;">
-            Sblocca la tua analisi a 7&euro; &#x2726;
+            Ricevi la tua analisi a 7&euro; &#x2726;
           </a>
         </div>
+
+        <p style="font-size: 13px; color: #9a8e88; text-align: center; margin-bottom: 28px;">
+          &#x1F512; Pagamento sicuro con Stripe
+        </p>
 
         <div style="border-top: 1px solid #e8e0d8; padding-top: 20px;">
           <p style="font-size: 14px; line-height: 1.7; color: #3a3430; margin-bottom: 4px;">
             A presto,
           </p>
           <p style="font-size: 14px; line-height: 1.7; color: #3a3430; margin-bottom: 0;">
-            <strong>Veronica</strong>
+            <strong>Veronica</strong><br>
+            <span style="color: #9a8e88; font-size: 13px;">Fondatrice di YouGlamour &middot; Consulente di armocromia</span>
           </p>
         </div>
 
