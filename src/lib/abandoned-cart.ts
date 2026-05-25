@@ -171,7 +171,7 @@ async function sendThirdReminder(sub: SubquizSubmission): Promise<void> {
   await getResend().emails.send({
     from: 'Veronica di YouGlamour <veronica@youglamour.it>',
     to: sub.email,
-    subject: `${sub.name}, una nota veloce sulla tua analisi`,
+    subject: `${sub.name}, ultimo giorno per averla a 7€`,
     html: `
       <div style="font-family: Georgia, serif; max-width: 560px; margin: 0 auto; padding: 32px; color: #1a1614; background: #ffffff;">
 
@@ -180,23 +180,25 @@ async function sendThirdReminder(sub: SubquizSubmission): Promise<void> {
         </p>
 
         <p style="font-size: 15px; line-height: 1.8; color: #3a3430; margin-bottom: 20px;">
-          volevo dirti che <strong>domani lo sconto che ho riservato per te scade</strong>.
-          Non voglio essere insistente &mdash; solo non volevo che ti sfuggisse tra le altre mail.
+          volevo solo segnalarti che <strong>domani lo sconto che ho riservato per te scade</strong>.
+          Te lo dico perch&eacute; pu&ograve; sfuggire tra le mail della giornata.
         </p>
 
         <p style="font-size: 15px; line-height: 1.8; color: #3a3430; margin-bottom: 20px;">
-          Non perch&eacute; voglia metterti fretta: lo sconto del 20% &egrave; pensato come piccolo
-          ringraziamento per chi sceglie di completare il percorso subito dopo il test.
-          Dopo, semplicemente, l'analisi torna al suo prezzo normale di 9,90&euro;.
+          Lo sconto a <strong style="color: #c9a96e;">7&euro;</strong> invece di 9,90&euro;
+          &egrave; un piccolo ringraziamento per chi completa il percorso subito dopo il test.
+          Dopodomani l'analisi torna al prezzo normale.
         </p>
 
         <p style="font-size: 15px; line-height: 1.8; color: #3a3430; margin-bottom: 28px;">
-          Se in questi giorni hai pensato di farla e l'hai lasciata l&igrave;,
-          questo &egrave; il momento giusto. E se invece preferisci aspettare, va benissimo
-          &mdash; puoi sempre tornare quando vorrai, al prezzo intero.
+          Se in questi giorni hai pensato di farla e l'hai lasciata l&igrave; &mdash;
+          <strong>il tuo sottogruppo fra i 16 possibili</strong>, pi&ugrave; il PDF completo
+          con palette, make-up e outfit &mdash; questo &egrave; il momento giusto.
+          E se preferisci aspettare, va benissimo lo stesso: puoi tornare quando vorrai,
+          al prezzo intero.
         </p>
 
-        <div style="text-align: center; margin-bottom: 32px;">
+        <div style="text-align: center; margin-bottom: 28px;">
           <a href="${scontoUrl}"
              style="display: inline-block; background: #1a1614; color: #faf7f2; text-decoration: none;
                     padding: 16px 40px; border-radius: 100px; font-family: 'Helvetica Neue', Arial, sans-serif;
@@ -205,12 +207,17 @@ async function sendThirdReminder(sub: SubquizSubmission): Promise<void> {
           </a>
         </div>
 
+        <p style="font-size: 13px; color: #9a8e88; text-align: center; margin-bottom: 28px;">
+          &#x1F512; Pagamento sicuro con Stripe
+        </p>
+
         <div style="border-top: 1px solid #e8e0d8; padding-top: 20px;">
           <p style="font-size: 14px; line-height: 1.7; color: #3a3430; margin-bottom: 4px;">
             A presto,
           </p>
           <p style="font-size: 14px; line-height: 1.7; color: #3a3430; margin-bottom: 0;">
-            <strong>Veronica</strong>
+            <strong>Veronica</strong><br>
+            <span style="color: #9a8e88; font-size: 13px;">Fondatrice di YouGlamour &middot; Consulente di armocromia</span>
           </p>
         </div>
 
