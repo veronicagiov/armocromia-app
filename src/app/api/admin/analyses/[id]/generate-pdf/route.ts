@@ -18,12 +18,20 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
   }
 
   try {
+    let photoPath: string | undefined
+    try {
+      const photos: string[] = JSON.parse(analysis.photos || '[]')
+      const first = photos.find((p) => p && fs.existsSync(p))
+      if (first) photoPath = first
+    } catch { /* photos malformato: salta l'embed */ }
+
     const pdfBuffer = await generatePDF({
       customerName: analysis.customer_name,
       customerEmail: analysis.customer_email,
       season: analysis.season,
       subgroup: analysis.subgroup || seasonToAssoluto(analysis.season),
       notes: analysis.notes,
+      photoPath,
     })
 
     const pdfDir = path.join(DATA_DIR, 'pdfs')

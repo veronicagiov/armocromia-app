@@ -4,7 +4,7 @@
 
 App web per analisi armocromatica personalizzata. Permette agli utenti di scoprire la propria stagione e sottogruppo armocromatico, caricare foto per l'analisi e ricevere un PDF personalizzato con palette colori, consigli make-up e outfit.
 
-**Stack:** Next.js 14 (App Router) · SQLite · Stripe · Resend · Claude API · pdfkit
+**Stack:** Next.js 14 (App Router) · SQLite · Stripe · Resend · Claude API · @react-pdf/renderer
 
 ---
 
@@ -213,17 +213,21 @@ File: `armocromia.db` in `STORAGE_PATH` o `/storage` o `./data`
 
 ## PDF personalizzato
 
-Generato con pdfkit (A4). Contenuto per ogni sottogruppo:
-- Se il sottogruppo non e' specificato o e' uguale al nome della stagione, viene automaticamente mappato alla variante "Assoluta/Assoluto" (es. "Primavera" → "Primavera Assoluta")
-- Copertina con nome stagione e sottogruppo
-- Descrizione dettagliata del sottogruppo
-- 4 caratteristiche chiave
-- Palette 30+ colori con nomi e hex
-- 6 colori da evitare
-- 5 colori "prestito" dal sottogruppo vicino
-- Consigli make-up (fondotinta, blush, rossetto, ombretti, eyeliner)
-- 6 consigli stile e outfit
-- Libro consigliato con link Amazon
+Generato con `@react-pdf/renderer` (A4, 4 pagine). Layout editoriale ispirato a una pagina magazine di armocromia. Sorgente: [src/lib/pdf.tsx](src/lib/pdf.tsx), copy per sottogruppo in [src/lib/pdf-copy.ts](src/lib/pdf-copy.ts).
+
+**Font**: Cormorant Garamond (serif per titoli) + Inter (sans per testo). Caricati a runtime da `node_modules/@fontsource/*/files/*.woff` via `Font.register`.
+
+**Normalizzazione**: se il sottogruppo non e' specificato o coincide col nome della stagione, viene mappato alla variante "Assoluta/Assoluto" (es. "Primavera" → "Primavera Assoluta").
+
+**Pagine**:
+1. **Copertina infografica** — foto cliente a sinistra (embedded in base64 dal path su disco; vedi sezione Privacy), titolo serif "Armocromia · personale", griglia 12 colori "Migliori colori", sezione "Il tuo sottotono" con 3 icone SVG (sole/occhio/capelli), box "Stagione più valorizzante" col sottogruppo, riga "Migliori neutri" con 7 swatch.
+2. **La tua palette** — griglia 12 colori principali + sezione "Confronto con le altre stagioni" (4 strisce Primavera/Estate/Autunno/Inverno con check sulla stagione della cliente) + 5 colori dal sottogruppo confinante + 6 colori da evitare con ✕.
+3. **Guida rapida** — 4 blocchi dal copy curato per sottogruppo: Punti di forza, Cosa valorizza, Cosa evitare, Consiglio di stile. Sotto, "Make-up — i tuoi alleati" con 6 micro-consigli (fondotinta, correttore, blush, illuminante, labbra, occhi).
+4. **Chiusura** — messaggio personalizzato col nome cliente, box "Il tuo profilo" col sottogruppo, link al libro Amazon della stagione, email di contatto.
+
+**Copy per sottogruppo** ([src/lib/pdf-copy.ts](src/lib/pdf-copy.ts)): 16 sottogruppi × 4 blocchi (strengths, valorizza, evita, stileAdvice). Da editare direttamente nel file `pdf-copy.ts`: ogni sottogruppo è una chiave di `SUBGROUP_COPY`.
+
+**Foto cliente**: il route `generate-pdf` legge `analysis.photos[0]` da disco e lo passa come `photoPath` a `generatePDF`. La foto viene embeddata come data URI base64 dentro il PDF. Il file originale su disco viene poi cancellato in fase di `send` (vedi sezione Privacy) — la foto vive solo dentro il PDF inviato alla cliente.
 
 ---
 
