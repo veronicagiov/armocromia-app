@@ -6,6 +6,8 @@
  * - accostamenti: 3 base + 2 neutri + 4 extra per ispirare combinazioni outfit
  * - smalti: 6 colori smalto consigliati
  * - smaltiIntro: 1-2 frasi che spiegano la scelta degli smalti
+ * - gioielli: 6-8 metalli/pietre per accessori (ognuno con nome e hex rappresentativo)
+ * - gioielliIntro: 1-2 frasi sulla scelta di metalli e pietre
  */
 
 export interface PaletteColor {
@@ -24,6 +26,8 @@ export interface SubgroupData {
   }
   smalti: PaletteColor[]
   smaltiIntro: string
+  gioielli: PaletteColor[]
+  gioielliIntro: string
 }
 
 export const SUBGROUP_DATA: Record<string, SubgroupData> = {
@@ -77,6 +81,16 @@ export const SUBGROUP_DATA: Record<string, SubgroupData> = {
     ],
     smaltiIntro:
       'Smalti caldi e luminosi che valorizzano la tua mano: nude pesca, corallo brillante, oro champagne. Evita rossi freddi e bordeaux.',
+    gioielliIntro:
+      'Oro giallo, rame e legno chiaro sono i tuoi metalli signature. Tra le pietre, scegli quelle calde e luminose.',
+    gioielli: [
+      { name: 'Oro giallo', hex: '#FFD700' },
+      { name: 'Rame', hex: '#B86020' },
+      { name: 'Ambra', hex: '#FFBF00' },
+      { name: 'Corallo', hex: '#FF7F50' },
+      { name: 'Turchese caldo', hex: '#40C8B0' },
+      { name: 'Citrino', hex: '#E8C040' },
+    ],
   },
 
   'Spring Light': {
@@ -128,6 +142,16 @@ export const SUBGROUP_DATA: Record<string, SubgroupData> = {
     ],
     smaltiIntro:
       'I tuoi smalti perfetti sono leggeri, luminosi e dolci: pesca tenue, nude caldo, corallo soft. Stop ai colori scuri o troppo saturi.',
+    gioielliIntro:
+      'Oro chiaro e oro rosa esaltano la tua luminosità delicata. Le pietre giuste sono quelle calde e tenui, mai troppo intense.',
+    gioielli: [
+      { name: 'Oro chiaro', hex: '#F0D880' },
+      { name: 'Oro rosa', hex: '#E8B4A8' },
+      { name: 'Perla pesca', hex: '#FFDAB9' },
+      { name: 'Quarzo rosa caldo', hex: '#F4C2C2' },
+      { name: 'Acquamarina chiara', hex: '#B8DCE8' },
+      { name: 'Corallo tenue', hex: '#FFA08C' },
+    ],
   },
 
   'Spring Warm': {
@@ -179,6 +203,16 @@ export const SUBGROUP_DATA: Record<string, SubgroupData> = {
     ],
     smaltiIntro:
       'Smalti dai toni terra e bronzo che dialogano con il tuo sottotono caldo: terracotta, caramello, oro antico. Evita rosa freddi e argento.',
+    gioielliIntro:
+      'Oro antico, rame e bronzo sono i tuoi metalli. Tra le pietre, le terre calde sono le tue alleate.',
+    gioielli: [
+      { name: 'Oro antico', hex: '#C89030' },
+      { name: 'Rame', hex: '#B86020' },
+      { name: 'Bronzo', hex: '#C07832' },
+      { name: 'Ambra', hex: '#FFBF00' },
+      { name: 'Topazio', hex: '#FFC080' },
+      { name: 'Carniola', hex: '#B05028' },
+    ],
   },
 
   'Spring Bright': {
@@ -230,6 +264,16 @@ export const SUBGROUP_DATA: Record<string, SubgroupData> = {
     ],
     smaltiIntro:
       'Smalti vivaci e brillanti per la tua palette accesa: corallo, fucsia caldo, turchese. Evita toni smorzati o pastel sbiaditi.',
+    gioielliIntro:
+      'Oro lucido e pietre vivaci accompagnano la tua brillantezza. Punta sui colori puri e luminosi.',
+    gioielli: [
+      { name: 'Oro lucido', hex: '#E8C040' },
+      { name: 'Turchese vivido', hex: '#00C8C0' },
+      { name: 'Smeraldo caldo', hex: '#008060' },
+      { name: 'Corallo brillante', hex: '#FF4830' },
+      { name: 'Citrino vivido', hex: '#F8E000' },
+      { name: 'Ambra brillante', hex: '#FFB000' },
+    ],
   },
 
   // ── ESTATE ─────────────────────────────────────────────────────────────────
@@ -282,6 +326,16 @@ export const SUBGROUP_DATA: Record<string, SubgroupData> = {
     ],
     smaltiIntro:
       'Smalti delicati e freddi che assecondano la tua armonia: rosa cipria, malva, nude freddo. Stop a corallo, terracotta e oro giallo.',
+    gioielliIntro:
+      'Argento, platino e perle sono i tuoi metalli. Tra le pietre, scegli quelle fredde e sfumate.',
+    gioielli: [
+      { name: 'Argento', hex: '#C0C0C8' },
+      { name: 'Platino', hex: '#D8D8E0' },
+      { name: 'Perla bianca', hex: '#F0F0F0' },
+      { name: 'Quarzo rosa freddo', hex: '#E8C8C8' },
+      { name: 'Ametista soft', hex: '#B58FB0' },
+      { name: 'Madreperla', hex: '#F5F0E8' },
+    ],
   },
 
   'Summer Light': {
@@ -333,6 +387,16 @@ export const SUBGROUP_DATA: Record<string, SubgroupData> = {
     ],
     smaltiIntro:
       'I tuoi smalti perfetti sono i pastelli freddi: rosa cipria chiara, lavanda pallida, nude freddo. Evita rossi caldi, ori e neri pieni.',
+    gioielliIntro:
+      'Argento opaco e perle accompagnano la tua leggerezza luminosa. Cerca pietre fredde con trasparenze delicate.',
+    gioielli: [
+      { name: 'Argento opaco', hex: '#C8C8D0' },
+      { name: 'Perla bianca', hex: '#F0F0F8' },
+      { name: 'Madreperla', hex: '#F5F0E8' },
+      { name: 'Acquamarina chiara', hex: '#B8DCE8' },
+      { name: 'Pietra di luna', hex: '#E0E0E8' },
+      { name: 'Quarzo rosa chiaro', hex: '#F4C8D0' },
+    ],
   },
 
   'Summer Soft': {
@@ -384,6 +448,16 @@ export const SUBGROUP_DATA: Record<string, SubgroupData> = {
     ],
     smaltiIntro:
       'Smalti smorzati e vellutati che amplificano la tua eleganza discreta: malva polveroso, nude taupe, bordeaux soft. Stop a colori puri e brillanti.',
+    gioielliIntro:
+      'Argento antico, ottone spazzolato e pietre smorzate si fondono con la tua qualità vellutata.',
+    gioielli: [
+      { name: 'Argento antico', hex: '#B0A8B0' },
+      { name: 'Perla taupe', hex: '#C0B8B8' },
+      { name: 'Quarzo fumé', hex: '#A89898' },
+      { name: 'Ametista soft', hex: '#B89AA8' },
+      { name: 'Pietra grigia', hex: '#B0B0B8' },
+      { name: 'Tormalina rosa fredda', hex: '#C09898' },
+    ],
   },
 
   'Summer Cool': {
@@ -435,6 +509,16 @@ export const SUBGROUP_DATA: Record<string, SubgroupData> = {
     ],
     smaltiIntro:
       'Smalti freddi con più profondità: prugna, bordeaux rosato, lampone. Evita arancio, terracotta e tutti gli ori caldi.',
+    gioielliIntro:
+      'Argento, platino e pietre fredde con carattere accompagnano la tua eleganza profonda.',
+    gioielli: [
+      { name: 'Argento', hex: '#B8B8C8' },
+      { name: 'Platino', hex: '#C8C8D8' },
+      { name: 'Ametista', hex: '#6040A0' },
+      { name: 'Acquamarina', hex: '#5878A8' },
+      { name: 'Tormalina rosa fredda', hex: '#C84A6E' },
+      { name: 'Pietra di luna fredda', hex: '#C0D8E8' },
+    ],
   },
 
   // ── AUTUNNO ────────────────────────────────────────────────────────────────
@@ -487,6 +571,16 @@ export const SUBGROUP_DATA: Record<string, SubgroupData> = {
     ],
     smaltiIntro:
       'Smalti caldi e ricchi che si fondono col tuo sottotono dorato: ruggine, terracotta, bronzo, borgogna. Stop a rosa freddi e argento.',
+    gioielliIntro:
+      'Oro antico, rame e bronzo sono i tuoi metalli signature. Le pietre calde e terrose ti incorniciano alla perfezione.',
+    gioielli: [
+      { name: 'Oro antico', hex: '#C89030' },
+      { name: 'Rame', hex: '#B86020' },
+      { name: 'Bronzo', hex: '#C07832' },
+      { name: 'Ambra', hex: '#FFBF00' },
+      { name: 'Turchese caldo', hex: '#2E8B96' },
+      { name: 'Diaspro rosso', hex: '#A05028' },
+    ],
   },
 
   'Autumn Soft': {
@@ -538,6 +632,16 @@ export const SUBGROUP_DATA: Record<string, SubgroupData> = {
     ],
     smaltiIntro:
       'Smalti caldi smorzati che valorizzano il tuo tono velato: cammello, bronzo antico, nude terra. Evita colori brillanti o troppo saturi.',
+    gioielliIntro:
+      'Oro antico spazzolato, ottone e pietre opache si fondono con la tua morbidezza calda.',
+    gioielli: [
+      { name: 'Oro antico opaco', hex: '#A07840' },
+      { name: 'Bronzo opaco', hex: '#98682A' },
+      { name: 'Ambra smorzata', hex: '#C8A040' },
+      { name: 'Diaspro', hex: '#B07050' },
+      { name: 'Quarzo fumé caldo', hex: '#806848' },
+      { name: 'Topazio opaco', hex: '#B8884A' },
+    ],
   },
 
   'Autumn Warm': {
@@ -589,6 +693,16 @@ export const SUBGROUP_DATA: Record<string, SubgroupData> = {
     ],
     smaltiIntro:
       'Smalti caldi e luminosi tra Autunno e Primavera: caramello, pesca dorato, oro vivo. Stop a rosa freddi e argento.',
+    gioielliIntro:
+      'Oro giallo, rame brillante e pietre calde luminose accompagnano la tua luminosità dorata.',
+    gioielli: [
+      { name: 'Oro giallo', hex: '#E8C040' },
+      { name: 'Rame brillante', hex: '#B86020' },
+      { name: 'Ambra dorata', hex: '#E8B040' },
+      { name: 'Citrino caldo', hex: '#F0C040' },
+      { name: 'Corallo caldo', hex: '#FF7850' },
+      { name: 'Topazio dorato', hex: '#E8B060' },
+    ],
   },
 
   'Autumn Deep': {
@@ -640,6 +754,16 @@ export const SUBGROUP_DATA: Record<string, SubgroupData> = {
     ],
     smaltiIntro:
       'Smalti profondi e caldi all\'altezza del tuo magnetismo: bordeaux scuro, prugna calda, cioccolato. Stop a colori chiari e freddi.',
+    gioielliIntro:
+      'Oro antico scuro, bronzo scuro e pietre profonde valorizzano la tua intensità calda.',
+    gioielli: [
+      { name: 'Oro antico scuro', hex: '#9A6F1E' },
+      { name: 'Bronzo scuro', hex: '#805020' },
+      { name: 'Granato', hex: '#7C0A02' },
+      { name: 'Ambra scura', hex: '#B07020' },
+      { name: 'Onice marrone', hex: '#3A1F12' },
+      { name: 'Occhio di tigre', hex: '#8B6020' },
+    ],
   },
 
   // ── INVERNO ────────────────────────────────────────────────────────────────
@@ -692,6 +816,16 @@ export const SUBGROUP_DATA: Record<string, SubgroupData> = {
     ],
     smaltiIntro:
       'Smalti netti e definiti come la tua palette: rosso freddo intenso, nero, fucsia, bordeaux. Stop a tutti i toni caldi/dorati.',
+    gioielliIntro:
+      'Argento, platino e pietre cristalline esaltano il tuo contrasto. Vai sul puro, mai sul tiepido.',
+    gioielli: [
+      { name: 'Argento', hex: '#B8B8C8' },
+      { name: 'Platino', hex: '#D0D0D8' },
+      { name: 'Diamante', hex: '#F0F0F8' },
+      { name: 'Rubino freddo', hex: '#CC0010' },
+      { name: 'Zaffiro', hex: '#0A1850' },
+      { name: 'Smeraldo', hex: '#008050' },
+    ],
   },
 
   'Winter Cool': {
@@ -743,6 +877,16 @@ export const SUBGROUP_DATA: Record<string, SubgroupData> = {
     ],
     smaltiIntro:
       'Smalti freddi delicati per la tua armonia sfumata: rosa freddo, malva, carminio. Stop a corallo e dorati caldi.',
+    gioielliIntro:
+      'Argento e pietre fredde delicate accompagnano la tua armonia sfumata.',
+    gioielli: [
+      { name: 'Argento', hex: '#B8B8C8' },
+      { name: 'Platino', hex: '#D0D0D8' },
+      { name: 'Acquamarina', hex: '#B8D0E0' },
+      { name: 'Ametista chiara', hex: '#B89AB8' },
+      { name: 'Tormalina rosa fredda', hex: '#D8A0B8' },
+      { name: 'Cristallo', hex: '#E0E0E8' },
+    ],
   },
 
   'Winter Bright': {
@@ -794,6 +938,16 @@ export const SUBGROUP_DATA: Record<string, SubgroupData> = {
     ],
     smaltiIntro:
       'Smalti vivaci e brillanti come la tua palette: fucsia, smeraldo, rosso intenso, viola. Evita tutti i toni smorzati.',
+    gioielliIntro:
+      'Argento lucido e pietre vivaci come la tua palette: i contrasti sono il tuo segno distintivo.',
+    gioielli: [
+      { name: 'Argento lucido', hex: '#C8C8D0' },
+      { name: 'Cristallo', hex: '#F0F0F8' },
+      { name: 'Smeraldo', hex: '#008050' },
+      { name: 'Rubino freddo', hex: '#E80020' },
+      { name: 'Zaffiro brillante', hex: '#3A5ACC' },
+      { name: 'Ametista vivace', hex: '#6A0080' },
+    ],
   },
 
   'Winter Deep': {
@@ -845,5 +999,15 @@ export const SUBGROUP_DATA: Record<string, SubgroupData> = {
     ],
     smaltiIntro:
       'Smalti scuri e intensi all\'altezza della tua profondità: bordeaux scuro, nero, rosso freddo, smeraldo scuro. Stop a tutti i caldi.',
+    gioielliIntro:
+      'Argento, platino e pietre profonde scure incorniciano la tua bellezza magnetica.',
+    gioielli: [
+      { name: 'Argento', hex: '#A8A8B8' },
+      { name: 'Platino', hex: '#B8B8C0' },
+      { name: 'Onice nero', hex: '#0F0F12' },
+      { name: 'Zaffiro scuro', hex: '#0A1830' },
+      { name: 'Granato scuro', hex: '#4A0010' },
+      { name: 'Smeraldo scuro', hex: '#005038' },
+    ],
   },
 }

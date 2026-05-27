@@ -536,6 +536,16 @@ function GiftIcon({ color, size = 22 }: { color: string; size?: number }) {
     </Svg>
   )
 }
+function GemIcon({ color, size = 18 }: { color: string; size?: number }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24">
+      <Path d="M6 3 L18 3 L22 9 L12 22 L2 9 Z" stroke={color} strokeWidth={1.3} fill="none" strokeLinejoin="round" />
+      <Path d="M2 9 H22" stroke={color} strokeWidth={1.3} />
+      <Path d="M9 3 L7 9 L12 22" stroke={color} strokeWidth={1} fill="none" />
+      <Path d="M15 3 L17 9 L12 22" stroke={color} strokeWidth={1} fill="none" />
+    </Svg>
+  )
+}
 
 // ── HELPER COMPONENTI ────────────────────────────────────────────────────────
 function Swatch({ color, w = 50, h = 50, labelSize = 6 }: { color: PaletteColor; w?: number; h?: number; labelSize?: number }) {
@@ -858,6 +868,23 @@ function PageGuide({ data, subgroup }: { data: SeasonInfo; subgroup: string }) {
       <View style={{ flexDirection: 'row', gap: 8, marginBottom: 8 }}>
         {block('Colori da evitare', BanIcon, copy.evita)}
         {block('Consigli di stile', PencilIcon, copy.stileAdvice)}
+      </View>
+
+      {/* Gioielli e pietre */}
+      <View style={[styles.card, { marginBottom: 8 }]}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6, gap: 6 }}>
+          <GemIcon color={data.accent} size={16} />
+          <Text style={styles.cardTitle}>Gioielli e pietre</Text>
+        </View>
+        <Text style={{ fontSize: 8, color: '#7A6A5C', marginBottom: 8, lineHeight: 1.4 }}>{sg.gioielliIntro}</Text>
+        <View style={{ flexDirection: 'row', gap: 4 }}>
+          {sg.gioielli.map((p, i) => (
+            <View key={i} style={{ flex: 1, alignItems: 'center' }}>
+              <View style={{ width: 38, height: 38, borderRadius: 19, backgroundColor: p.hex, borderWidth: isLightColor(p.hex) ? 0.5 : 0, borderColor: '#E5D8C9' }} />
+              <Text style={{ fontSize: 6, color: '#7A6A5C', textTransform: 'uppercase', letterSpacing: 0.4, textAlign: 'center', marginTop: 3, lineHeight: 1.2 }}>{p.name}</Text>
+            </View>
+          ))}
+        </View>
       </View>
 
       {/* Accostamenti colori */}
