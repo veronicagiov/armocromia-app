@@ -18,9 +18,20 @@ function getResend(): Resend {
   return new Resend(process.env.RESEND_API_KEY)
 }
 
+function getBaseUrl(): string {
+  return process.env.NEXT_PUBLIC_BASE_URL || 'https://armocromia-app-production.up.railway.app'
+}
+
 function getScontoUrl(sub: SubquizSubmission): string {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://armocromia-app-production.up.railway.app'
-  return `${baseUrl}/sconto?email=${encodeURIComponent(sub.email)}&name=${encodeURIComponent(sub.name)}&season=${encodeURIComponent(sub.season)}`
+  return `${getBaseUrl()}/sconto?email=${encodeURIComponent(sub.email)}&name=${encodeURIComponent(sub.name)}&season=${encodeURIComponent(sub.season)}`
+}
+
+// Pixel invisibile 1x1 per il tracking aperture. Quando il client di posta carica
+// l'immagine, la route /api/email/open registra l'apertura della mail `n` per la
+// submission. Usato per calcolare l'open rate delle 3 mail post-subquiz.
+function getOpenPixel(sub: SubquizSubmission, mailNumber: 1 | 2 | 3): string {
+  const url = `${getBaseUrl()}/api/email/open?sid=${sub.id}&m=${mailNumber}`
+  return `<img src="${url}" width="1" height="1" alt="" style="display:none;width:1px;height:1px;border:0;" />`
 }
 
 // ─── MAIL 1 — +15 min dopo subquiz abbandonato ────────────────────────────
@@ -33,6 +44,7 @@ async function sendFirstReminder(sub: SubquizSubmission): Promise<void> {
     subject: `${sub.name}, manca poco per scoprire il tuo sottogruppo`,
     html: `
       <div style="font-family: Georgia, serif; max-width: 560px; margin: 0 auto; padding: 32px; color: #1a1614; background: #ffffff;">
+        ${getOpenPixel(sub, 1)}
 
         <p style="font-size: 16px; line-height: 1.8; color: #3a3430; margin-bottom: 20px;">
           Ciao ${sub.name},
@@ -112,6 +124,7 @@ async function sendSecondReminder(sub: SubquizSubmission): Promise<void> {
     subject: `${sub.name}, il tuo sottogruppo ti aspetta ancora`,
     html: `
       <div style="font-family: Georgia, serif; max-width: 560px; margin: 0 auto; padding: 32px; color: #1a1614; background: #ffffff;">
+        ${getOpenPixel(sub, 2)}
 
         <p style="font-size: 16px; line-height: 1.8; color: #3a3430; margin-bottom: 20px;">
           Ciao ${sub.name},
@@ -174,6 +187,7 @@ async function sendThirdReminder(sub: SubquizSubmission): Promise<void> {
     subject: `${sub.name}, ultimo giorno per averla a 7€`,
     html: `
       <div style="font-family: Georgia, serif; max-width: 560px; margin: 0 auto; padding: 32px; color: #1a1614; background: #ffffff;">
+        ${getOpenPixel(sub, 3)}
 
         <p style="font-size: 16px; line-height: 1.8; color: #3a3430; margin-bottom: 20px;">
           Ciao ${sub.name},

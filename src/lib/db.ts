@@ -273,6 +273,23 @@ try {
   db.exec(`ALTER TABLE subquiz_submissions ADD COLUMN reminder3_sent_at TEXT DEFAULT NULL`)
 } catch (e) { /* esiste già */ }
 
+// Aggiunge colonne per il tracking aperture (open tracking via pixel invisibile).
+// reminderN_opened = 1 alla prima apertura; reminderN_opened_at registra il primo
+// timestamp. Servono a calcolare l'open rate delle 3 mail automatiche post-subquiz.
+// reminderN_open_count conta TUTTE le aperture (incl. riaperture), mentre
+// reminderN_opened è il flag binario "aperta almeno una volta".
+for (const n of ['', '2', '3']) {
+  try {
+    db.exec(`ALTER TABLE subquiz_submissions ADD COLUMN reminder${n}_opened INTEGER DEFAULT 0`)
+  } catch (e) { /* esiste già */ }
+  try {
+    db.exec(`ALTER TABLE subquiz_submissions ADD COLUMN reminder${n}_opened_at TEXT DEFAULT NULL`)
+  } catch (e) { /* esiste già */ }
+  try {
+    db.exec(`ALTER TABLE subquiz_submissions ADD COLUMN reminder${n}_open_count INTEGER DEFAULT 0`)
+  } catch (e) { /* esiste già */ }
+}
+
 export interface SubquizSubmission {
   id: number
   name: string
@@ -287,6 +304,15 @@ export interface SubquizSubmission {
   reminder2_sent_at: string | null
   reminder3_sent: number
   reminder3_sent_at: string | null
+  reminder_opened: number
+  reminder_opened_at: string | null
+  reminder_open_count: number
+  reminder2_opened: number
+  reminder2_opened_at: string | null
+  reminder2_open_count: number
+  reminder3_opened: number
+  reminder3_opened_at: string | null
+  reminder3_open_count: number
   created_at: string
 }
 
@@ -362,6 +388,61 @@ export function markReminder2Sent(id: number): void {
 
 export function markReminder3Sent(id: number): void {
   db.prepare(`UPDATE subquiz_submissions SET reminder3_sent = 1, reminder3_sent_at = datetime('now', 'localtime') WHERE id = ?`).run(id)
+}
+
+// Registra l'apertura di una mail reminder (1, 2 o 3) per una submission, tramite
+// il pixel invisibile incluso nell'email. `_open_count` viene incrementato a OGNI
+// caricamento (conta anche le riaperture), mentre `_opened`/`_opened_at` restano
+// fissati alla PRIMA apertura (COALESCE preserva il timestamp originale).
+export function markReminderOpened(id: number, mailNumber: 1 | 2 | 3): void {
+  const n = mailNumber === 1 ? '' : String(mailNumber)
+  db.prepare(
+    `UPDATE subquiz_submissions
+     SET reminder${n}_open_count = reminder${n}_open_count + 1,
+         reminder${n}_opened = 1,
+         reminder${n}_opened_at = COALESCE(reminder${n}_opened_at, datetime('now', 'localtime'))
+     WHERE id = ?`
+  ).run(id)
+}
+
+export interface ReminderOpenStat {
+  sent: number
+  opened: number      // aperture uniche (persone diverse che hanno aperto almeno 1 volta)
+  totalOpens: number  // aperture totali, incluse le riaperture
+  rate: number        // 0..1 (opened / sent); 0 se sent === 0
+}
+
+// Open rate aggregato delle 3 mail automatiche post-subquiz.
+// Denominatore = mail effettivamente inviate (reminderN_sent = 1), così la
+// percentuale è "aperte su inviate", non su tutte le submission.
+// Il filtro date (opzionale) si applica al created_at della submission, coerente
+// con le altre metriche dell'analytics.
+export function getReminderOpenStats(dateFrom?: string, dateTo?: string): { mail1: ReminderOpenStat; mail2: ReminderOpenStat; mail3: ReminderOpenStat } {
+  const conditions: string[] = []
+  const params: string[] = []
+  if (dateFrom) { conditions.push('created_at >= ?'); params.push(dateFrom + ' 00:00:00') }
+  if (dateTo) { conditions.push('created_at <= ?'); params.push(dateTo + ' 23:59:59') }
+  const where = conditions.length > 0 ? ' WHERE ' + conditions.join(' AND ') : ''
+
+  const row = db.prepare(`
+    SELECT
+      SUM(reminder_sent)    AS sent1,  SUM(reminder_opened)    AS opened1,  SUM(reminder_open_count)    AS opens1,
+      SUM(reminder2_sent)   AS sent2,  SUM(reminder2_opened)   AS opened2,  SUM(reminder2_open_count)   AS opens2,
+      SUM(reminder3_sent)   AS sent3,  SUM(reminder3_opened)   AS opened3,  SUM(reminder3_open_count)   AS opens3
+    FROM subquiz_submissions${where}
+  `).get(...params) as Record<string, number | null>
+
+  const stat = (sent: number | null, opened: number | null, totalOpens: number | null): ReminderOpenStat => {
+    const s = sent || 0
+    const o = opened || 0
+    return { sent: s, opened: o, totalOpens: totalOpens || 0, rate: s > 0 ? o / s : 0 }
+  }
+
+  return {
+    mail1: stat(row.sent1, row.opened1, row.opens1),
+    mail2: stat(row.sent2, row.opened2, row.opens2),
+    mail3: stat(row.sent3, row.opened3, row.opens3),
+  }
 }
 
 // Submissions che hanno ricevuto la mail 1 da più di REMINDER2_DELAY_HOURS ore
@@ -528,6 +609,7 @@ export function getQuizEventsAggregated(dateFrom?: string, dateTo?: string): {
   photoUploadTime: { avg_ms: number; count: number } | null
   dailyActivity: { date: string; leads: number; subquiz: number; payments: number }[]
   seasonDistribution: { season: string; count: number }[]
+  reminderOpenStats: { mail1: ReminderOpenStat; mail2: ReminderOpenStat; mail3: ReminderOpenStat }
 } {
   // Costruisci clausola WHERE per filtro date
   const dateConditions: string[] = []
@@ -700,6 +782,7 @@ export function getQuizEventsAggregated(dateFrom?: string, dateTo?: string): {
     photoUploadTime,
     dailyActivity,
     seasonDistribution,
+    reminderOpenStats: getReminderOpenStats(dateFrom, dateTo),
   }
 }
 

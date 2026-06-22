@@ -50,6 +50,11 @@ interface AnalyticsData {
   photoUploadTime: { avg_ms: number; count: number } | null
   dailyActivity: { date: string; leads: number; subquiz: number; payments: number }[]
   seasonDistribution: { season: string; count: number }[]
+  reminderOpenStats?: {
+    mail1: { sent: number; opened: number; totalOpens: number; rate: number }
+    mail2: { sent: number; opened: number; totalOpens: number; rate: number }
+    mail3: { sent: number; opened: number; totalOpens: number; rate: number }
+  }
 }
 
 const SEASON_COLORS: Record<string, string> = {
@@ -937,7 +942,7 @@ function AnalyticsTab({ initialAnalytics }: { initialAnalytics: AnalyticsData | 
     )
   }
 
-  const { funnel, quizAnswerTimes, subquizAnswerTimes, leadFormTime, photoUploadTime, dailyActivity, seasonDistribution } = analytics
+  const { funnel, quizAnswerTimes, subquizAnswerTimes, leadFormTime, photoUploadTime, dailyActivity, seasonDistribution, reminderOpenStats } = analytics
 
   const funnelMax = Math.max(...FUNNEL_STEPS.map(s => funnel[s.event] || 0), 1)
   const hasData = funnelMax > 0 && Object.keys(funnel).length > 0
@@ -1518,6 +1523,74 @@ function AnalyticsTab({ initialAnalytics }: { initialAnalytics: AnalyticsData | 
           )
         })()}
       </div>
+
+      {/* ── OPEN RATE MAIL POST-SUBQUIZ ── */}
+      {reminderOpenStats && (
+        <div style={{ background: '#fff', border: '1px solid #E8E0D8', borderRadius: 12, padding: 28 }}>
+          <div style={{ fontSize: 11, letterSpacing: 2, textTransform: 'uppercase', color: '#999', fontWeight: 600, marginBottom: 20 }}>Open rate mail post-subquiz</div>
+          {(() => {
+            const rows = [
+              { key: 'mail1', label: 'Mail 1', sub: '+15 min', color: '#c9a96e' },
+              { key: 'mail2', label: 'Mail 2', sub: '+24h', color: '#9B7FA6' },
+              { key: 'mail3', label: 'Mail 3', sub: '+72h', color: '#E8895A' },
+            ] as const
+            const anySent = rows.some(r => reminderOpenStats[r.key].sent > 0)
+            if (!anySent) {
+              return <div style={{ color: '#ccc', fontSize: 13, padding: 20, textAlign: 'center' }}>Nessuna mail inviata nel periodo selezionato</div>
+            }
+            return (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                {rows.map(r => {
+                  const s = reminderOpenStats[r.key]
+                  const pct = Math.round(s.rate * 100)
+                  const prev = compareEnabled && previousAnalytics?.reminderOpenStats ? previousAnalytics.reminderOpenStats[r.key] : null
+                  const d = prev && prev.sent > 0 ? deltaInfo(s.rate, prev.rate) : null
+                  return (
+                    <div key={r.key} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                      <div style={{ width: 110, textAlign: 'right', flexShrink: 0 }}>
+                        <div style={{ fontSize: 13, fontWeight: 600, color: '#1a1614' }}>{r.label}</div>
+                        <div style={{ fontSize: 10, color: '#BBB' }}>{r.sub}</div>
+                      </div>
+                      <div style={{ flex: 1, height: 28, background: '#F5F3F0', borderRadius: 6, overflow: 'hidden', position: 'relative' }}>
+                        <div style={{
+                          height: '100%', borderRadius: 6,
+                          width: `${Math.max(pct, s.opened > 0 ? 2 : 0)}%`,
+                          background: r.color, transition: 'width .5s ease',
+                        }} />
+                        <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', fontSize: 12, fontWeight: 600, color: pct > 12 ? '#fff' : '#555' }}>
+                          {pct}%
+                        </span>
+                      </div>
+                      <div style={{ width: 150, fontSize: 11, color: '#999', flexShrink: 0, lineHeight: 1.4 }}>
+                        <div>{s.opened} / {s.sent} hanno aperto</div>
+                        <div style={{ color: '#BBB', fontSize: 10 }}>
+                          {s.totalOpens} aperture tot.
+                          {s.opened > 0 && ` · ${(s.totalOpens / s.opened).toFixed(1)}×/persona`}
+                        </div>
+                      </div>
+                      {compareEnabled && (
+                        <div style={{ width: 100, flexShrink: 0 }}>
+                          <div style={{ fontSize: 11, fontWeight: 600, color: d?.color || '#ccc' }}>
+                            {d ? `${d.text} vs prec.` : ''}
+                          </div>
+                          {prev && prev.sent > 0 && (
+                            <div style={{ fontSize: 10, color: '#999', fontWeight: 400, marginTop: 1 }}>
+                              prec. {Math.round(prev.rate * 100)}%
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+            )
+          })()}
+          <div style={{ fontSize: 11, color: '#BBB', marginTop: 14, lineHeight: 1.5 }}>
+            Stime via pixel di tracking. La % è "aperte su inviate" (persone uniche); "aperture tot." conta anche le riaperture (×/persona = media). I proxy immagini (es. Apple Mail Privacy) e i reload automatici dei client gonfiano i numeri, le immagini bloccate li sottostimano: utili per il trend e per confrontare le 3 mail, non come valori assoluti.
+          </div>
+        </div>
+      )}
     </div>
   )
 }
