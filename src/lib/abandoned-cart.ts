@@ -2,17 +2,10 @@ import { Resend } from 'resend'
 import {
   getSubquizById,
   markReminderSent,
-  markReminder2Sent,
-  markReminder3Sent,
-  getPendingFollowup2Submissions,
-  getPendingFollowup3Submissions,
-  DISCOUNT_EXPIRY_DAYS,
   type SubquizSubmission,
 } from './db'
 
-const REMINDER_DELAY_MS = 15 * 60 * 1000 // 15 minuti per la prima mail
-export const REMINDER2_DELAY_HOURS = 24  // mail 2: +24h dopo la mail 1
-export const REMINDER3_DELAY_HOURS = 48  // mail 3: +48h dopo la mail 2 (= +72h dopo mail 1)
+const REMINDER_DELAY_MS = 15 * 60 * 1000 // 15 minuti per la (unica) mail di recupero
 
 function getResend(): Resend {
   return new Resend(process.env.RESEND_API_KEY)
@@ -28,13 +21,13 @@ function getScontoUrl(sub: SubquizSubmission): string {
 
 // Pixel invisibile 1x1 per il tracking aperture. Quando il client di posta carica
 // l'immagine, la route /api/email/open registra l'apertura della mail `n` per la
-// submission. Usato per calcolare l'open rate delle 3 mail post-subquiz.
+// submission. Usato per calcolare l'open rate della mail post-subquiz.
 function getOpenPixel(sub: SubquizSubmission, mailNumber: 1 | 2 | 3): string {
   const url = `${getBaseUrl()}/api/email/open?sid=${sub.id}&m=${mailNumber}`
   return `<img src="${url}" width="1" height="1" alt="" style="display:none;width:1px;height:1px;border:0;" />`
 }
 
-// ─── MAIL 1 — +15 min dopo subquiz abbandonato ────────────────────────────
+// ─── MAIL 1 — +15 min dopo subquiz abbandonato (unica mail di recupero) ────
 async function sendFirstReminder(sub: SubquizSubmission): Promise<void> {
   const scontoUrl = getScontoUrl(sub)
 
@@ -114,185 +107,10 @@ async function sendFirstReminder(sub: SubquizSubmission): Promise<void> {
   })
 }
 
-// ─── MAIL 2 — +24h dopo la mail 1, breve e diretta ────────────────────────
-async function sendSecondReminder(sub: SubquizSubmission): Promise<void> {
-  const scontoUrl = getScontoUrl(sub)
-
-  await getResend().emails.send({
-    from: 'Veronica di YouGlamour <veronica@youglamour.it>',
-    to: sub.email,
-    subject: `${sub.name}, il tuo sottogruppo ti aspetta ancora`,
-    html: `
-      <div style="font-family: Georgia, serif; max-width: 560px; margin: 0 auto; padding: 32px; color: #1a1614; background: #ffffff;">
-        ${getOpenPixel(sub, 2)}
-
-        <p style="font-size: 16px; line-height: 1.8; color: #3a3430; margin-bottom: 20px;">
-          Ciao ${sub.name},
-        </p>
-
-        <p style="font-size: 15px; line-height: 1.8; color: #3a3430; margin-bottom: 20px;">
-          ieri ti ho scritto a proposito della tua analisi: <strong>il tuo sottogruppo
-          preciso fra i 16 possibili</strong>, pi&ugrave; il PDF personalizzato con palette,
-          make-up e outfit. Volevo solo ricordarti che lo sconto &egrave; ancora qui per te.
-        </p>
-
-        <p style="font-size: 15px; line-height: 1.8; color: #3a3430; margin-bottom: 28px;">
-          Hai ancora qualche giorno per averla a
-          <strong style="color: #c9a96e;">7&euro;</strong> invece di 9,90&euro;
-          &mdash; lo sconto che ho riservato per chi ha completato il test.
-        </p>
-
-        <div style="text-align: center; margin-bottom: 28px;">
-          <a href="${scontoUrl}"
-             style="display: inline-block; background: #1a1614; color: #faf7f2; text-decoration: none;
-                    padding: 16px 40px; border-radius: 100px; font-family: 'Helvetica Neue', Arial, sans-serif;
-                    font-size: 15px; font-weight: 600;">
-            Ricevi la tua analisi a 7&euro; &#x2726;
-          </a>
-        </div>
-
-        <p style="font-size: 13px; color: #9a8e88; text-align: center; margin-bottom: 28px;">
-          &#x1F512; Pagamento sicuro con Stripe
-        </p>
-
-        <div style="border-top: 1px solid #e8e0d8; padding-top: 20px;">
-          <p style="font-size: 14px; line-height: 1.7; color: #3a3430; margin-bottom: 4px;">
-            A presto,
-          </p>
-          <p style="font-size: 14px; line-height: 1.7; color: #3a3430; margin-bottom: 0;">
-            <strong>Veronica</strong><br>
-            <span style="color: #9a8e88; font-size: 13px;">Fondatrice di YouGlamour &middot; Consulente di armocromia</span>
-          </p>
-        </div>
-
-      </div>
-    `,
-  })
-}
-
-// ─── MAIL 3 — +48h dopo la mail 2 (= +72h dopo la 1), urgenza ────────────
-// Calcola dinamicamente le ore restanti prima della scadenza dello sconto,
-// basandosi su DISCOUNT_EXPIRY_DAYS e sulla timeline (mail 1 + 72h = mail 3,
-// quindi residuo = DISCOUNT_EXPIRY_DAYS*24 - 72).
-function getDiscountHoursRemaining(): number {
-  return Math.max(0, DISCOUNT_EXPIRY_DAYS * 24 - 72)
-}
-
-async function sendThirdReminder(sub: SubquizSubmission): Promise<void> {
-  const scontoUrl = getScontoUrl(sub)
-
-  await getResend().emails.send({
-    from: 'Veronica di YouGlamour <veronica@youglamour.it>',
-    to: sub.email,
-    subject: `${sub.name}, ultimo giorno per averla a 7€`,
-    html: `
-      <div style="font-family: Georgia, serif; max-width: 560px; margin: 0 auto; padding: 32px; color: #1a1614; background: #ffffff;">
-        ${getOpenPixel(sub, 3)}
-
-        <p style="font-size: 16px; line-height: 1.8; color: #3a3430; margin-bottom: 20px;">
-          Ciao ${sub.name},
-        </p>
-
-        <p style="font-size: 15px; line-height: 1.8; color: #3a3430; margin-bottom: 20px;">
-          volevo solo segnalarti che <strong>domani lo sconto che ho riservato per te scade</strong>.
-          Te lo dico perch&eacute; pu&ograve; sfuggire tra le mail della giornata.
-        </p>
-
-        <p style="font-size: 15px; line-height: 1.8; color: #3a3430; margin-bottom: 20px;">
-          Lo sconto a <strong style="color: #c9a96e;">7&euro;</strong> invece di 9,90&euro;
-          &egrave; un piccolo ringraziamento per chi completa il percorso subito dopo il test.
-          Dopodomani l'analisi torna al prezzo normale.
-        </p>
-
-        <p style="font-size: 15px; line-height: 1.8; color: #3a3430; margin-bottom: 28px;">
-          Se in questi giorni hai pensato di farla e l'hai lasciata l&igrave; &mdash;
-          <strong>il tuo sottogruppo fra i 16 possibili</strong>, pi&ugrave; il PDF completo
-          con palette, make-up e outfit &mdash; questo &egrave; il momento giusto.
-          E se preferisci aspettare, va benissimo lo stesso: puoi tornare quando vorrai,
-          al prezzo intero.
-        </p>
-
-        <div style="text-align: center; margin-bottom: 28px;">
-          <a href="${scontoUrl}"
-             style="display: inline-block; background: #1a1614; color: #faf7f2; text-decoration: none;
-                    padding: 16px 40px; border-radius: 100px; font-family: 'Helvetica Neue', Arial, sans-serif;
-                    font-size: 15px; font-weight: 600;">
-            Ricevi la tua analisi a 7&euro; &#x2726;
-          </a>
-        </div>
-
-        <p style="font-size: 13px; color: #9a8e88; text-align: center; margin-bottom: 28px;">
-          &#x1F512; Pagamento sicuro con Stripe
-        </p>
-
-        <div style="border-top: 1px solid #e8e0d8; padding-top: 20px;">
-          <p style="font-size: 14px; line-height: 1.7; color: #3a3430; margin-bottom: 4px;">
-            A presto,
-          </p>
-          <p style="font-size: 14px; line-height: 1.7; color: #3a3430; margin-bottom: 0;">
-            <strong>Veronica</strong><br>
-            <span style="color: #9a8e88; font-size: 13px;">Fondatrice di YouGlamour &middot; Consulente di armocromia</span>
-          </p>
-        </div>
-
-      </div>
-    `,
-  })
-}
-
-// ─── LAZY POLLING — invia follow-up pending (mail 2 e mail 3) ─────────────
-// Triggherato a ogni nuova submission. Recupera dal DB le submission eligible
-// per mail 2 (+24h dalla mail 1) e per mail 3 (+48h dalla mail 2 = +72h dalla 1),
-// e invia. Robusto ai riavvii del server (non dipende da setTimeout in memoria).
-async function processPendingFollowups(): Promise<void> {
-  // Mail 2
-  try {
-    const pending2 = getPendingFollowup2Submissions(REMINDER2_DELAY_HOURS)
-    for (const sub of pending2) {
-      const fresh = getSubquizById(sub.id)
-      if (!fresh || fresh.paid === 1 || fresh.reminder2_sent === 1) continue
-      if (!fresh.email || !fresh.email.includes('@')) continue
-
-      try {
-        await sendSecondReminder(fresh)
-        markReminder2Sent(fresh.id)
-        console.log(`[abandoned-cart] Mail 2 inviata a ${fresh.email} (submission #${fresh.id})`)
-      } catch (err) {
-        console.error(`[abandoned-cart] Errore invio mail 2 per submission #${fresh.id}:`, err)
-      }
-    }
-  } catch (err) {
-    console.error('[abandoned-cart] Errore in processing mail 2:', err)
-  }
-
-  // Mail 3
-  try {
-    const pending3 = getPendingFollowup3Submissions(REMINDER3_DELAY_HOURS)
-    for (const sub of pending3) {
-      const fresh = getSubquizById(sub.id)
-      if (!fresh || fresh.paid === 1 || fresh.reminder3_sent === 1) continue
-      if (!fresh.email || !fresh.email.includes('@')) continue
-
-      try {
-        await sendThirdReminder(fresh)
-        markReminder3Sent(fresh.id)
-        console.log(`[abandoned-cart] Mail 3 inviata a ${fresh.email} (submission #${fresh.id})`)
-      } catch (err) {
-        console.error(`[abandoned-cart] Errore invio mail 3 per submission #${fresh.id}:`, err)
-      }
-    }
-  } catch (err) {
-    console.error('[abandoned-cart] Errore in processing mail 3:', err)
-  }
-}
-
 // ─── ENTRY POINT — chiamato da /api/subquiz-upload su nuova submission ────
+// Schedula l'unica mail di recupero a +15 min. Robusto: il guard reminder_sent/paid
+// evita doppi invii. (La sequenza a 3 mail e' stata rimossa: solo mail 1.)
 export function scheduleAbandonedCartReminder(submissionId: number) {
-  // Lazy polling: ogni nuova submission triggera anche un check sui follow-up
-  // pending da inviare ad altre submission vecchie. Fire-and-forget.
-  processPendingFollowups().catch(err => console.error('[abandoned-cart] polling error:', err))
-
-  // Schedule mail 1 a +15 minuti per questa nuova submission
   setTimeout(async () => {
     try {
       const sub = getSubquizById(submissionId)

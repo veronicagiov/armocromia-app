@@ -378,14 +378,6 @@ export function markReminderSent(id: number): void {
   db.prepare(`UPDATE subquiz_submissions SET reminder_sent = 1, reminder_sent_at = datetime('now', 'localtime') WHERE id = ?`).run(id)
 }
 
-export function markReminder2Sent(id: number): void {
-  db.prepare(`UPDATE subquiz_submissions SET reminder2_sent = 1, reminder2_sent_at = datetime('now', 'localtime') WHERE id = ?`).run(id)
-}
-
-export function markReminder3Sent(id: number): void {
-  db.prepare(`UPDATE subquiz_submissions SET reminder3_sent = 1, reminder3_sent_at = datetime('now', 'localtime') WHERE id = ?`).run(id)
-}
-
 // Registra l'apertura di una mail reminder (1, 2 o 3) per una submission, tramite
 // il pixel invisibile incluso nell'email. `_open_count` viene incrementato a OGNI
 // caricamento (conta anche le riaperture), mentre `_opened`/`_opened_at` restano
@@ -439,38 +431,6 @@ export function getReminderOpenStats(dateFrom?: string, dateTo?: string): { mail
     mail2: stat(row.sent2, row.opened2, row.opens2),
     mail3: stat(row.sent3, row.opened3, row.opens3),
   }
-}
-
-// Submissions che hanno ricevuto la mail 1 da più di REMINDER2_DELAY_HOURS ore
-// e non hanno ancora ricevuto la mail 2, e non hanno pagato. Usato dal lazy
-// polling: ogni nuova submission triggera un check di follow-up pending.
-// Limitato per non sovraccaricare (cap di 50 per chiamata, molto generoso).
-export function getPendingFollowup2Submissions(delayHours: number): SubquizSubmission[] {
-  return db.prepare(`
-    SELECT * FROM subquiz_submissions
-    WHERE reminder_sent = 1
-      AND reminder_sent_at IS NOT NULL
-      AND reminder2_sent = 0
-      AND paid = 0
-      AND datetime(reminder_sent_at) <= datetime('now', 'localtime', '-${delayHours} hours')
-    ORDER BY reminder_sent_at ASC
-    LIMIT 50
-  `).all() as SubquizSubmission[]
-}
-
-// Submissions che hanno ricevuto la mail 2 da più di REMINDER3_DELAY_HOURS ore
-// e non hanno ancora ricevuto la mail 3, e non hanno pagato.
-export function getPendingFollowup3Submissions(delayHours: number): SubquizSubmission[] {
-  return db.prepare(`
-    SELECT * FROM subquiz_submissions
-    WHERE reminder2_sent = 1
-      AND reminder2_sent_at IS NOT NULL
-      AND reminder3_sent = 0
-      AND paid = 0
-      AND datetime(reminder2_sent_at) <= datetime('now', 'localtime', '-${delayHours} hours')
-    ORDER BY reminder2_sent_at ASC
-    LIMIT 50
-  `).all() as SubquizSubmission[]
 }
 
 // Verifica se lo sconto del reminder è scaduto per una certa email.
