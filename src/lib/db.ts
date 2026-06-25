@@ -312,11 +312,6 @@ export interface SubquizSubmission {
   created_at: string
 }
 
-// Lo sconto del reminder (`/sconto`, 7€ anziché 9,90€) scade dopo questo
-// numero di giorni dall'invio della mail. Trascorso questo periodo,
-// chi clicca il link vede il prezzo pieno.
-export const DISCOUNT_EXPIRY_DAYS = 4
-
 // UPSERT: se esiste una submission per la stessa email negli ultimi 30 minuti
 // e non e' ancora pagata, la aggiorniamo invece di crearne una nuova. Cosi' chi
 // salta le foto e poi cambia idea non genera duplicati ne' reminder doppi.
@@ -431,28 +426,6 @@ export function getReminderOpenStats(dateFrom?: string, dateTo?: string): { mail
     mail2: stat(row.sent2, row.opened2, row.opens2),
     mail3: stat(row.sent3, row.opened3, row.opens3),
   }
-}
-
-// Verifica se lo sconto del reminder è scaduto per una certa email.
-// Cerca la submission più recente con reminder inviato e calcola se sono
-// passati più di DISCOUNT_EXPIRY_DAYS giorni dall'invio.
-// Ritorna false se non c'è nessun reminder inviato per quella email
-// (così chi clicca un link "vecchio stile" senza mai aver ricevuto reminder
-// non viene bloccato — fallback al comportamento attuale).
-export function isDiscountExpiredForEmail(email: string): boolean {
-  const row = db.prepare(`
-    SELECT
-      CASE
-        WHEN datetime(reminder_sent_at) < datetime('now', 'localtime', '-${DISCOUNT_EXPIRY_DAYS} days') THEN 1
-        ELSE 0
-      END as expired
-    FROM subquiz_submissions
-    WHERE email = ? AND reminder_sent = 1 AND reminder_sent_at IS NOT NULL
-    ORDER BY reminder_sent_at DESC LIMIT 1
-  `).get(email) as { expired: number } | undefined
-
-  if (!row) return false
-  return row.expired === 1
 }
 
 export function getSubquizById(id: number): SubquizSubmission | undefined {
