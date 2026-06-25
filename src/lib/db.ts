@@ -94,10 +94,6 @@ export function seasonToAssoluto(season: string): string {
   return SEASON_TO_ASSOLUTO[season] || season
 }
 
-export function getLeadsCount(): number {
-  return (db.prepare('SELECT COUNT(*) as count FROM leads').get() as { count: number }).count
-}
-
 export function insertAnalysis(data: {
   stripe_session_id: string
   customer_name: string
